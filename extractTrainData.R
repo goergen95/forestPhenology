@@ -4,6 +4,12 @@ library(ggplot2)
 library(caret)
 photos = list.files("../data/",pattern=".tif",full.names = TRUE)
 photos = lapply(photos,stack)
+rem4=function(x){
+  #remove the 4th band from each tif
+  tmp=x[[-4]]
+  return(tmp)
+}
+photos=lapply(photos, rem4)
 trees = readOGR("../results/trees.shp")
 trees$treeID = as.factor(trees$treeID)
 trees$ID = 1:length(trees)
