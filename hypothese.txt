@@ -1,0 +1,27 @@
+2. Blattaustrieb
+	- Baumarten identifizieren durch den Zeitlichen Verlauf versch. RGB Indizes. 
+	
+Blattaustrieb:
+    - Indices
+    - Schwellenwerte
+    - Veränderung (Neuronale Netze) -> Ueberwachte Klassifikation
+
+Vorgehensweise:
+    - Training (Ueberwachte Klassifikation)
+      - Ignorieren von unterschiedlichen Beleuchtungseingenschaften
+      - Trainingsgebiete sind Gruene Blaettern
+    - Absolute Schwellenwerte aus der Grünheit setzen
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
