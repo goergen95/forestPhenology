@@ -1,0 +1,29 @@
+Gruppenmitglieder: Marvin Muesgen, Tobias Koch, Darius Goergen, Eike Schott
+
+Fragestellung:
+	- Koennen auf Grundlage von RGB Bildern Baumentitaeten segmetiert werden und anhand des Parameters (RGB Farbveraenderung) Blattaustrieb Eichen von Buchen unterschieden werden?
+
+1a. Segmentierung:
+	- Winter RGB Punktwolke
+		- Als terrain model annehmen (weniger Beblattung daher hoeherer Durchblick)
+	- Sommer RGB Punktwolke
+		- Als surface model annehmen (Vollaub kommt dem surface model naeher)
+		- Klassifizierung Punktwolke in Boden und nicht Boden Punkte vs. Punktwolke in Raster -> Rasterfilter etc. anwenden um Baumpunkte zu entfernen
+	- Aus der Differenz dann ein Canopy model errechnen
+	- Segmentierung des Canopy models
+
+1b. Bäume einmessen und Baumart bestimmen und Segementen zuordnen (Samplingstrategie waehlen, Was ist das Untersuchungsgebiet)
+
+2.	Trainingsdatensatz erstellen
+	- Trainingsdatensatz besteht aus zeitlichem Verlauf der Farbveraenderung
+	- Welche Pixel pro Segment werden verwendet?
+
+3.	Tiefes Neuronales Netzwerk mit Trainingsdaten trainieren und tunen
+
+4. 	Predictete Baumart gegen gemessene Baumart validieren.
+
+192.168.191.120/uav/club
+club19
+clubmate19
+
+Klara Lindemann 
