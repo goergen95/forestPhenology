@@ -1,3 +1,4 @@
+#Converting .csv file to point shapefile
 library(rgdal)
 library(sp)
 trees = read.csv("../data/trees_20190611.csv", sep = ";")
