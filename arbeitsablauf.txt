@@ -22,8 +22,4 @@ Fragestellung:
 
 4. 	Predictete Baumart gegen gemessene Baumart validieren.
 
-192.168.191.120/uav/club
-club19
-clubmate19
 
-Klara Lindemann 
