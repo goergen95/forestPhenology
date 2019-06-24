@@ -1,0 +1,12 @@
+Title: Exploration of impacts on the accuracy for tree species classifiaction based on UAV collected RGB time-series 
+
+Research Questions:
+RGB images collected by UAVs represent a low-cost alternative to obtain high-resoultional data of forest areas Compared to space- or aircraft borne data, RGB data lacks spectral resoultion but often shows higher spatial resoultion. Here we investigate which impacts on the classification accuracy can be observed by the parameters of spatial resolution, sampling strategy, predictor dataset and the classification model. 
+
+(1.) Does the calculation of phenological parameters over the time-series yield to accurcy increases?
+(2.) Do different resoultions/spatial aggregation levels restrain classifcation accuracies?
+(3.) Do different sampling stratgies within tree segments lead to different classification accuracies?
+(4.) Which machine learning model is best suited to classfiy tree species based on RGB data?
+
+Experimental Design:
+ We chose an experimental study design to answer above questions. We will run a selection of machine learning algorithms and classical parametric classification models (RF, MLP, MLR...) on different pre-processed datasets. These datasets will vary in their spatial resolution (between 0.04m to 2m) and different strategies to select pixels within tree segments (based on visual interpretation of orthophotos and GPS data of tree stems) will be tested. Also, classification models will be run on both, phenological parameters and RGB based indices as well as only on RGB based indices to generate insight on how much information can be retrieved from seasonal parameters. The accuracy of the different data levels will be measured by a commom accuracy measure (Kappa? AUC/ROC?) applied to the classification outcome on ?pixel/object? basis.   
