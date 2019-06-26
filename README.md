@@ -22,4 +22,4 @@ Structure to organize our code:
 - Training Preparation: a script preparing the different levels of training data for each run
 - Model Building: a script taking different levels of training data and piping it through a selection of machine learning algorithms, the models and validation results should be saved immediately and comprehensively
 - Data exploration: a script exploring the results of the experiment, possibly already creating plots, comparison values etc..
-- ![img](file:///C:/Users/dagoe/AppData/Local/Temp/msohtmlclip1/01/clip_image002.png)
+- ![img](doc/diagramm.png)
