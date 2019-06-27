@@ -2,7 +2,7 @@ library(raster)
 library(rgdal)
 library(ggplot2)
 library(caret)
-photos = list.files("../data/",pattern=".tif",full.names = TRUE)
+photos = list.files("data/",pattern=".tif",full.names = TRUE)
 photos = lapply(photos,stack)
 rem4=function(x){
   #remove the 4th band from each tif
@@ -10,7 +10,7 @@ rem4=function(x){
   return(tmp)
 }
 photos=lapply(photos, rem4)
-trees = readOGR("../results/trees.shp")
+trees = readOGR("results/trees.shp")
 trees$treeID = as.factor(trees$treeID)
 trees$ID = 1:length(trees)
 ext = bbox(trees)

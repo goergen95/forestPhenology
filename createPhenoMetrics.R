@@ -37,7 +37,7 @@ rgbIndices <- function(rgb,rgbi=c("TGI","GLI","CIVE")){
 }
 
 
-photos = list.files("../data/",pattern=".tif",full.names = TRUE)
+photos = list.files("data/",pattern=".tif",full.names = TRUE)
 photos = lapply(photos,stack)
 rem4=function(x){
   #remove the 4th band from each tif
