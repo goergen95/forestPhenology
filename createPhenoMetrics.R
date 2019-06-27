@@ -4,6 +4,8 @@ library(rgdal)
 
 
 # first we create some RGB vegetation indices, which proved useful in last years semester courses
+# should add VVI and IO, because both achived high variable importance for group bjcm 
+# IO index: 03 Red - Blue - Ratio (for Iron Oxides = IO)
 
 rgbIndices <- function(rgb,rgbi=c("TGI","GLI","CIVE")){
   
@@ -13,28 +15,46 @@ rgbIndices <- function(rgb,rgbi=c("TGI","GLI","CIVE")){
   
   
   indices <- lapply(rgbi, function(item){
+    
     if (item=="TGI"){
       # Triangular greenness index
       cat("\ncalculate Triangular greenness index (TGI)")
       TGI <- -0.5*(190*(red - green)- 120*(red - blue))
       names(TGI) <- "TGI"
       return(TGI)
+      
     } else if (item=="GLI"){
       cat("\ncalculate green leaf index (GLI)")
       # green leaf index
       GLI<-(2*green-red-blue)/(2*green+red+blue)
       names(GLI) <- "GLI"
       return(GLI)
+      
     } else if (item=="CIVE"){
       # Color Index of Vegetation (CIVE): 0.441*R - 0.881*G + 0.385*B + 18.787
       cat("\ncalculate Color Index of Vegetation (CIVE)")
       CIVE<-(0.441*red-0.881*green+0.385*blue+18.787)
       names(CIVE) <- "CIVE"
       return(CIVE)
-    }
-  })
+      
+    } else if (item=="IO"){
+      cat("\ncalculate Iron Oxide Index (IO)")
+      # IO index
+      IO<-red/blue
+      names(IO) <- "IO"
+      return(IO)
+      
+      }else if (item=="VVI"){
+        cat("\ncalculate Visible Vegetation Index (VVI)")
+        VVI <- (1 - abs((red - 30) / (red + 30))) * 
+          (1 - abs((green - 50) / (green + 50))) * 
+          (1 - abs((blue - 1) / (blue + 1)))
+        names(VVI) <- "VVI"
+        return(VVI)
+      }
+    })
   return(raster::stack(indices))
-}
+  }
 
 
 photos = list.files("data/",pattern=".tif",full.names = TRUE)
