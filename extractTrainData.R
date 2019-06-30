@@ -27,7 +27,7 @@ rem4=function(x){
 }
 photos=lapply(photos, rem4)
 
-ext = sp::bbox(rgeos::gBuffer(treesBuff,byid=FALSE, width=5))
+ext = sp::bbox(rgeos::gBuffer(treesBuff,byid=FALSE, width=10))
 
 cropTifs = function(x){
   tmp = raster::crop(x,ext)
