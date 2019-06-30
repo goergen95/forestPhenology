@@ -3,20 +3,13 @@ library(rgdal)
 library(stringr)
 library(rgeos)
 
-
-
-
-
-
 ###########################################
 # create artificial trees
-trees = rgdal::readOGR("results/trees.shp")
+trees = rgdal::readOGR("data/trees.shp")
 trees$treeID = as.factor(trees$treeID)
 trees$ID = 1:length(trees)
 treesBuff = rgeos::gBuffer(trees, byid=TRUE, width = 2.5)
 rgdal::writeOGR(treesBuff, dsn = "data/artTrees.shp",driver="ESRI Shapefile",layer="artTrees", overwrite_layer = TRUE)
-
-
 
 photos = list.files("data/",pattern=".tif",full.names = TRUE)
 photos = lapply(photos,raster::stack)
@@ -34,7 +27,6 @@ cropTifs = function(x){
   return(tmp)
 }
 photos = lapply(photos, cropTifs)
-
 
 maske = photos[[1]]
 resTifs = function(x){
