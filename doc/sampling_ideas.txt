@@ -1,0 +1,5 @@
+1. Im Umkreis von X strecke um den Mittelpunkt/ Schwerpunkt des Baumes
+
+2. Random X% der Pixel im Polygon samplen
+
+3. 
