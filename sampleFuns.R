@@ -1,7 +1,7 @@
 # functions to apply varius sampling stratgeis accross tree objects
 loadandinstall = function(mypkg) {if (!is.element(mypkg, installed.packages()[,1])){install.packages(mypkg)};
   library(mypkg, character.only = TRUE)}
-libs = c("rgdal","raster","rgeos","gdalUtils")
+libs = c("rgdal","raster","rgeos","gdalUtils","sp","magrittr")
 lapply(libs,loadandinstall)
 
 
@@ -40,3 +40,60 @@ sampleAll = function(predictors,trees,overlap=FALSE,category="specID"){
     
   }
 }
+
+
+sampleRand = function(predictors,trees,objectbased=TRUE,category="specID",nPix=2000,res=.25){
+  
+  if(!objectbased){
+    
+    specs = unique(trees@data[,category])
+    treeRas = raster::rasterize(trees,predictors,field=category)
+    predictors[is.na(treeRas)] = NA
+    data = list()
+    for (id in unique(na.omit(values(treeRas)))){
+      tmpTree = treeRas
+      tmpTree[tmpTree != id] = NA
+      tmpPred = predictors
+      tmpPred[is.na(tmpTree)] = NA
+      dataID = as.data.frame(sampleRandom(tmpPred,size = nPix,na.rm=TRUE))
+      dataID[,category] = specs[id]
+      data[[id]] = dataID
+    }
+    data = do.call("rbind",data)
+    return(data)
+    
+  }else{
+    
+    sampTree = function(object,rasters,size){
+      spPoints = sp::spsample(object,n=size,type="random")
+      allBuffer = rgeos::gBuffer(spPoints,byid=TRUE,width = res/2)
+      
+      i = 1
+      while(i <= length(spPoints)){
+      spBuffer = rgeos::gBuffer(spPoints[i,], byid = TRUE, width = res/2)
+      issue = gIntersects(spBuffer,allBuffer,byid=TRUE)
+      index = which(issue == TRUE)
+      if (length(index)==1){
+        i = i + 1
+        next}
+      index = index[-1]
+      spPoints = spPoints[-index,]
+      allBuffer = allBuffer[-index]
+      i = i + 1
+      }
+      
+      treePixels = raster::extract(rasters,spPoints,df=TRUE,na.rm=TRUE)
+      treePixels = treePixels[,-1]
+      treePixels[,category] = object@data[,category]
+      return(treePixels)
+    }
+  data = list()
+  for (tree in 1:length(trees)){
+    smpTree = sampTree(trees[tree,],predictors,nPix)
+    data[[tree]] = smpTree
+  }
+  data = do.call("rbind",data)
+  
+  }
+}
+  
