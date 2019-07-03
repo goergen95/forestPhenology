@@ -85,6 +85,24 @@ sampleRand = function(predictors,trees,objectbased=TRUE,category="specID",nPix=2
       i = i + 1
       }
       
+      missing = size - length(spPoints)
+      while (missing != 0){
+        spAdd = sp::spsample(object,n=missing,type="random")
+        spAddBuf = rgeos::gBuffer(spAdd,byid=TRUE,width=res/2)
+        issue = gIntersects(spAddBuf,allBuffer,byid=TRUE)
+        index = which(as.numeric(colSums(issue))>0)
+        if (length(index) == 0){
+          spPoints = spAdd + spPoints
+          allBuffer = rgeos::gBuffer(spPoints,byid=TRUE,width = res/2)
+          missing = size - length(spPoints)
+        }else{
+          spAdd = spAdd[-index,]
+          spPoints = spAdd + spPoints
+          allBuffer = rgeos::gBuffer(spPoints,byid=TRUE,width = res/2)
+          missing = size - length(spPoints)
+        }}
+      
+      
       treePixels = raster::extract(rasters,spPoints,df=TRUE,na.rm=TRUE)
       treePixels = treePixels[,-1]
       treePixels[,category] = object@data[,category]
