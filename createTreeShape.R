@@ -7,4 +7,4 @@ coords = trees[,2:3]
 
 treeshape = SpatialPointsDataFrame(coords=coords,proj4string = CRS(crs),data=trees[,c(1,4:8)])
 treeshape@data
-writeOGR(treeshape,dsn="results/trees.shp",driver="ESRI Shapefile",layer="trees")
+writeOGR(treeshape,dsn="data/trees.shp",driver="ESRI Shapefile",layer="trees")
