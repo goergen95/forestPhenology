@@ -12,8 +12,6 @@ predictors = projectRaster(predictors,crs =  proj4string(trees))
 names(predictors) = readRDS("data/resampled/dates.rds") #restore tif names
 category = "specID"
 
-t <- sampleAll(predictors = predictors, trees = trees, overlap = TRUE)
-
 # function to get all pixels in tree object to data.frame
 # two functionalities are implemented for the case of (non-)overlapping
 # trees. If trees do not overlap, the extraction of training data is significantly
