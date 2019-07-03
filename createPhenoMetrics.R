@@ -51,9 +51,23 @@ rgbIndices <- function(rgb,rgbi=c("TGI","GLI","CIVE")){
           (1 - abs((blue - 1) / (blue + 1)))
         names(VVI) <- "VVI"
         return(VVI)
+        
+      }else if (item=="GCC"){
+        cat("\nexcess greenness and green chromatic coordinate (GCC)")
+        GCC <- (green / (red+green+blue))
+        names(GCC) <- "GCC"
+        return(GCC)
+        
+      }else if (item=="RCC"){
+        cat("\nred chromatic coordinate (RCC)")
+        RCC <- (red / (red+green+blue))
+        names(RCC) <- "RCC"
+        return(RCC)
       }
+    
     })
-  return(raster::stack(indices))
+ 
+   return(raster::stack(indices))
   }
 
 

@@ -1,7 +1,7 @@
-library(raster)
-library(rgdal)
-library(stringr)
-library(rgeos)
+loadandinstall = function(mypkg) {if (!is.element(mypkg, installed.packages()[,1])){install.packages(mypkg)};
+  library(mypkg, character.only = TRUE)}
+libs = c("rgdal","raster","stringr","rgeos")
+lapply(libs,loadandinstall)
 
 ###########################################
 # create artificial trees
