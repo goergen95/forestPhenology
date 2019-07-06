@@ -1,13 +1,9 @@
-library(raster)
-library(rgdal)
-# better run the script of photos which already have equal resolution
-
 
 # first we create some RGB vegetation indices, which proved useful in last years semester courses
 # should add VVI and IO, because both achived high variable importance for group bjcm 
 # IO index: 03 Red - Blue - Ratio (for Iron Oxides = IO)
 
-rgbIndices <- function(rgb,rgbi=c("TGI","GLI","CIVE")){
+rgbIndices <- function(rgb,rgbi=c("TGI","GLI","CIVE","IO","VVI","GCC","RCC")){
   
   red = rgb[[1]]
   green = rgb[[2]]
@@ -70,14 +66,3 @@ rgbIndices <- function(rgb,rgbi=c("TGI","GLI","CIVE")){
    return(raster::stack(indices))
   }
 
-
-photos = list.files("data/",pattern=".tif",full.names = TRUE)
-photos = lapply(photos,stack)
-rem4=function(x){
-  #remove the 4th band from each tif
-  tmp=x[[-4]]
-  return(tmp)
-}
-photos=lapply(photos, rem4)
-
-indices = lapply(photos,rgbIndices)
