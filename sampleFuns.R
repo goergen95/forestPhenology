@@ -12,6 +12,8 @@ predictors = projectRaster(predictors,crs =  proj4string(trees))
 names(predictors) = readRDS("data/resampled/dates.rds") #restore tif names
 category = "specID"
 
+t <- sampleAll(predictors = predictors, trees = trees, overlap = TRUE)
+
 # function to get all pixels in tree object to data.frame
 # two functionalities are implemented for the case of (non-)overlapping
 # trees. If trees do not overlap, the extraction of training data is significantly
@@ -24,19 +26,23 @@ sampleAll = function(predictors,trees,overlap=FALSE,category="specID"){
     for (id in data$ID){
       data[which(data$ID == id),category] = trees@data[which(trees$ID == id),category] 
     }
-    data  = data[,-1]
+    data$treeID  = data[,1]
+    data = data[,-1]
     return(data)
     
   }else{
     
     specs = unique(trees@data[,category])
     treeRas = raster::rasterize(trees,predictors,field=category)
+    names(treeRas)=category
+    idRas = raster::rasterize(trees,predictors,field="ID")
+    names(idRas) = "treeID"
     predictors[is.na(treeRas)] = NA
     data = na.omit(as.data.frame(predictors))
     specVals = na.omit(as.data.frame(treeRas))
-    for (id in unique(specVals[,1])){
-      data[which(specVals==id),category] = as.factor(specs[id])
-    }
+    ids = na.omit(as.data.frame(idRas))
+    data = cbind(data,specVals,ids)
+    data[,category] = factor(data[,category],levels=unique(data[,category]),labels=levels(specs))
     return(data)
     
   }
@@ -49,6 +55,7 @@ sampleRand = function(predictors,trees,objectbased=TRUE,category="specID",nPix=2
     
     specs = unique(trees@data[,category])
     treeRas = raster::rasterize(trees,predictors,field=category)
+    treeID = raster::rasterize(trees,predictors,field="ID")
     predictors[is.na(treeRas)] = NA
     data = list()
     for (id in unique(na.omit(values(treeRas)))){
@@ -56,8 +63,13 @@ sampleRand = function(predictors,trees,objectbased=TRUE,category="specID",nPix=2
       tmpTree[tmpTree != id] = NA
       tmpPred = predictors
       tmpPred[is.na(tmpTree)] = NA
-      dataID = as.data.frame(sampleRandom(tmpPred,size = nPix,na.rm=TRUE))
+      tmpID = treeID
+      tmpID[is.na(tmpTree)] = NA
+      dataID = as.data.frame(sampleRandom(tmpPred,size = nPix,na.rm=TRUE,cells=TRUE))
+      ID = tmpID[dataID$cell]
       dataID[,category] = specs[id]
+      dataID$treeID = ID
+      dataID = dataID[,-1]
       data[[id]] = dataID
     }
     data = do.call("rbind",data)
@@ -109,10 +121,11 @@ sampleRand = function(predictors,trees,objectbased=TRUE,category="specID",nPix=2
   data = list()
   for (tree in 1:length(trees)){
     smpTree = sampTree(trees[tree,],predictors,nPix)
+    smpTree$treeID = trees@data$ID[tree]
     data[[tree]] = smpTree
   }
   data = do.call("rbind",data)
   
   }
 }
-  
+
