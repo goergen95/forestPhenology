@@ -1,8 +1,13 @@
 # script to apply indices and phenometrics function to raster data
 source("forestPhenology/phenoFun.R")
+loadandinstall = function(mypkg) {if (!is.element(mypkg, installed.packages()[,1])){install.packages(mypkg)};
+  library(mypkg, character.only = TRUE)}
+libs = c("rgdal","raster","rgeos","gdalUtils","sp","stringr")
+lapply(libs,loadandinstall)
+
 files = list.files("data/resampled/",patter=".tif",full.names = TRUE)
 dates = readRDS("data/resampled/dates.rds")
-
+days = stringr::str_sub(dates[seq(1,16,3)],-15,-3)
 
 for (file in files){
   RGBseries = raster::brick(file)
@@ -15,4 +20,62 @@ for (file in files){
     indices = rgbIndices(RGBseries[[seq(step,step+2,1)]],rgbi=c("TGI","GLI","CIVE","IO","VVI","GCC","RCC"))
     writeRaster(indices,filename=paste0("data/indices/indices_",days[which(steps==step)],"_",res),overwrite=TRUE)
   }
+}
+
+# function to calculate seasonal paramters
+calcPheno = function(index){
+  MAX = calc(index,max)
+  MIN = calc(index,min)
+  AMP = MAX - MIN
+  SUM = sum(index,na.rm=TRUE)
+  SD = calc(index,sd)
+  Qs = calc(index,fun=function(x) {quantile(x,probs=c(.25,.75),type=7)})# with: m = 1-p. p[k] = (k - 1) / (n - 1).
+  Q25 = Qs[[1]]
+  Q75 = Qs[[2]]
+  metrics = stack(MAX,MIN,AMP,SUM,SD,Q25,Q75)
+  VIname = str_split(names(index)[1],"_")[[1]][1]
+  names(metrics) = paste(VIname,c("_MAX","_MIN","_AMP","_SUM","_SD","_Q25","_Q76"),sep="")
+  return(metrics)
+}
+
+
+
+# apply pheno metrics for all resolutions
+res = c("res4","res8","res12","res25")
+
+for (r in res){
+
+files = list.files("data/indices/",pattern=r,full.names = TRUE)
+tmp = raster::stack(files)
+TGI = tmp[[seq(1,36,7)]]
+names(TGI) = paste("TGI_", days, sep="")
+GLI = tmp[[seq(2,37,7)]]
+names(GLI) = paste("GLI_", days, sep="")
+CIVE = tmp[[seq(3,38,7)]]
+names(CIVE) = paste("CIVE_", days, sep="")
+IO = tmp[[seq(4,39,7)]]
+names(IO) = paste("IO_", days, sep="")
+VVI = tmp[[seq(5,40,7)]]
+names(VVI) = paste("VVI_", days, sep="")
+GCC = tmp[[seq(6,41,7)]]
+names(GCC) = paste("GCC_", days, sep="")
+RCC = tmp[[seq(7,42,7)]]
+names(RCC) = paste("RCC_", days, sep="")
+
+metrics = calcPheno(TGI) 
+writeRaster(metrics, filname=paste0("data/season/season_TGI_",r,".tif"))
+metrics = calcPheno(GLI) 
+writeRaster(metrics, filname=paste0("data/season/season_GLI_",r,".tif"))
+metrics = calcPheno(CIVE) 
+writeRaster(metrics, filname=paste0("data/season/season_CIVE_",r,".tif"))
+metrics = calcPheno(IO) 
+writeRaster(metrics, filname=paste0("data/season/season_IO_",r,".tif"))
+metrics = calcPheno(VVI) 
+writeRaster(metrics, filname=paste0("data/season/season_VVI_",r,".tif"))
+metrics = calcPheno(GCC) 
+writeRaster(metrics, filname=paste0("data/season/season_GCC_",r,".tif"))
+metrics = calcPheno(RCC) 
+writeRaster(metrics, filname=paste0("data/season/season_RCC_",r,".tif"))
+print(r)
+
 }
