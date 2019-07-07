@@ -6,13 +6,12 @@ lapply(libs,loadandinstall)
 
 
 # dummy variables for development only
-trees = rgdal::readOGR("data/artTrees.shp")
-predictors = raster::brick("data/resampled/res25.tif")
-predictors = projectRaster(predictors,crs =  proj4string(trees))
-names(predictors) = readRDS("data/resampled/dates.rds") #restore tif names
-category = "specID"
+#trees = rgdal::readOGR("data/artTrees.shp")
+#predictors = raster::brick("data/resampled/res25.tif")
+#predictors = projectRaster(predictors,crs =  proj4string(trees))
+#names(predictors) = readRDS("data/resampled/dates.rds") #restore tif names
+#category = "specID"
 
-t <- sampleAll(predictors = predictors, trees = trees, overlap = TRUE)
 
 # function to get all pixels in tree object to data.frame
 # two functionalities are implemented for the case of (non-)overlapping
@@ -29,8 +28,8 @@ sampleAll = function(predictors,trees,overlap=FALSE,category="specID"){
     data$treeID  = data[,1]
     data = data[,-1]
     return(data)
-    
-  }else{
+    }
+  if (!overlap){
     
     specs = unique(trees@data[,category])
     treeRas = raster::rasterize(trees,predictors,field=category)
@@ -123,6 +122,7 @@ sampleRand = function(predictors,trees,objectbased=TRUE,category="specID",nPix=2
     smpTree = sampTree(trees[tree,],predictors,nPix)
     smpTree$treeID = trees@data$ID[tree]
     data[[tree]] = smpTree
+    print(paste0("Done with object ",tree," out of ",length(trees),"."))
   }
   data = do.call("rbind",data)
   

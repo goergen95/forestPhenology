@@ -80,7 +80,7 @@ calcPheno = function(index){
   Q75 = Qs[[2]]
   metrics = stack(MAX,MIN,AMP,SUM,SD,Q25,Q75)
   VIname = str_split(names(index)[1],"_")[[1]][1]
-  names(metrics) = paste(VIname,c("_MAX","_MIN","_AMP","_SUM","_SD","_Q25","_Q76"),sep="")
+  names(metrics) = paste(VIname,c("_MAX","_MIN","_AMP","_SUM","_SD","_Q25","_Q75"),sep="")
   return(metrics)
 }
 

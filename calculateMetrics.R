@@ -1,10 +1,13 @@
 # script to apply indices and phenometrics function to raster data
 source("forestPhenology/phenoFun.R")
+source("forestPhenology/sampleFuns.R")
 loadandinstall = function(mypkg) {if (!is.element(mypkg, installed.packages()[,1])){install.packages(mypkg)};
   library(mypkg, character.only = TRUE)}
 libs = c("rgdal","raster","rgeos","gdalUtils","sp","stringr")
 lapply(libs,loadandinstall)
 
+
+trees = readOGR("data/artTrees.shp")
 files = list.files("data/resampled/",patter=".tif",full.names = TRUE)
 dates = readRDS("data/resampled/dates.rds")
 days = stringr::str_sub(dates[seq(1,16,3)],-15,-3)
@@ -45,7 +48,7 @@ names(GCC) = paste("GCC_", days, sep="")
 RCC = tmp[[seq(7,42,7)]]
 names(RCC) = paste("RCC_", days, sep="")
 
-print(paste0("Starting with seasonal paramters for ",r,"."))
+print(paste0("Starting with seasonal parameters for ",r,"."))
 metrics = calcPheno(TGI) 
 raster::writeRaster(metrics, filename=paste0("data/season/season_TGI_",r,".tif"),overwrite=TRUE)
 print("Finished TGI parameters.")
@@ -67,5 +70,17 @@ print("Finished GCC parameters.")
 metrics = calcPheno(RCC) 
 raster::writeRaster(metrics, filename=paste0("data/season/season_RCC_",r,".tif"),overwrite=TRUE)
 print("Finished RCC parameters.")
-
+rm(TGI,GLI,CIVE,IO,VVI,GCC,RCC,metrics)
+gc()
 }
+
+
+RGB = raster::stack(list.files("data/resampled/", pattern=res[3], full.names=TRUE))
+IND = raster::stack(list.files("data/indices/", pattern=res[3], full.names=TRUE))
+SES = raster::stack(list.files("data/season/", pattern=res[3], full.names=TRUE))
+predictors = stack(RGB,IND,SES)
+data  = sampleAll(predictors, trees, overlap=TRUE,category="specID")
+data2 = sampleAll(predictors,trees,overlap=FALSE,category="specID")
+data3 = sampleRand(predictors=predictors,trees=trees,objectbased=FALSE,category="specID",nPix=1000,res=0.12)
+data4 = sampleRand(predictors,trees,objectbase=TRUE,category="specID",nPix=50,res=0.12)
+
