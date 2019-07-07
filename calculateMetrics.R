@@ -22,23 +22,6 @@ for (file in files){
   }
 }
 
-# function to calculate seasonal paramters
-calcPheno = function(index){
-  MAX = calc(index,max)
-  MIN = calc(index,min)
-  AMP = MAX - MIN
-  SUM = sum(index,na.rm=TRUE)
-  SD = calc(index,sd)
-  Qs = calc(index,fun=function(x) {quantile(x,probs=c(.25,.75),type=7)})# with: m = 1-p. p[k] = (k - 1) / (n - 1).
-  Q25 = Qs[[1]]
-  Q75 = Qs[[2]]
-  metrics = stack(MAX,MIN,AMP,SUM,SD,Q25,Q75)
-  VIname = str_split(names(index)[1],"_")[[1]][1]
-  names(metrics) = paste(VIname,c("_MAX","_MIN","_AMP","_SUM","_SD","_Q25","_Q76"),sep="")
-  return(metrics)
-}
-
-
 
 # apply pheno metrics for all resolutions
 res = c("res4","res8","res12","res25")

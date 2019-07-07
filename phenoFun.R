@@ -40,29 +40,47 @@ rgbIndices <- function(rgb,rgbi=c("TGI","GLI","CIVE","IO","VVI","GCC","RCC")){
       names(IO) <- "IO"
       return(IO)
       
-      }else if (item=="VVI"){
-        cat("\ncalculate Visible Vegetation Index (VVI)")
-        VVI <- (1 - abs((red - 30) / (red + 30))) * 
-          (1 - abs((green - 50) / (green + 50))) * 
-          (1 - abs((blue - 1) / (blue + 1)))
-        names(VVI) <- "VVI"
-        return(VVI)
-        
-      }else if (item=="GCC"){
-        cat("\nexcess greenness and green chromatic coordinate (GCC)")
-        GCC <- (green / (red+green+blue))
-        names(GCC) <- "GCC"
-        return(GCC)
-        
-      }else if (item=="RCC"){
-        cat("\nred chromatic coordinate (RCC)")
-        RCC <- (red / (red+green+blue))
-        names(RCC) <- "RCC"
-        return(RCC)
-      }
+    }else if (item=="VVI"){
+      cat("\ncalculate Visible Vegetation Index (VVI)")
+      VVI <- (1 - abs((red - 30) / (red + 30))) * 
+        (1 - abs((green - 50) / (green + 50))) * 
+        (1 - abs((blue - 1) / (blue + 1)))
+      names(VVI) <- "VVI"
+      return(VVI)
+      
+    }else if (item=="GCC"){
+      cat("\nexcess greenness and green chromatic coordinate (GCC)")
+      GCC <- (green / (red+green+blue))
+      names(GCC) <- "GCC"
+      return(GCC)
+      
+    }else if (item=="RCC"){
+      cat("\nred chromatic coordinate (RCC)")
+      RCC <- (red / (red+green+blue))
+      names(RCC) <- "RCC"
+      return(RCC)
+    }
     
-    })
- 
-   return(raster::stack(indices))
-  }
+  })
+  
+  return(raster::stack(indices))
+}
+
+
+
+# function to calculate seasonal paramters
+calcPheno = function(index){
+  MAX = calc(index,max)
+  MIN = calc(index,min)
+  AMP = MAX - MIN
+  SUM = sum(index,na.rm=TRUE)
+  SD = calc(index,sd)
+  Qs = calc(index,fun=function(x) {quantile(x,probs=c(.25,.75),type=7)})# with: m = 1-p. p[k] = (k - 1) / (n - 1).
+  Q25 = Qs[[1]]
+  Q75 = Qs[[2]]
+  metrics = stack(MAX,MIN,AMP,SUM,SD,Q25,Q75)
+  VIname = str_split(names(index)[1],"_")[[1]][1]
+  names(metrics) = paste(VIname,c("_MAX","_MIN","_AMP","_SUM","_SD","_Q25","_Q76"),sep="")
+  return(metrics)
+}
 
