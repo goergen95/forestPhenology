@@ -69,7 +69,7 @@ rgbIndices <- function(rgb,rgbi=c("TGI","GLI","CIVE","IO","VVI","GCC","RCC")){
 
 
 # function to calculate seasonal paramters
-calcPheno = function(index){
+calcPheno = function(index,cores){
   MAX = index[[1]]
   MIN = index[[1]]
   AMP = index[[1]]
@@ -80,13 +80,22 @@ calcPheno = function(index){
   
   dataArray = array(index,dim=dim(index))
   
-  MAX[] = apply(dataArray,c(1,2),function(x) max(x, na.rm=TRUE))
-  MIN[] = apply(dataArray,c(1,2),function(x) min(x, na.rm=TRUE))
-  AMP = MAX - MIN
-  SUM[] = apply(dataArray,c(1,2),function(x) sum(x, na.rm=TRUE))
-  SD[] = apply(dataArray,c(1,2),function(x) sd(x, na.rm=TRUE))
-  Q25[] = apply(dataArray,c(1,2),function(x) quantile(x,probs=c(.25),type=7,na.rm=TRUE))
-  Q75[] = apply(dataArray,c(1,2),function(x) quantile(x,probs=c(.75),type=7,na.rm=TRUE))
+  cl = makeCluster(cores)
+  MAX[] = parallel::parApply(cl, dataArray, MARGIN=c(1,2), FUN=function(x) max(x,na.rm=TRUE))
+  MIN[] = parallel::parApply(cl, dataArray, MARGIN=c(1,2), FUN=function(x) min(x,na.rm=TRUE))
+  AMP[] = MAX - MIN
+  SUM[] = parallel::parApply(cl, dataArray, MARGIN=c(1,2), FUN=function(x) sum(x,na.rm=TRUE))
+  SD[] = parallel::parApply(cl, dataArray, MARGIN=c(1,2), FUN=function(x) sd(x,na.rm=TRUE))
+  Q25[] = parallel::parApply(cl, dataArray, MARGIN=c(1,2), FUN=function(x) quantile(x,probs=c(.25),type=7,na.rm=TRUE))
+  Q75[] = parallel::parApply(cl, dataArray, MARGIN=c(1,2), FUN=function(x) quantile(x,probs=c(.75),type=7,na.rm=TRUE))
+  stopCluster(cl)
+  #MAX[] = apply(dataArray,c(1,2),function(x) max(x, na.rm=TRUE))
+  #MIN[] = apply(dataArray,c(1,2),function(x) min(x, na.rm=TRUE))
+  #AMP = MAX - MIN
+  #SUM[] = apply(dataArray,c(1,2),function(x) sum(x, na.rm=TRUE))
+  #SD[] = apply(dataArray,c(1,2),function(x) sd(x, na.rm=TRUE))
+  #Q25[] = apply(dataArray,c(1,2),function(x) quantile(x,probs=c(.25),type=7,na.rm=TRUE))
+  #Q75[] = apply(dataArray,c(1,2),function(x) quantile(x,probs=c(.75),type=7,na.rm=TRUE))
   
   metrics = stack(MAX,MIN,AMP,SUM,SD,Q25,Q75)
   VIname = str_split(names(index)[1],"_")[[1]][1]
