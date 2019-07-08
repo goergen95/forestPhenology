@@ -3,7 +3,6 @@ loadandinstall = function(mypkg) {if (!is.element(mypkg, installed.packages()[,1
 libs = c("rgdal","raster","rgeos","gdalUtils","sp","stringr")
 lapply(libs,loadandinstall)
 
-
 #Resample tifs | adapted to the new files
 photos = list.files("data/",pattern=".tif",full.names = TRUE)
 photos = lapply(photos,raster::stack)
@@ -13,6 +12,13 @@ rem4=function(x){
   return(tmp)
 }
 photos=lapply(photos, rem4)
+
+
+#Load trees in order to crop to the right extend
+trees = rgdal::readOGR("data/trees.shp")
+trees$treeID = as.factor(trees$treeID)
+trees$ID = 1:length(trees)
+treesBuff = rgeos::gBuffer(trees, byid=TRUE, width = 2.5)
 
 ext = sp::bbox(rgeos::gBuffer(treesBuff,byid=FALSE, width=10))
 
