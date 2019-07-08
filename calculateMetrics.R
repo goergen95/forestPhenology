@@ -8,7 +8,7 @@ lapply(libs,loadandinstall)
 
 
 trees = readOGR("data/artTrees.shp")
-files = list.files("data/resampled/",patter=".tif",full.names = TRUE)
+files = list.files("data/resampled",patter=".tif",full.names = TRUE)
 dates = readRDS("data/resampled/dates.rds")
 days = dates[seq(1,length(dates),3)]
 
