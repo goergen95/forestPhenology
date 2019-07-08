@@ -72,7 +72,6 @@ rgbIndices <- function(rgb,rgbi=c("TGI","GLI","CIVE","IO","VVI","GCC","RCC")){
 calcPheno = function(index,cores){
   MAX = index[[1]]
   MIN = index[[1]]
-  AMP = index[[1]]
   SUM = index[[1]]
   SD = index[[1]]
   Q25 = index[[1]]
@@ -83,7 +82,7 @@ calcPheno = function(index,cores){
   cl = makeCluster(cores)
   MAX[] = parallel::parApply(cl, dataArray, MARGIN=c(1,2), FUN=function(x) max(x,na.rm=TRUE))
   MIN[] = parallel::parApply(cl, dataArray, MARGIN=c(1,2), FUN=function(x) min(x,na.rm=TRUE))
-  AMP[] = MAX - MIN
+  AMP = MAX - MIN
   SUM[] = parallel::parApply(cl, dataArray, MARGIN=c(1,2), FUN=function(x) sum(x,na.rm=TRUE))
   SD[] = parallel::parApply(cl, dataArray, MARGIN=c(1,2), FUN=function(x) sd(x,na.rm=TRUE))
   Q25[] = parallel::parApply(cl, dataArray, MARGIN=c(1,2), FUN=function(x) quantile(x,probs=c(.25),type=7,na.rm=TRUE))
