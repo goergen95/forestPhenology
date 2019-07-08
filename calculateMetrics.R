@@ -84,3 +84,6 @@ data2 = sampleAll(predictors,trees,overlap=FALSE,category="specID")
 data3 = sampleRand(predictors=predictors,trees=trees,objectbased=FALSE,category="specID",nPix=1000,res=0.12)
 data4 = sampleRand(predictors,trees,objectbase=TRUE,category="specID",nPix=50,res=0.12)
 
+test = velox::velox(predictors)
+testdata = test$extract(trees,df = TRUE)
+testsd = test$extract(trees,df=TRUE,fun=sd)
