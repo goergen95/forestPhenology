@@ -37,8 +37,7 @@ photos = lapply(photos,resTifs)
 photos = raster::stack(photos)
 
 # 4, 8, 12, 25 cm resolution data
-tmp = raster::raster(crs=proj4string(photos),ext=extent(photos),resolution=0.04)
-res4 = raster::resample(photos,tmp)
+
 tmp = raster::raster(crs=proj4string(photos),ext=extent(photos),resolution=0.08)
 res8 = raster::resample(photos,tmp)
 tmp = raster::raster(crs=proj4string(photos),ext=extent(photos),resolution=0.12)
@@ -46,7 +45,7 @@ res12 = raster::resample(photos,tmp)
 tmp = raster::raster(crs=proj4string(photos),ext=extent(photos),resolution=0.25)
 res25 = raster::resample(photos,tmp)
 
-raster::writeRaster(res4, filename = "data/resampled/res4.tif",overwrite=TRUE)
+raster::writeRaster(photos, filename = "data/resampled/res5.tif",overwrite=TRUE)
 raster::writeRaster(res8, filename = "data/resampled/res8.tif",overwrite=TRUE)
 raster::writeRaster(res12, filename = "data/resampled/res12.tif",overwrite=TRUE)
 raster::writeRaster(res25, filename = "data/resampled/res25.tif",overwrite=TRUE)
