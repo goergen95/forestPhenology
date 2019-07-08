@@ -70,29 +70,24 @@ rgbIndices <- function(rgb,rgbi=c("TGI","GLI","CIVE","IO","VVI","GCC","RCC")){
 
 # function to calculate seasonal paramters
 calcPheno = function(index){
-  veloxObject = velox::velox(index)
-  dummy = veloxObject
-  data = list(apply(dataArray,c(1,2),FUN = function(x) max(x,na.rm=TRUE)))
-  x = velox::velox(data,extent=veloxObject$extent,res=veloxObject$res)
-  x = x$as.RasterLayer()
-  x
-  plot(x)
-  plot(t[[1]])
-  dataArray = array(unlist(veloxObject$rasterbands),dim=c(veloxObject$dim,veloxObject$nbands))
-  dummy$rasterbands[1] = list(apply(dataArray,c(1,2),max))
-  dummy$rasterbands[2] = list(apply(dataArray,c(1,2),min))
-  #dummy$rasterbands[3] = list(dummy$rasterbands[1]- dummy$rasterbands[2])
-  s = dummy$as.RasterLayer(band=2)
-  t = veloxObject$as.RasterStack()
+  MAX = index[[1]]
+  MIN = index[[1]]
+  AMP = index[[1]]
+  SUM = index[[1]]
+  SD = index[[1]]
+  Q25 = index[[1]]
+  Q75 = index[[1]]
   
+  dataArray = array(index,dim=dim(index))
   
-  MIN = calc(index,min)
+  MAX[] = apply(dataArray,c(1,2),function(x) max(x, na.rm=TRUE))
+  MIN[] = apply(dataArray,c(1,2),function(x) min(x, na.rm=TRUE))
   AMP = MAX - MIN
-  SUM = sum(index,na.rm=TRUE)
-  SD = calc(index,sd)
-  Qs = calc(index,fun=function(x) {quantile(x,probs=c(.25,.75),type=7)})# with: m = 1-p. p[k] = (k - 1) / (n - 1).
-  Q25 = Qs[[1]]
-  Q75 = Qs[[2]]
+  SUM[] = apply(dataArray,c(1,2),function(x) sum(x, na.rm=TRUE))
+  SD[] = apply(dataArray,c(1,2),function(x) sd(x, na.rm=TRUE))
+  Q25[] = apply(dataArray,c(1,2),function(x) quantile(x,probs=c(.25),type=7))
+  Q75[] = apply(dataArray,c(1,2),function(x) quantile(x,probs=c(.75),type=7))
+  
   metrics = stack(MAX,MIN,AMP,SUM,SD,Q25,Q75)
   VIname = str_split(names(index)[1],"_")[[1]][1]
   names(metrics) = paste(VIname,c("_MAX","_MIN","_AMP","_SUM","_SD","_Q25","_Q75"),sep="")
