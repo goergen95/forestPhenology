@@ -51,5 +51,5 @@ raster::writeRaster(res8, filename = "data/resampled/res8.tif",overwrite=TRUE)
 raster::writeRaster(res12, filename = "data/resampled/res12.tif",overwrite=TRUE)
 raster::writeRaster(res25, filename = "data/resampled/res25.tif",overwrite=TRUE)
 
-dates = stringr::str_sub(names(res4),-12,-1)
+dates = stringr::str_sub(names(photos)[1:9],-24,-15)
 saveRDS(dates, file ="data/resampled/dates.rds")
