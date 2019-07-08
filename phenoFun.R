@@ -85,8 +85,8 @@ calcPheno = function(index){
   AMP = MAX - MIN
   SUM[] = apply(dataArray,c(1,2),function(x) sum(x, na.rm=TRUE))
   SD[] = apply(dataArray,c(1,2),function(x) sd(x, na.rm=TRUE))
-  Q25[] = apply(dataArray,c(1,2),function(x) quantile(x,probs=c(.25),type=7))
-  Q75[] = apply(dataArray,c(1,2),function(x) quantile(x,probs=c(.75),type=7))
+  Q25[] = apply(dataArray,c(1,2),function(x) quantile(x,probs=c(.25),type=7,na.rm=TRUE))
+  Q75[] = apply(dataArray,c(1,2),function(x) quantile(x,probs=c(.75),type=7,na.rm=TRUE))
   
   metrics = stack(MAX,MIN,AMP,SUM,SD,Q25,Q75)
   VIname = str_split(names(index)[1],"_")[[1]][1]
