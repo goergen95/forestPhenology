@@ -70,7 +70,22 @@ rgbIndices <- function(rgb,rgbi=c("TGI","GLI","CIVE","IO","VVI","GCC","RCC")){
 
 # function to calculate seasonal paramters
 calcPheno = function(index){
-  MAX = calc(index,max)
+  veloxObject = velox::velox(index)
+  dummy = veloxObject
+  data = list(apply(dataArray,c(1,2),FUN = function(x) max(x,na.rm=TRUE)))
+  x = velox::velox(data,extent=veloxObject$extent,res=veloxObject$res)
+  x = x$as.RasterLayer()
+  x
+  plot(x)
+  plot(t[[1]])
+  dataArray = array(unlist(veloxObject$rasterbands),dim=c(veloxObject$dim,veloxObject$nbands))
+  dummy$rasterbands[1] = list(apply(dataArray,c(1,2),max))
+  dummy$rasterbands[2] = list(apply(dataArray,c(1,2),min))
+  #dummy$rasterbands[3] = list(dummy$rasterbands[1]- dummy$rasterbands[2])
+  s = dummy$as.RasterLayer(band=2)
+  t = veloxObject$as.RasterStack()
+  
+  
   MIN = calc(index,min)
   AMP = MAX - MIN
   SUM = sum(index,na.rm=TRUE)

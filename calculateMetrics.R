@@ -26,25 +26,25 @@ for (file in files){
 
 
 # apply pheno metrics for all resolutions
-res = c("res4","res8","res12","res25")
+res = c("res5","res8","res12","res25")
 
 for (r in res){
 
 files = list.files("data/indices/",pattern=r,full.names = TRUE)
 tmp = raster::stack(files)
-TGI = tmp[[seq(1,36,7)]]
+TGI = tmp[[seq(1,57,7)]]
 names(TGI) = paste("TGI_", days, sep="")
-GLI = tmp[[seq(2,37,7)]]
+GLI = tmp[[seq(2,58,7)]]
 names(GLI) = paste("GLI_", days, sep="")
-CIVE = tmp[[seq(3,38,7)]]
+CIVE = tmp[[seq(3,59,7)]]
 names(CIVE) = paste("CIVE_", days, sep="")
-IO = tmp[[seq(4,39,7)]]
+IO = tmp[[seq(4,60,7)]]
 names(IO) = paste("IO_", days, sep="")
-VVI = tmp[[seq(5,40,7)]]
+VVI = tmp[[seq(5,61,7)]]
 names(VVI) = paste("VVI_", days, sep="")
-GCC = tmp[[seq(6,41,7)]]
+GCC = tmp[[seq(6,62,7)]]
 names(GCC) = paste("GCC_", days, sep="")
-RCC = tmp[[seq(7,42,7)]]
+RCC = tmp[[seq(7,63,7)]]
 names(RCC) = paste("RCC_", days, sep="")
 
 print(paste0("Starting with seasonal parameters for ",r,"."))
