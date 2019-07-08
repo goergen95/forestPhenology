@@ -36,8 +36,7 @@ resTifs = function(x){
 photos = lapply(photos,resTifs)
 photos = raster::stack(photos)
 
-# 4, 8, 12, 25 cm resolution data
-
+# 8, 12, 25 cm resolution data
 tmp = raster::raster(crs=proj4string(photos),ext=extent(photos),resolution=0.08)
 res8 = raster::resample(photos,tmp)
 tmp = raster::raster(crs=proj4string(photos),ext=extent(photos),resolution=0.12)
