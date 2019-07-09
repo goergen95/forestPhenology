@@ -48,7 +48,7 @@ for (r in res){
   names(RCC) = paste("RCC_", days, sep="")
   
   print(paste0("Starting with seasonal parameters for ",r,"."))
-  metrics = calcPheno(TGI,cores=7) 
+  metrics = calcPheno(TGI,cores=7)
   raster::writeRaster(metrics, filename=paste0("data/season/season_TGI_",r,".tif"),overwrite=TRUE)
   print("Finished TGI parameters.")
   metrics = calcPheno(GLI,cores=7) 
@@ -72,7 +72,6 @@ for (r in res){
   rm(TGI,GLI,CIVE,IO,VVI,GCC,RCC,metrics)
   gc()
 }
-
 
 RGB = raster::stack(list.files("data/resampled/", pattern=res[3], full.names=TRUE))
 IND = raster::stack(list.files("data/indices/", pattern=res[3], full.names=TRUE))
