@@ -1,6 +1,6 @@
 # script to apply indices and phenometrics function to raster data
-source("forestPhenology/phenoFun.R")
-source("forestPhenology/sampleFuns.R")
+source("fun/forestPhenology/phenoFun.R")
+source("fun/forestPhenology/sampleFuns.R")
 
 loadandinstall = function(mypkg) {if (!is.element(mypkg, installed.packages()[,1])){install.packages(mypkg)};
   library(mypkg, character.only = TRUE)}
