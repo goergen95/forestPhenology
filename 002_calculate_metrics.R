@@ -24,27 +24,29 @@ for (file in files){
     writeRaster(indices,filename=paste0("data/indices/indices_",DOY,"_",res),overwrite=TRUE)
   }
 }
-
-
+names_indices = names(indices)
+saveRDS(names_indices, file = "data/indices/names_indices.rds")
+rm(indices,RGBseries,res,steps,DOY)
+gc()
 # apply pheno metrics for all resolutions
-res = c("res5","res8","res12","res25")
+res = c("res25","res15","res10","res5")
 
 for (r in res){
   files = list.files("data/indices/",pattern=r,full.names = TRUE)
   tmp = raster::stack(files)
-  TGI = tmp[[seq(1,57,7)]]
+  TGI = tmp[[seq(length(names_indices)-6,nlayers(tmp)-6,length(names_indices))]]
   names(TGI) = paste("TGI_", days, sep="")
-  GLI = tmp[[seq(2,58,7)]]
+  GLI = tmp[[seq(length(names_indices)-5,nlayers(tmp)-5,length(names_indices))]]
   names(GLI) = paste("GLI_", days, sep="")
-  CIVE = tmp[[seq(3,59,7)]]
+  CIVE = tmp[[seq(length(names_indices)-4,nlayers(tmp)-4,length(names_indices))]]
   names(CIVE) = paste("CIVE_", days, sep="")
-  IO = tmp[[seq(4,60,7)]]
+  IO = tmp[[seq(length(names_indices)-3,nlayers(tmp)-3,length(names_indices))]]
   names(IO) = paste("IO_", days, sep="")
-  VVI = tmp[[seq(5,61,7)]]
+  VVI = tmp[[seq(length(names_indices)-2,nlayers(tmp)-2,length(names_indices))]]
   names(VVI) = paste("VVI_", days, sep="")
-  GCC = tmp[[seq(6,62,7)]]
+  GCC = tmp[[seq(length(names_indices)-1,nlayers(tmp)-1,length(names_indices))]]
   names(GCC) = paste("GCC_", days, sep="")
-  RCC = tmp[[seq(7,63,7)]]
+  RCC = tmp[[seq(length(names_indices),nlayers(tmp),length(names_indices))]]
   names(RCC) = paste("RCC_", days, sep="")
   
   print(paste0("Starting with seasonal parameters for ",r,"."))
