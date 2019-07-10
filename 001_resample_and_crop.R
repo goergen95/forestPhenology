@@ -36,7 +36,7 @@ photos = lapply(photos, cropTifs)
 
 mask = photos[[1]]
 resTifs = function(x){
-  tmp = raster::resample(x,maske)
+  tmp = raster::resample(x,mask)
   return(tmp)}
 
 photos = lapply(photos,resTifs)
