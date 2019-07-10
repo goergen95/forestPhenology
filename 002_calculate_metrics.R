@@ -17,7 +17,7 @@ for (file in files){
   RGBseries = raster::brick(file)
   res = stringr::str_split(file,"/")[[1]][3]
   names(RGBseries) = dates
-  steps = seq(1,nlayers(RGBseries),3)
+  steps = seq(1,raster::nlayers(RGBseries),3)
   for (step in steps){
     DOY = dates[step]
     indices = rgbIndices(RGBseries[[seq(step,step+2,1)]],rgbi=c("TGI","GLI","CIVE","IO","VVI","GCC","RCC"))
@@ -88,12 +88,3 @@ for (r in res){
   rm(TGI,GLI,CIVE,IO,VVI,GCC,RCC,metrics)
   gc()
 }
-
-RGB = raster::stack(list.files("data/resampled", pattern=res[3], full.names=TRUE))
-IND = raster::stack(list.files("data/indices", pattern=res[3], full.names=TRUE))
-SES = raster::stack(list.files("data/season", pattern=res[3], full.names=TRUE))
-predictors = stack(RGB,IND,SES)
-data  = sampleAll(predictors, trees, overlap=TRUE,category="specID")
-data2 = sampleAll(predictors,trees,overlap=FALSE,category="specID")
-data3 = sampleRand(predictors=predictors,trees=trees,objectbased=FALSE,category="specID",nPix=1000,res=0.12)
-data4 = sampleRand(predictors,trees,objectbase=TRUE,category="specID",nPix=50,res=0.12)
