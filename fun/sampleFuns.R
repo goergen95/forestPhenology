@@ -1,7 +1,7 @@
 # functions to apply varius sampling stratgeis accross tree objects
 loadandinstall = function(mypkg) {if (!is.element(mypkg, installed.packages()[,1])){install.packages(mypkg)};
   library(mypkg, character.only = TRUE)}
-libs = c("rgdal","raster","rgeos","gdalUtils","sp","magrittr")
+libs = c("rgdal","raster","rgeos","gdalUtils","sp")
 lapply(libs,loadandinstall)
 
 

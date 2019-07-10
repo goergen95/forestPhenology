@@ -32,7 +32,7 @@ gc()
 res = c("res25","res15","res10","res5")
 
 for (r in res){
-  files = list.files("data/indices/",pattern=r,full.names = TRUE)
+  files = list.files("data/indices",pattern=r,full.names = TRUE)
   tmp = raster::stack(files)
   TGI = tmp[[seq(length(names_indices)-6,nlayers(tmp)-6,length(names_indices))]]
   names(TGI) = paste("TGI_", days, sep="")
@@ -89,9 +89,9 @@ for (r in res){
   gc()
 }
 
-RGB = raster::stack(list.files("data/resampled/", pattern=res[3], full.names=TRUE))
-IND = raster::stack(list.files("data/indices/", pattern=res[3], full.names=TRUE))
-SES = raster::stack(list.files("data/season/", pattern=res[3], full.names=TRUE))
+RGB = raster::stack(list.files("data/resampled", pattern=res[3], full.names=TRUE))
+IND = raster::stack(list.files("data/indices", pattern=res[3], full.names=TRUE))
+SES = raster::stack(list.files("data/season", pattern=res[3], full.names=TRUE))
 predictors = stack(RGB,IND,SES)
 data  = sampleAll(predictors, trees, overlap=TRUE,category="specID")
 data2 = sampleAll(predictors,trees,overlap=FALSE,category="specID")
