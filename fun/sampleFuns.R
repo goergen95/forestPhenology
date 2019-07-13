@@ -6,11 +6,11 @@ lapply(libs,loadandinstall)
 
 
 # dummy variables for development only
-#trees = rgdal::readOGR("data/artTrees.shp")
-#predictors = raster::brick("data/resampled/res25.tif")
-#predictors = projectRaster(predictors,crs =  proj4string(trees))
-#names(predictors) = readRDS("data/resampled/dates.rds") #restore tif names
-#category = "specID"
+# trees = rgdal::readOGR("data/artTrees.shp")
+# predictors = raster::brick("data/resampled/res25.tif")
+# predictors = projectRaster(predictors,crs =  proj4string(trees))
+# names(predictors) = readRDS("data/resampled/dates.rds") #restore tif names
+# category = "specID"
 
 
 # function to get all pixels in tree object to data.frame
@@ -77,23 +77,9 @@ sampleRand = function(predictors,trees,objectbased=TRUE,category="specID",nPix=2
   }else{
     
     sampTree = function(object,rasters,size){
-      spPoints = sp::spsample(object,n=size,type="random")
-      allBuffer = rgeos::gBuffer(spPoints,byid=TRUE,width = res/2)
       
-      i = 1
-      while(i <= length(spPoints)){
-      spBuffer = rgeos::gBuffer(spPoints[i,], byid = TRUE, width = res/2)
-      issue = gIntersects(spBuffer,allBuffer,byid=TRUE)
-      index = which(issue == TRUE)
-      if (length(index)==1){
-        i = i + 1
-        next}
-      index = index[-1]
-      spPoints = spPoints[-index,]
-      allBuffer = allBuffer[-index]
-      i = i + 1
-      }
-      
+      spPoints = sp::spsample(object,n=1,type="random")
+      allBuffer = rgeos::gBuffer(spPoints,byid=TRUE,width=res/2)
       missing = size - length(spPoints)
       while (missing != 0){
         spAdd = sp::spsample(object,n=missing,type="random")
@@ -128,4 +114,68 @@ sampleRand = function(predictors,trees,objectbased=TRUE,category="specID",nPix=2
   
   }
 }
+
+samplePatch <- function(predictors,trees,category="specID",nPatch=3,size=3,res=.25){
+  sampTree = function(object,rasters,category,nPatch,size,res){
+    
+    within = TRUE
+    while (within){
+      spPoints = sp::spsample(object,n=1,type="random")
+      allBuffer = rgeos::gBuffer(spPoints,byid=TRUE,width = (size * res)/2)
+      within = !rgeos::gContains(object,allBuffer,byid=TRUE)[1]
+    }
+    missing = nPatch - length(spPoints)
+    
+    while (missing != 0){
+      border = missing
+      while (border != 0){
+        spAdd = sp::spsample(object,n=border,type="random")
+        spAddBuf = rgeos::gBuffer(spAdd,byid=TRUE,width= (size * res)/2)
+        borderBuff = rgeos::gContains(object, spAddBuf, byid = TRUE)
+        index = which(borderBuff == FALSE)
+        if (length(index) == 0){
+          border = border - length(spAdd)
+          next
+        }
+        if (length(index) == border){
+          next
+        }
+        spAdd = spAdd[-index,]
+        spAddBuf = spAddBuf[-index,]
+        border = border - length(spAdd)
+      }
+      
+      issue = gIntersects(spAddBuf,allBuffer,byid=TRUE)
+      index = which(issue == TRUE)
+      if (length(index) == 0){
+        spPoints = spAdd + spPoints
+        allBuffer = rgeos::gBuffer(spPoints,byid=TRUE,width = (size * res)/2)
+        missing = nPatch - length(spPoints)
+      }
+      if (length(index) == missing){
+        next
+      }
+      spAdd = spAdd[-index,]
+      spPoints = spAdd + spPoints
+      allBuffer = rgeos::gBuffer(spPoints,byid=TRUE,width = (size * res)/2)
+      missing = nPatch - length(spPoints)
+    }
+
+  squares = rgeos::gEnvelope(allBuffer,byid=TRUE)
+  patches = raster::extract(predictors,squares,df=TRUE)
+  patches[,category] = object@data[,category]
+  return(patches)
+  }
+  data = list()
+  for (tree in 1:length(trees)){
+    smpTree = sampTree(object = trees[tree,],rasters = predictors,category="specID",nPatch=3,size=3,res=.25)
+    smpTree$treeID = trees@data$ID[tree]
+    data[[tree]] = smpTree
+    print(paste0("Done with object ",tree," out of ",length(trees),"."))
+  }
+  data = do.call("rbind",data)
+  
+  }
+  
+  
 
