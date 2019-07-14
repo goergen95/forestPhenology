@@ -1,4 +1,6 @@
 #Fixing names for rasterstacks
+res = c("res5","res10","res15","res25")
+
 RGB_names = readRDS("data/resampled/dates.rds")
 RGB = raster::stack(list.files("data/resampled", pattern=res[3], full.names=TRUE))
 names(RGB) = paste0(RGB_names, "_", res[3])
