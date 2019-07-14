@@ -29,7 +29,6 @@ subDir= c("data",
           "forestPhenology",
           "forestPhenology/doc",
           "forestPhenology/fun",
-          "results",
-          "test")
+          "results")
 
 for (dir in subDir){if(!dir.exists(file.path(mainDir, dir))){dir.create(file.path(mainDir, dir))}}
