@@ -84,7 +84,7 @@ sampleRand = function(predictors,trees,objectbased=TRUE,category="specID",nPix=2
       while (missing != 0){
         spAdd = sp::spsample(object,n=missing,type="random")
         spAddBuf = rgeos::gBuffer(spAdd,byid=TRUE,width=res/2)
-        issue = gIntersects(spAddBuf,allBuffer,byid=TRUE)
+        issue = rgeos::gIntersects(spAddBuf,allBuffer,byid=TRUE)
         index = which(as.numeric(colSums(issue))>0)
         if (length(index) == 0){
           spPoints = spAdd + spPoints
@@ -116,19 +116,20 @@ sampleRand = function(predictors,trees,objectbased=TRUE,category="specID",nPix=2
 }
 
 samplePatch <- function(predictors,trees,category="specID",nPatch=3,size=3,res=.25){
+  # function to retrive nPatch patches within a spatial polygon with sizeXsize pixels each
   sampTree = function(object,rasters,category,nPatch,size,res){
-    
+    # check if initial point buffer of (size * res)/2 lies within the polygon
     within = TRUE
     while (within){
       spPoints = sp::spsample(object,n=1,type="random")
       allBuffer = rgeos::gBuffer(spPoints,byid=TRUE,width = (size * res)/2)
       within = !rgeos::gContains(object,allBuffer,byid=TRUE)[1]
     }
-    missing = nPatch - length(spPoints)
+    missing = nPatch - length(spPoints) # number of additional center pixels for patches
     
     while (missing != 0){
       border = missing
-      while (border != 0){
+      while (border != 0){# checks if the random pixels buffer cross the border of the tree object
         spAdd = sp::spsample(object,n=border,type="random")
         spAddBuf = rgeos::gBuffer(spAdd,byid=TRUE,width= (size * res)/2)
         borderBuff = rgeos::gContains(object, spAddBuf, byid = TRUE)
@@ -144,7 +145,7 @@ samplePatch <- function(predictors,trees,category="specID",nPatch=3,size=3,res=.
         spAddBuf = spAddBuf[-index,]
         border = border - length(spAdd)
       }
-      
+      # checks if the buffers of the random pixels intersect
       issue = gIntersects(spAddBuf,allBuffer,byid=TRUE)
       index = which(issue == TRUE)
       if (length(index) == 0){
@@ -160,12 +161,13 @@ samplePatch <- function(predictors,trees,category="specID",nPatch=3,size=3,res=.
       allBuffer = rgeos::gBuffer(spPoints,byid=TRUE,width = (size * res)/2)
       missing = nPatch - length(spPoints)
     }
-
-  squares = rgeos::gEnvelope(allBuffer,byid=TRUE)
+  # data extraction
+  squares = rgeos::gEnvelope(allBuffer,byid=TRUE)#generation of squares by coordinates of the buffers
   patches = raster::extract(predictors,squares,df=TRUE)
   patches[,category] = object@data[,category]
   return(patches)
   }
+  # applying sampling function over the data
   data = list()
   for (tree in 1:length(trees)){
     smpTree = sampTree(object = trees[tree,],rasters = predictors,category="specID",nPatch=3,size=3,res=.25)
