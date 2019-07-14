@@ -162,6 +162,19 @@ samplePatch <- function(predictors,trees,category="specID",nPatch=3,size=3,res=.
       missing = nPatch - length(spPoints)
     }
   # data extraction
+  # centerCell = raster::cellFromXY(predictors,spPoints)
+  # growWindow = function(cell,raster,size){
+  #   cols = ncol(raster)
+  #   rows = nrow(raster)
+  #   centerRow = c(cell)
+  #   for (i in seq(size)){
+  #     tmp1 = cell + i
+  #     tmp2 = cell - i
+  #     centerRow = c(tmp2,centerRow,tmp1)
+  #   }
+  #   addRows = matrix(ncol=size,nrow=size)
+  # }
+  
   squares = rgeos::gEnvelope(allBuffer,byid=TRUE)#generation of squares by coordinates of the buffers
   patches = raster::extract(predictors,squares,df=TRUE)
   patches[,category] = object@data[,category]
