@@ -1,7 +1,7 @@
 if(Sys.info()["sysname"] == "Windows"){
   root_folder = "~/pheno"
 } else {
-  root_folder = "~/Documents/studium/10_Semester/envisys/"
+  root_folder = "~/pheno"
   }
 ##loading librarys
 loadandinstall = function(mypkg) {

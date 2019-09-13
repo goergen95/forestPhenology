@@ -1,7 +1,9 @@
 loadandinstall = function(mypkg) {if (!is.element(mypkg, installed.packages()[,1])){install.packages(mypkg)};
   library(mypkg, character.only = TRUE)}
-libs = c("rgdal","raster","rgeos","gdalUtils","sp","stringr")
+libs = c("rgdal","raster","rgeos","gdalUtils","sp","stringr","parallel")
 lapply(libs,loadandinstall)
+
+ncores = parallel::detectCores()-1
 
 #Resample tifs | adapted to the new files
 photos = list.files("data/",pattern=".tif",full.names = TRUE)
@@ -13,7 +15,7 @@ rem4=function(x){
   tmp=x[[-4]]
   return(tmp)
 }
-photos=lapply(photos, rem4)
+photos= parallel::mclapply(photos, rem4, mc.cores = ncores)
 
 # target projection: utm32 wgs84
 proj = "+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"
@@ -32,19 +34,19 @@ cropTifs = function(x){
   tmp = raster::crop(x,ext)
   return(tmp)
 }
-photos = lapply(photos, cropTifs)
+photos = parallel::mclapply(photos, cropTifs, mc.cores = ncores)
 
 mask = photos[[1]]
 resTifs = function(x){
   tmp = raster::resample(x,mask)
   return(tmp)}
 
-photos = lapply(photos,resTifs)
+photos = parallel::mclapply(photos,resTifs, mc.cores = ncores)
 photos = raster::stack(photos)
 
 # projection to target projection (UTM32 - WGS84)
-photos = projectRaster(photos,crs=proj)
-trees = spTransform(trees,CRSobj=proj)
+#photos = projectRaster(photos,crs=proj) # changed it, better stay with GRS80
+trees = spTransform(trees,CRSobj=crs(photos))
 
 # 10, 15, 25 cm resolution data
 tmp = raster::raster(crs=proj4string(photos),ext=extent(photos),resolution=0.10)
