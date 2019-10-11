@@ -7,7 +7,7 @@ ncores = parallel::detectCores()-1
 
 #Resample tifs | adapted to the new files
 photos = list.files("data/",pattern=".tif",full.names = TRUE)
-photos = photos[-grep("2019_04_23", photos)]
+#photos = photos[-grep("2019_04_23", photos)]
 
 photos = lapply(photos,raster::stack)
 rem4=function(x){
@@ -18,14 +18,22 @@ rem4=function(x){
 photos= parallel::mclapply(photos, rem4, mc.cores = ncores)
 
 # target projection: utm32 wgs84
-proj = "+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"
+proj = "+proj=utm +zone=32 +datum=GRS80 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
 
 #Load trees in order to crop to the right extend
-trees = rgdal::readOGR("data/trees.shp")
+trees = rgdal::readOGR("data/trees_final.shp")
+trees_buffer = rgeos::gBuffer(trees, byid = TRUE, width = 1.5, capStyle = "SQUARE")
+index = as.data.frame(rgeos::gDisjoint(trees_buffer, byid = TRUE))
+index = which(colSums(index)<length(trees_buffer)-1)
+trees_buffer = trees_buffer[-index,]
+trees_buffer = trees_buffer[trees_buffer$specID == "BUR" | trees_buffer$specID == "EIT",]
+writeOGR(trees_buffer, "data/trees_buffer.shp", driver ="ESRI Shapefile", layer = "trees_buffer", overwrite_layer = T)
+
+trees = trees_buffer
 trees$treeID = as.factor(trees$treeID)
 trees$ID = 1:length(trees)
-treesBuff = rgeos::gBuffer(trees, byid=TRUE, width = 4)
+treesBuff = rgeos::gBuffer(trees, width = 5)
 trees = spTransform(trees, CRSobj = crs(photos[[1]]))
 
 ext = sp::bbox(rgeos::gBuffer(treesBuff,byid=FALSE, width=10))
@@ -43,10 +51,6 @@ resTifs = function(x){
 
 photos = parallel::mclapply(photos,resTifs, mc.cores = ncores)
 photos = raster::stack(photos)
-
-# projection to target projection (UTM32 - WGS84)
-#photos = projectRaster(photos,crs=proj) # changed it, better stay with GRS80
-trees = spTransform(trees,CRSobj=crs(photos))
 
 # 10, 15, 25 cm resolution data
 tmp = raster::raster(crs=proj4string(photos),ext=extent(photos),resolution=0.10)
