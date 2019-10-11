@@ -6,7 +6,7 @@ lapply(libs,loadandinstall)
 ncores = parallel::detectCores()-1
 
 #Resample tifs | adapted to the new files
-photos = list.files("data/",pattern=".tif",full.names = TRUE)
+photos = list.files("data",pattern=".tif",full.names = TRUE)
 #photos = photos[-grep("2019_04_23", photos)]
 
 photos = lapply(photos,raster::stack)
@@ -34,8 +34,7 @@ trees = trees_buffer
 trees$treeID = as.factor(trees$treeID)
 trees$ID = 1:length(trees)
 treesBuff = rgeos::gBuffer(trees, width = 5)
-trees = spTransform(trees, CRSobj = crs(photos[[1]]))
-
+sp::proj4string(trees) = sp::CRS(sp::proj4string(photos[[1]]))
 ext = sp::bbox(rgeos::gBuffer(treesBuff,byid=FALSE, width=10))
 
 cropTifs = function(x){
