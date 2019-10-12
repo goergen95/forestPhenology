@@ -1,6 +1,7 @@
 # script to apply indices and phenometrics function to raster data
 source("forestPhenology/fun/phenoFun.R")
 source("forestPhenology/fun/sampleFuns.R")
+source("forestPhenology/000_setup.R")
 
 loadandinstall = function(mypkg) {if (!is.element(mypkg, installed.packages()[,1])){install.packages(mypkg)};
   library(mypkg, character.only = TRUE)}
@@ -9,7 +10,7 @@ lapply(libs,loadandinstall)
 
 ncores = parallel::detectCores() - 1
 
-trees = readOGR("data/artTrees.shp")
+trees = readOGR("data/trees_buffer.shp")
 files = list.files("data/resampled",patter=".tif",full.names = TRUE)
 dates = readRDS("data/resampled/dates.rds")
 days = dates[seq(1,length(dates),3)]
@@ -38,31 +39,31 @@ for (r in res){
   TGI = tmp[[seq(length(names_indices)-6,nlayers(tmp)-6,length(names_indices))]]
   names(TGI) = paste("TGI_", days, sep="")
   saveRDS(names(TGI), file = "data/indices/time_series/TGI_names.rds")
-  raster::writeRaster(TGI, filename=paste0("data/indices/time_series/TGI_timeseries_",r,".tif"))
+  raster::writeRaster(TGI, filename=paste0("data/indices/time_series/TGI_timeseries_",r,".tif"),overwrite=TRUE)
   GLI = tmp[[seq(length(names_indices)-5,nlayers(tmp)-5,length(names_indices))]]
   names(GLI) = paste("GLI_", days, sep="")
   saveRDS(names(GLI), file = "data/indices/time_series/GLI_names.rds")
-  raster::writeRaster(GLI, filename=paste0("data/indices/time_series/GLI_timeseries_",r,".tif"))
+  raster::writeRaster(GLI, filename=paste0("data/indices/time_series/GLI_timeseries_",r,".tif"),overwrite=TRUE)
   CIVE = tmp[[seq(length(names_indices)-4,nlayers(tmp)-4,length(names_indices))]]
   names(CIVE) = paste("CIVE_", days, sep="")
   saveRDS(names(CIVE), file = "data/indices/time_series/CIVE_names.rds")
-  raster::writeRaster(CIVE, filename=paste0("data/indices/time_series/CIVE_timeseries_",r,".tif"))
+  raster::writeRaster(CIVE, filename=paste0("data/indices/time_series/CIVE_timeseries_",r,".tif"),overwrite=TRUE)
   IO = tmp[[seq(length(names_indices)-3,nlayers(tmp)-3,length(names_indices))]]
   names(IO) = paste("IO_", days, sep="")
   saveRDS(names(IO), file = "data/indices/time_series/IO_names.rds")
-  raster::writeRaster(IO, filename=paste0("data/indices/time_series/IO_timeseries_",r,".tif"))
+  raster::writeRaster(IO, filename=paste0("data/indices/time_series/IO_timeseries_",r,".tif"),overwrite=TRUE)
   VVI = tmp[[seq(length(names_indices)-2,nlayers(tmp)-2,length(names_indices))]]
   names(VVI) = paste("VVI_", days, sep="")
   saveRDS(names(VVI), file = "data/indices/time_series/VVI_names.rds")
-  raster::writeRaster(VVI, filename=paste0("data/indices/time_series/VVI_timeseries_",r,".tif"))
+  raster::writeRaster(VVI, filename=paste0("data/indices/time_series/VVI_timeseries_",r,".tif"),overwrite=TRUE)
   GCC = tmp[[seq(length(names_indices)-1,nlayers(tmp)-1,length(names_indices))]]
   names(GCC) = paste("GCC_", days, sep="")
   saveRDS(names(GCC), file = "data/indices/time_series/GCC_names.rds")
-  raster::writeRaster(GCC, filename=paste0("data/indices/time_series/GCC_timeseries_",r,".tif"))
+  raster::writeRaster(GCC, filename=paste0("data/indices/time_series/GCC_timeseries_",r,".tif"),overwrite=TRUE)
   RCC = tmp[[seq(length(names_indices),nlayers(tmp),length(names_indices))]]
   names(RCC) = paste("RCC_", days, sep="")
   saveRDS(names(RCC), file = "data/indices/time_series/RCC_names.rds")
-  raster::writeRaster(RCC, filename=paste0("data/indices/time_series/RCC_timeseries_",r,".tif"))
+  raster::writeRaster(RCC, filename=paste0("data/indices/time_series/RCC_timeseries_",r,".tif"),overwrite=TRUE)
   
   print(paste0("Starting with seasonal parameters for ",r,"."))
   metrics = calcPheno(TGI,cores=ncores)

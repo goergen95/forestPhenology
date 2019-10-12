@@ -34,8 +34,8 @@ trees = trees_buffer
 trees$treeID = as.factor(trees$treeID)
 trees$ID = 1:length(trees)
 treesBuff = rgeos::gBuffer(trees, width = 5)
-sp::proj4string(trees) = sp::CRS(sp::proj4string(photos[[1]]))
-ext = sp::bbox(rgeos::gBuffer(treesBuff,byid=FALSE, width=10))
+trees = sp::spTransform(trees, sp::proj4string(photos[[1]]))
+ext = sp::bbox(rgeos::gBuffer(treesBuff,byid=FALSE, width=5))
 
 cropTifs = function(x){
   tmp = raster::crop(x,ext)

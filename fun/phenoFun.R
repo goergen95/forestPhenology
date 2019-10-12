@@ -70,14 +70,17 @@ rgbIndices <- function(rgb,rgbi=c("TGI","GLI","CIVE","IO","VVI","GCC","RCC")){
 
 # function to calculate seasonal paramters
 calcPheno = function(index,cores){
-  MAX = index[[1]]
-  MIN = index[[1]]
-  SUM = index[[1]]
-  SD = index[[1]]
-  Q25 = index[[1]]
-  Q75 = index[[1]]
+  MAX = setValues(index[[1]], NA)
+  MIN = setValues(index[[1]], NA)
+  SUM = setValues(index[[1]], NA)
+  SD = setValues(index[[1]], NA)
+  Q25 = setValues(index[[1]], NA)
+  Q75 = setValues(index[[1]], NA)
   
-  dataArray = array(index,dim=dim(index))
+  dataArray = array(index, dim=dim(index))
+  VIname = str_split(names(index)[1],"_")[[1]][1]
+  rm(index)
+  gc()
   
   cl = parallel::makeCluster(cores)
   MAX[] = as.numeric(parallel::parApply(cl, dataArray, MARGIN=c(1,2), FUN=function(x) max(x,na.rm=TRUE)))
@@ -97,7 +100,9 @@ calcPheno = function(index,cores){
   #Q75[] = apply(dataArray,c(1,2),function(x) quantile(x,probs=c(.75),type=7,na.rm=TRUE))
   
   metrics = stack(MAX,MIN,AMP,SUM,SD,Q25,Q75)
-  VIname = str_split(names(index)[1],"_")[[1]][1]
+  rm(MAX,MIN,AMP,SUM,SD,Q25,Q75)
+  gc()
+  
   names(metrics) = paste(VIname,c("_MAX","_MIN","_AMP","_SUM","_SD","_Q25","_Q75"),sep="")
   return(metrics)
 }
