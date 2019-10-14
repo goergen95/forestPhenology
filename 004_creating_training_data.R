@@ -4,15 +4,15 @@ source("forestPhenology/fun/sampleFuns.R")
 ncores = parallel::detectCores()-1
 
 res = c("res5","res10","res15","res25")
-RGB = raster::stack(list.files("data/resampled", pattern=res[1], full.names=TRUE))
+RGB = raster::stack(list.files("data/resampled", pattern=res[3], full.names=TRUE))
 RGB_names = readRDS("data/resampled/names_RGB_stack.rds")
 names(RGB) = RGB_names
 
-IND = raster::stack(list.files("data/indices", pattern=res[1], full.names=TRUE))
+IND = raster::stack(list.files("data/indices", pattern=res[3], full.names=TRUE))
 IND_names = readRDS("data/indices/names_indices_stack.rds")
 names(IND) = IND_names
 
-SES = raster::stack(list.files("data/season", pattern=res[1], full.names=TRUE))
+SES = raster::stack(list.files("data/season", pattern=res[3], full.names=TRUE))
 SES_names = readRDS("data/season/season_names.rds")
 names(SES) = SES_names
 
@@ -33,6 +33,9 @@ data = parallel::mclapply(treesLS, function(x){
   tmp = as.data.frame(tmp)
   return(tmp)
 }, mc.cores = ncores)
+
+n_pixel = dim(data[[1]])[1]
+n_vars = dim(data[[1]])[2]
 
 
 index = caret::createDataPartition(trees@data$specID, p = 0.2)
