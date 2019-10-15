@@ -20,8 +20,7 @@ libs <-  c("RODBC",
           "gdalUtils",
           "sp",
           "lidR",
-          "rlas",
-          "uavRst")
+          "rlas")
 for (lib in libs){loadandinstall(lib)}
 
 # checking directory
