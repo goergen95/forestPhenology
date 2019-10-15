@@ -7,7 +7,9 @@ ncores = parallel::detectCores()-1
 
 #Resample tifs | adapted to the new files
 photos = list.files("data",pattern=".tif",full.names = TRUE)
-#photos = photos[-grep("2019_04_23", photos)]
+photos = photos[-grep("2019_04_18", photos)]
+photos = photos[-grep("2019_04_20", photos)]
+photos = photos[-grep("2019_04_23", photos)]
 
 photos = lapply(photos,raster::stack)
 rem4=function(x){
