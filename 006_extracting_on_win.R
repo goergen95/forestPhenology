@@ -49,7 +49,8 @@ for (i in seq(length(res))) {
   
   # extract data for each tree in parallel
   data = lapply(treesLS, function(x){
-    print(x)
+    print(x@data$ID)
+    print(Sys.time())
     tmp = crop(predictors, x)
     tmp = as.data.frame(tmp)
     return(tmp)
