@@ -14,7 +14,7 @@ treesLS = lapply(1:length(trees), function(x){
 })
 
 for (i in seq(length(res))) {
-  print(paste0("Starting_", res[i])) 
+  print(paste0("Starting ", res[i])) 
   RGB = raster::stack(list.files("data/resampled", pattern=res[i], full.names=TRUE))
   RGB_names = readRDS("data/resampled/names_RGB_stack.rds")
   names(RGB) = RGB_names
@@ -34,15 +34,15 @@ for (i in seq(length(res))) {
     tmp = crop(predictors, x)
     tmp = as.data.frame(tmp)
     return(tmp)
-    
-  }, mc.cores = ncores))
-  print(paste0("Finished extracting", res[i]))
+  }, mc.cores = ncores)
+  
+  print(Sys.time())
+  print(paste0("Finished extracting ", res[i]))
   for (l in seq(length(data))) {
-    data[[l]]$polID <- l
+    data[[l]]$polID = l
   }
   
-  
-  data_extract <- do.call(rbind,data)
+  data_extract = do.call(rbind,data)
   write.csv2(data_extract, file = paste0("data/results/extract_data_", res[i], ".csv"), sep = ";")
-  print(paste0("Wrote", res[i], ".csv"))
+  print(paste0("Wrote ", res[i], ".csv"))
 }

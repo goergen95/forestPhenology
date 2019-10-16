@@ -29,7 +29,7 @@ treesLS = lapply(1:length(trees), function(x){
 
 # extract data for each tree in parallel
 data = parallel::mclapply(treesLS, function(x){
-  tmp = crop(SES, x)
+  tmp = crop(RGB[[1:4]], x)
   tmp = as.data.frame(tmp)
   return(tmp)
 }, mc.cores = ncores)

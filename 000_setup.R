@@ -20,7 +20,10 @@ libs <-  c("RODBC",
           "gdalUtils",
           "sp",
           "lidR",
-          "rlas")
+          "rlas",
+          "CAST",
+          "doParallel",
+          "randomForest")
 for (lib in libs){loadandinstall(lib)}
 
 # checking directory
