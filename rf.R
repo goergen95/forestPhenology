@@ -1,6 +1,6 @@
 source("forestPhenology/000_setup.R")
 
-res = c("res5","res10","res15","res25")
+res = c("res25","res15","res10","res5")
 trees = rgdal::readOGR("data/trees_buffer.shp")
 trees@data$polID = seq(nrow(trees@data))
 
@@ -45,3 +45,26 @@ for (i in seq(length(res))){
   print(pate0("Finished model 1: ", Sys.time()))
   gc()
 }
+
+mod1_res25 = readRDS("data/results/mod1_res25.rds")
+
+test = predict(mod1_res25, traindat[index,])
+conf = caret::confusionMatrix(test, traindat$specID[index])
+
+RGB = raster::stack(list.files("data/resampled", pattern=res[i], full.names=TRUE))
+RGB_names = readRDS("data/resampled/names_RGB_stack.rds")
+names(RGB) = RGB_names
+
+IND = raster::stack(list.files("data/indices", pattern=res[i], full.names=TRUE))
+IND_names = readRDS("data/indices/names_indices_stack.rds")
+names(IND) = IND_names
+
+SES = raster::stack(list.files("data/season", pattern=res[i], full.names=TRUE))
+SES_names = readRDS("data/season/season_names.rds")
+names(SES) = SES_names
+
+sta = stack(RGB,IND,SES)
+
+areapred = raster::predict(sta, mod1_res25)
+writeRaster(areapred, "data/results/mod1_res25_areapred.tif", overwrite = TRUE)
+
