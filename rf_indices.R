@@ -1,6 +1,6 @@
 source("forestPhenology/000_setup.R")
 
-res = c("res25","res15","res10","res5")
+res = c("res25")
 trees = rgdal::readOGR("data/trees_buffer.shp")
 trees@data$polID = seq(nrow(trees@data))
 
