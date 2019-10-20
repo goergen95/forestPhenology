@@ -42,7 +42,7 @@ for (i in seq(length(res))){
                           metric = "Kappa")
   #Saving model to disk
   saveRDS(mod1_indices, paste0("data/results/mod1_indices_", res[i], ".rds"))
-  print(pate0("Finished model 1: ", Sys.time()))
+  print(paste0("Finished model 1: ", Sys.time()))
   gc()
 }
 
