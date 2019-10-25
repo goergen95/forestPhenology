@@ -7,6 +7,8 @@ output:
     df_print: kable
     latex_engine: pdflatex
     fig_caption: true
+bibliography: ForestPhenology.bib
+csl: elsevier-harvard.csl
 title: "UAV imagery based tree species classification in the Marburg OpenForest"
 author: 
 - Darius A. Görgen
@@ -28,12 +30,11 @@ knitr::opts_chunk$set(echo = TRUE)
 # Data and Method
 
 # Results
+Example citation [@Ulsig2017a].
 
-
-```{r read_results, include=T, warning=FALSE, message=FALSE}
+```{r read_results, echo=FALSE, warning=FALSE, message=FALSE}
 model = readRDS("../results/mod1_res10.rds")
-model$selectedvars
-model$selectedvars_perf
+head(model$trainingData[,1:4])
 
 ```
 
