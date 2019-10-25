@@ -1,0 +1,39 @@
+---
+output: 
+  pdf_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    df_print: kable
+    latex_engine: pdflatex
+    fig_caption: true
+title: "UAV imagery based tree species classification in the Marburg OpenForest"
+author: 
+- Darius A. Görgen
+- Tobias Koch
+- Marvin Müsgen
+- Eike Schott
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+
+abstract: "The monitoring of forests environments is of crucial importance since they serve as natural habitats and constitute a main source of biological diversity. Yet, it is very costly and labor intensive to monitor forests by traditional means. Recently, there have been several attempts to use UAV-borne imagery in forest monitoring since these images can be obtained at low cost and can come with both, high spatial and temporal resolution which enable scientists and practitioners to comprehensively monitor forest environments. Tree species identification is primary interest, since the identification of species allows to draw conclusions about the structure and biodiversity in given areas of a forest. When using simple RGB images, species classification still remains a challenge. In this paper we present our results of an experiment exploring the influence of spatial resolution of RGB imagery, artificially derived vegetation indices as well as seasonal parameters on the accuracy of tree species classification within the Marburg OpenForest. We used a resolution of 5 cm, 10 cm, 15 cm, and 25 cm in a forwar-feature-selection based on the RandomForest classification algorithm. Additionally we tested the obtained accuracy when only mono-temporal or multi-temporal variables are included as well as both types of variables. Our results show that ..."
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+# Data and Method
+
+# Results
+
+
+```{r read_results, include=T, warning=FALSE, message=FALSE}
+model = readRDS("../results/mod1_res10.rds")
+model$selectedvars
+model$selectedvars_perf
+
+```
+
