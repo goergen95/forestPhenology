@@ -23,6 +23,9 @@ abstract: "The monitoring of forests environments is of crucial importance since
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tmap)
+library(caret)
+library(raster)
 ```
 
 # Introduction
@@ -42,6 +45,51 @@ dates = unique(readRDS("../../data/resampled/dates.rds"))
 dates = as.Date(dates, format = "%Y_%m_%d" )
 dates = data.frame(Dates=dates)
 knitr::kable(dates, align="l", caption = "Dates of the UAV overpasses.",)
+
+```
+```{r cv_visualization, warning=F,message=F,echo=F}
+trees = rgdal::readOGR("../../data/trees_buffer.shp" )
+trees@data$polID = seq(nrow(trees@data))
+set.seed(1899)
+index = caret::createDataPartition(y = trees@data$polID, p = .70, list = FALSE)
+pred = trees@data[-index, ]
+ind = CAST::CreateSpacetimeFolds(pred, spacevar = "polID", k = 5)
+
+trees@data$train[index] = 0
+trees@data$train[-index] = 1
+
+trees@data$cv1[trees$id %in%pred$id[ind$index[[1]]]] = 1
+trees@data$cv1[trees$id %in%pred$id[ind$indexOut[[1]]]] = 0
+
+trees@data$cv2[trees$id %in%pred$id[ind$index[[2]]]] = 1
+trees@data$cv2[trees$id %in%pred$id[ind$indexOut[[2]]]] = 0
+
+trees@data$cv3[trees$id %in%pred$id[ind$index[[3]]]] = 1
+trees@data$cv3[trees$id %in%pred$id[ind$indexOut[[3]]]] = 0
+
+trees@data$cv4[trees$id %in%pred$id[ind$index[[4]]]] = 1
+trees@data$cv4[trees$id %in%pred$id[ind$indexOut[[4]]]] = 0
+
+trees@data$cv5[trees$id %in%pred$id[ind$index[[5]]]] = 1
+trees@data$cv5[trees$id %in%pred$id[ind$indexOut[[5]]]] = 0
+
+rgbimage = raster::stack("../../data/resampled/res25.tif")
+rgb_names = readRDS("../../data/resampled/names_RGB_stack.rds")
+names(rgbimage) = rgb_names 
+
+rgbimage = rgbimage[[13:15]]
+
+
+tm_shape(rgbimage)+
+  tm_rgb()+
+  tm_shape(trees)+
+  tm_fill(col = "train", palette = "RdBu")
+
+
+tm_shape(rgbimage)+
+  tm_rgb()+
+  tm_shape(trees)+
+  tm_polygons(c("cv1","cv2","cv3","cv4","cv5"))
 
 ```
 
