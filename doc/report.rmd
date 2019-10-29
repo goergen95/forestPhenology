@@ -30,6 +30,29 @@ library(raster)
 
 # Introduction
 
+Forests environments provide valuabel services to the human well being as well as 
+supporting services to the function of ecosystems. Additionally, they count to 
+the main biodiversity hotspots on earth [@Brockerhoff2017]. However, the most recent
+Global Forest Ressource Assessment of the FAO states, that the global forest area
+shrinked between 1990 and 2015 from 31.6% of the global land cover to 30.6%, or in 
+other numbers from 4,128 Mio. ha to 3,999 Mio. ha - a decrease of 3.1% [@FoodandAgricultureOrgansiationoftheUnitedNations2015].
+Simultaniously, the percentage of planted trees increased by over 105 Mio. ha, 
+reducing the share of natural forest areas. Over the last decades, we can find 
+scholary interests on ecosystem services and functions which are sustained by forests,
+mainly the habitat provision for endangered or native species, the provision of 
+material goods such as wood biomass, soil formation and composition, as well as 
+climatic regulation functions, such as carbon sequestration [@Brockerhoff2017].
+One of the main critical variables in assessing the quality of forest envrionments,
+their biodiversity, and their structural attributes is the tree species, either on
+the individual tree level or the dominating species for coarser areas of interest. 
+
+Identifying tree species, however, on an operative scale for larger areas, remains a challenge.
+Recently, different remote sensing approaches proved that tree species identification
+from above the earth's surface is feasiable, but there still remain significant 
+trade-offs between the costs, computational demand and spatial-temporal resolution of
+remotly sensed imagery.
+
+
 # Data and Method
 
 The UAV imageries were obtained through the use of a GoPro x.x and an overpass over the region
@@ -85,11 +108,11 @@ tm_shape(rgbimage)+
   tm_shape(trees)+
   tm_fill(col = "train", palette = "RdBu")
 
-
-tm_shape(rgbimage)+
-  tm_rgb()+
-  tm_shape(trees)+
-  tm_polygons(c("cv1","cv2","cv3","cv4","cv5"))
+# 
+# tm_shape(rgbimage)+
+#   tm_rgb()+
+#   tm_shape(trees)+
+#   tm_polygons(c("cv1","cv2","cv3","cv4","cv5"))
 
 ```
 
