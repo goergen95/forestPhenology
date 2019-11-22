@@ -63,6 +63,13 @@ peak of mixed forests. We calculated a selection of RGB-based vegetational indic
 of the images as well as seasonal statistics which describe the development of these indices
 in the course of the vegetation period.
 
+- UAV orthoimages, AgiSoft (how-to), flight height
+- pre-process: crop to AOI, spatial aggregations different resolutions, indices, season parameters
+- tree shape: differential GPS points, >= 40cm DBH, 2m buffer, squares -> species
+- RF model, 5-fold cross validation, training vs. testing, kappa & accuracy,
+- plots predictors (all, indices, seasons) vs. resolutions 
+
+
 ```{r dates-table, echo=F, tab.cap="Days of UAV overpass.",}
 dates = unique(readRDS("../../data/resampled/dates.rds"))
 dates = as.Date(dates, format = "%Y_%m_%d" )
@@ -108,11 +115,11 @@ tm_shape(rgbimage)+
   tm_shape(trees)+
   tm_fill(col = "train", palette = "RdBu")
 
-# 
-# tm_shape(rgbimage)+
-#   tm_rgb()+
-#   tm_shape(trees)+
-#   tm_polygons(c("cv1","cv2","cv3","cv4","cv5"))
+
+tm_shape(rgbimage)+
+  tm_rgb()+
+  tm_shape(trees, col = c("red","blue","grey"))+
+  tm_polygons(c("cv1","cv2","cv3","cv4","cv5"))
 
 ```
 
