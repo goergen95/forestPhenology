@@ -26,6 +26,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tmap)
 library(caret)
 library(raster)
+library(stringr)
+library(ggplot2)
 ```
 
 # Introduction
@@ -55,14 +57,14 @@ remotly sensed imagery.
 
 # Data and Method
 
-In this project, AgisoftPhotoScan (???) in the version (???) was used to process the UAV imagery. Agisoft Photoscan Professional is anaffordable 3D reconstruction software from the Russian company Agisoft LLC (Agisoft, 2018) for the generation of dense point clouds and photogrammetric products such as orthorectified mosaics and DSM derived from images. Photoscan has the advantage to provide a simple workflow, from performing bundle block adjustment to calibrate the camera and orientate images after automatic tie point measurements, geo-referencing by measuring ground control points, concluding with the computation of a dense point cloud and requested final products (Mayer et al. 2018 ???? Mendely hinzufügen). The Airborne system (???Drohnenname) was used to acquire the UAV imagery using a commercial goPro (???Model + Objektiv. In (??? Anzahl flights) flight campaigns with a flight altitude of (40 meters???), (???Anzahlfotos) photos were acquired. The internal GPS of the GoPro was used for geotagging the images. A post referencing enabled a better processing of the images in SFM software (Version???) and more accurate orthophotos without manual referencing in Photoscan.  Photo Alignment is a process in PS for image matching and bundle block adjustment in an arbitrary system. It generates a sparse point cloud as well as the interior and exterior orientation parameters of all images in that system, including systematic error compensation such as non-linear lens distortions. Prior to the adjustment, the tie points are automatically measured by detecting and matching features in overlapping images resulting in a sparse point cloud (Mayer et al. 2018??? Mendely hinzufügen).The settings in this project were chosen as follows:
+In this project, AgisoftPhotoScan (???) in the version (???) was used to process the UAV imagery. Agisoft Photoscan Professional is anaffordable 3D reconstruction software from the Russian company Agisoft LLC (Agisoft, 2018) for the generation of dense point clouds and photogrammetric products such as orthorectified mosaics and DSM derived from images. Photoscan has the advantage to provide a simple workflow, from performing bundle block adjustment to calibrate the camera and orientate images after automatic tie point measurements, geo-referencing by measuring ground control points, concluding with the computation of a dense point cloud and requested final products (Mayer et al. 2018 ???? Mendely hinzuf?gen). The Airborne system (???Drohnenname) was used to acquire the UAV imagery using a commercial goPro (???Model + Objektiv. In (??? Anzahl flights) flight campaigns with a flight altitude of (40 meters???), (???Anzahlfotos) photos were acquired. The internal GPS of the GoPro was used for geotagging the images. A post referencing enabled a better processing of the images in SFM software (Version???) and more accurate orthophotos without manual referencing in Photoscan.  Photo Alignment is a process in PS for image matching and bundle block adjustment in an arbitrary system. It generates a sparse point cloud as well as the interior and exterior orientation parameters of all images in that system, including systematic error compensation such as non-linear lens distortions. Prior to the adjustment, the tie points are automatically measured by detecting and matching features in overlapping images resulting in a sparse point cloud (Mayer et al. 2018??? Mendely hinzuf?gen).The settings in this project were chosen as follows:
 - General: Accuracy: Medium; Generec preselection: yes; Reference preselection: yes
 - Advances: Key Piont limit: 40000; Tie point limit: 4000; apply mask: no; Adaptive camera model fitting: yes
 
 Sparse cloud filtering was performed under the following settings:
 -gradual Selection: reprojection error: 0.26; reconstruction uncertainty: 189.461; projection accuracy:12.4621; reconstruction uncertainty:6.72951; reprojectionerror:0.122199
 
-Based on the information of the point cloud (Sparse Cloud, Dense Cloudetc  ...) PhotoScan can construct a polygon model (Mesh) (Agisoft 2018??? Mendeley hinzufügen) In this Project the Mesh was build by following setting:
+Based on the information of the point cloud (Sparse Cloud, Dense Cloudetc  ...) PhotoScan can construct a polygon model (Mesh) (Agisoft 2018??? Mendeley hinzuf?gen) In this Project the Mesh was build by following setting:
 - General: surface type: Height field (2.5D); source data: sparse cloud; face count: medium
 - advanced: Interpolation: enabled; Point classes: all; calculate vertex colors
 
@@ -136,6 +138,48 @@ tm_shape(rgbimage)+
 ```
 
 # Results
+
+
+```{r result_plots, echo=F, warning=F, message=F}
+
+models = list.files("../results", pattern = "\\.rds$", full.names = T)
+
+getModelMetric <- function(model, metric){
+    decomp = str_split(str_split(model, "/")[[1]][3], "_")[[1]]
+    if (length(decomp) == 2){
+      res = str_sub(decomp[2],4,5)
+      type = "all"
+    } else {
+      res =  str_sub(decomp[3],4,5)
+      type = decomp[2]
+    }
+    
+    model = readRDS(model)
+    besthyper = as.numeric(model$bestTune)
+    if (!metric %in% c("Kappa", "Accuracy")) stop("chosen metric not valid.")
+    if (metric == "Kappa"){
+      metricVal = model$results$Kappa[which(model$results$mtry == besthyper)]}
+    if (metric == "Accuracy"){
+      metricVal = model$results$Accuracy[which(model$results$mtry == besthyper)]}
+    df_return = data.frame(resolution=res, type=type, metric=metricVal)
+    names(df_return)[3] = metric
+   return(df_return)
+  }
+  
+kappas = do.call("rbind", lapply(models, getModelMetric, metric="Kappa"))
+
+ggplot(data = kappas, aes(x=resolution)) +
+  geom_point(aes(y=Kappa, shape=type, col=type), size=2)+
+  theme_minimal()
+
+
+accuracies = do.call("rbind", lapply(models, getModelMetric, metric="Accuracy"))
+
+ggplot(data = accuracies, aes(x=resolution)) +
+  geom_point(aes(y=Accuracy, shape=type, col=type), size=2)+
+  theme_minimal()
+
+```
 
 
 # Sources
