@@ -17,7 +17,7 @@ author:
 - Eike Schott
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 
-abstract: "The monitoring of forests environments is of crucial importance since they serve as natural habitats and constitute a main source of biological diversity. Yet, it is very costly and labor intensive to monitor forests by traditional means. Recently, there have been several attempts to use UAV-borne imagery in forest monitoring since these images can be obtained at low cost and can come with both, high spatial and temporal resolution which enable scientists and practitioners to comprehensively monitor forest environments. Tree species identification is primary interest, since the identification of species allows to draw conclusions about the structure and biodiversity in given areas of a forest. When using simple RGB images, species classification still remains a challenge. In this paper we present our results of an experiment exploring the influence of spatial resolution of RGB imagery, artificially derived vegetation indices as well as seasonal parameters on the accuracy of tree species classification within the Marburg OpenForest. We used a resolution of 5 cm, 10 cm, 15 cm, and 25 cm in a forwar-feature-selection based on the RandomForest classification algorithm. Additionally we tested the obtained accuracy when only mono-temporal or multi-temporal variables are included as well as both types of variables. Our results show that ..."
+abstract: "The monitoring of forests environments is of crucial importance since they serve as natural habitats and constitute a main source of biological diversity on the planet. Yet, it is very costly and labor intensive to monitor forests by traditional means and classical remote sensing technologies restrict the analysis to the regional level. To overcome these challenges there have been several attempts to use UAV-borne imagery in forest monitoring. By the use of drones images can be obtained at low cost and can be associated with both, high spatial and temporal resolution. This enables scientists and practitioners to comprehensively monitor forest environments. Tree species identification is primary interest, since the identification of species allows to draw conclusions about the structure and biodiversity in given areas of a forest. When using simple RGB images, species classification still remains a challenge. In this paper we present our results of an experiment exploring the influence of spatial resolution of RGB imagery, artificially derived vegetation indices as well as seasonal parameters on the accuracy of tree species classification within the Marburg OpenForest. We used a resolution of 5 cm, 10 cm, 15 cm, and 25 cm in a forward-feature-selection based on the Random Forest classification algorithm. Additionally we tested the obtained accuracy when only mono-temporal or multi-temporal variables are included as well as both types of variables. Our results show that ..."
 
 ---
 
@@ -32,27 +32,66 @@ library(ggplot2)
 
 # Introduction
 
-Forests environments provide valuabel services to the human well being as well as 
+Forests environments provide valuable services to the human well being as well as 
 supporting services to the function of ecosystems. Additionally, they count to 
 the main biodiversity hotspots on earth [@Brockerhoff2017]. However, the most recent
-Global Forest Ressource Assessment of the FAO states, that the global forest area
+Global Forest Resource Assessment of the FAO states, that the global forest area
 shrinked between 1990 and 2015 from 31.6% of the global land cover to 30.6%, or in 
 other numbers from 4,128 Mio. ha to 3,999 Mio. ha - a decrease of 3.1% [@FoodandAgricultureOrgansiationoftheUnitedNations2015].
-Simultaniously, the percentage of planted trees increased by over 105 Mio. ha, 
-reducing the share of natural forest areas. Over the last decades, we can find 
-scholary interests on ecosystem services and functions which are sustained by forests,
+Simultaneously, the percentage of planted trees increased by over 105 Mio. ha, 
+reducing the share of natural forest areas. Over the last decades, we can find growing
+scholar interests on ecosystem services and functions which are sustained by forests,
 mainly the habitat provision for endangered or native species, the provision of 
 material goods such as wood biomass, soil formation and composition, as well as 
 climatic regulation functions, such as carbon sequestration [@Brockerhoff2017].
-One of the main critical variables in assessing the quality of forest envrionments,
+One of the main critical variables in assessing the quality of forest environments,
 their biodiversity, and their structural attributes is the tree species, either on
 the individual tree level or the dominating species for coarser areas of interest. 
 
 Identifying tree species, however, on an operative scale for larger areas, remains a challenge.
 Recently, different remote sensing approaches proved that tree species identification
-from above the earth's surface is feasiable, but there still remain significant 
+from above the earth's surface is feasible, but there still remain significant 
 trade-offs between the costs, computational demand and spatial-temporal resolution of
-remotly sensed imagery.
+remotely sensed imagery. Some studies have used satellite imagery which most frequently also
+include information in the infrared spectrum [@Zhang2003; @Elatawneh2013; @Ulsig2017a; @Persson2018; @Grabska2019]
+but generally shows a relatively low spatial resolution limiting the analysis to a 
+level of stand rather than individuals. Additionally, depended on the platform's orbit
+and current weather conditions, the temporal resolution may vary significantly and is 
+not completely planable.
+
+One technology to partly overcome these restrictions is the use of Radio Detection And
+Ranging (RADAR) sensors which show a lower dependency of data quality to the presence
+of clouds and fog. Recently, multi-temporal data from Sentinel-1 has been used in 
+conjunction with spectral data to not only improve the species classification accuracy but
+also to retrieve additional parameters important to forest monitoring such as forest type, 
+stand density, annual phenology, and biomass production among others [@Frison2018; @Niculescu2018; @Dostalova2018; @Mngadi2019].
+
+However promising these advances, the analysis are most commonly restricted to regional analysis
+of forest structures. On a more localized level, high resolution satellite data is 
+either not available or associated with very high costs. With the rapid development of
+unmanned aerial vehicles (UAV) during the last years and a significant decrease in price for
+this technology, new approaches to monitor forest structures on a very local level
+have recently emerged [@Yao2019b].  
+
+UAVs serve as an aerial platform of different kind of sensors which can range from
+LidAR [@Fricker2019], hyper- and multi spectral sensors [@Marques2019a; @Berra2019] as well as simple RGB cameras [@Natesan2019]. A broad methodology to get species information for 
+single tree individuals has been developed integrating the calculation of various 
+vegetation indices from mono- and multi-temporal imagery and the use of machine learning
+models to derieve a relationship between the measured variables and the tree species [@Berra2016; @Klosterman2017; @Klosterman2018; @Sadeghi2018; @Natesan2019; @Fricker2019; @Berra2019].
+For example, @Klosterman2017 were able to estimate phenological status on the leaf-level
+based on the calculation of the green and red chromatic coordinate (GCC and RCC) 
+during spring and autumn.  
+
+Additionally, the development of structure-from-motion algorithms 
+to get 3D information from 2D RGB imagery taken from slightly different angles have enriched the analysis of forest structures from low-cost sensors [@Nevalainen2017; @Yan2018a; @Onishi2018a; @Krause2019a; @Brieger2019a; @Sothe2019a]. @Krause2019a were able to retrive individual 
+tree height based on a photogrammetric point-cloud with an RMSE at about 2-3 %. 
+@Natesan2019 used a Residual Neural Network to effectivly delinate individual tree crowns
+from RGB derived point-clouds and used the spectral informaton for a species classification
+achieving an overall accuracy of 80%. 
+
+In this study, we evaluate the impact on classification accuracy in terms of 
+Kappa scores based on spatial resolution and a comparison between mono-temporal
+and seasonal artificial indices. 
 
 
 # Data and Method
@@ -91,8 +130,9 @@ dates = data.frame(Dates=dates)
 knitr::kable(dates, align="l", caption = "Dates of the UAV overpasses.",)
 
 ```
-```{r cv_visualization, warning=F,message=F,echo=F}
-trees = rgdal::readOGR("../../data/trees_buffer.shp" )
+
+```{r cv_visualization, warning=F, message=F, echo=F, fig.cap="Overview of the training and validation trees of the five-fold cross-validation."}
+trees = rgdal::readOGR("../../data/trees_buffer.shp")
 trees@data$polID = seq(nrow(trees@data))
 set.seed(1899)
 index = caret::createDataPartition(y = trees@data$polID, p = .70, list = FALSE)
@@ -124,10 +164,10 @@ names(rgbimage) = rgb_names
 rgbimage = rgbimage[[13:15]]
 
 
-tm_shape(rgbimage)+
-  tm_rgb()+
-  tm_shape(trees)+
-  tm_fill(col = "train", palette = "RdBu")
+# tm_shape(rgbimage)+
+#   tm_rgb()+
+#   tm_shape(trees)+
+#   tm_fill(col = "train", palette = "RdBu")
 
 
 tm_shape(rgbimage)+
@@ -140,7 +180,7 @@ tm_shape(rgbimage)+
 # Results
 
 
-```{r result_plots, echo=F, warning=F, message=F}
+```{r result_plots, echo=F, warning=F, message=F, fig.cap="Kappa scores of the random fores models based varying pixel sizes and predictor variables (red - mono-temporal indices, blue - seasonal indices, green - mono-temporal and seasonal indices)"}
 
 models = list.files("../results", pattern = "\\.rds$", full.names = T)
 
@@ -173,16 +213,20 @@ ggplot(data = kappas, aes(x=resolution)) +
   theme_minimal()
 
 
-accuracies = do.call("rbind", lapply(models, getModelMetric, metric="Accuracy"))
+#accuracies = do.call("rbind", lapply(models, getModelMetric, metric="Accuracy"))
 
-ggplot(data = accuracies, aes(x=resolution)) +
-  geom_point(aes(y=Accuracy, shape=type, col=type), size=2)+
-  theme_minimal()
+# ggplot(data = accuracies, aes(x=resolution)) +
+#   geom_point(aes(y=Accuracy, shape=type, col=type), size=2)+
+#   theme_minimal()
 
 ```
 
+```{r object_accuracy, echo=F, warning=F, message=F, eval=F}
+models = readRDS(list.files("../results", pattern = "\\.rds$", full.names = T))
 
-# Sources
-Example citation [@Ulsig2017a].
+```
+
+# References
+
 
 
