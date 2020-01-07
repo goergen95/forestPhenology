@@ -28,6 +28,8 @@ library(caret)
 library(raster)
 library(stringr)
 library(ggplot2)
+library(dplyr)
+library(purrr)
 ```
 
 # Introduction
@@ -93,7 +95,6 @@ Network to classify tree species. They also underwent an experiment which only i
 data. The hyperspectral data achieved an F-score of 0.87, while the RGB data achieved 
 a score of 0.64 in a dominantly coniferous forest.
 
-
 Additionally, the development of structure-from-motion algorithms 
 to get 3D information from 2D RGB imagery taken from slightly different angles 
 have enriched the analysis of forest structures from low-cost sensors 
@@ -112,8 +113,7 @@ and achived and Kappa score of 0.7 (overall accuracy of 72.4%) by combining spec
 raw data, indices as well as structural parameters in the classification process using 
 a support-vector machine. 
 
-So far, in our best knowledge, there has not been any attempt reported to the
-scientific community to structurally investigate the impact of decreasing
+However, little efforts have been done to structurally investigate the impact of decreasing
 spatial resolution on the classification accuracy as well as the impact of
 the integration of seasonal parameters derived from multiple mono-temporal observations.
 Here, we strictly limit our analysis to the investigation of these two thematic 
@@ -122,12 +122,31 @@ from point clouds. We solely focus on the analysis of the dynamic in predictive 
 of RGB derived mono- and multi-temporal variables to model tree species with 
 changing spatial resoulution. 
 
+To this end we use the RGB imagery obtained by multiple overflights during the year 
+2019 from the Marburg OpenForest research project. This area is used as a joint
+research area from different scientists of several German universities who set out
+to investigate questions of biodiversity and natural resource management in temperate forests. 
+We artificially decrease the spatial resoultion of the imagery resulting in three different target
+resolutions of 10, 15, and 25 cm. For every single overflight we calculated a series
+of RGB indices on a pixels basis. Additionally, we calculate descriptive statistics
+(mean, maximum, minimum, amplitude, etc.) for each index over the course of the year
+to include information about the seasonality of the phenological development.
 
-# Data and Method
+The resulting input data is used to establish 9 distinct random forest models, one
+for each resolution including either only mono-temporal predictor variables, only seasonal
+variables or both types of variables. On the basis of a forward-feature selection
+the variables who bare the most relevant information content for the tree species
+classification are then selected and used in the species prediction. The evaluation
+of the classification accuracies is compared on a pixel and object basis to draw
+conclusions on the importance of spatial resolution as well as the importance
+of mono- vs. multi-temporal input data.
+
+
+# Data and Methods
 
 ## Study Area
 
-## Pre-Process
+## Pre-Processing
 
 ### UAV orthoimages
 
@@ -168,8 +187,7 @@ in the course of the vegetation period.
 
 ### Auxiliary data
 
-## Random Forest Classification and Evaluation
-
+## Classification and Validation
 
 ```{r cv_visualization, warning=F, message=F, echo=F, fig.cap="Overview of the training and validation trees of the five-fold cross-validation."}
 trees = rgdal::readOGR("../../data/trees_buffer.shp")
@@ -219,14 +237,6 @@ tm_shape(rgbimage)+
 
 # Results
 
-# Discussion
-
-# Conclusion
-
-
-
-# Results
-
 ```{r result_plots, echo=F, warning=F, message=F, fig.cap="Kappa scores of the random fores models based varying pixel sizes and predictor variables (red - mono-temporal indices, blue - seasonal indices, green - mono-temporal and seasonal indices)"}
 
 models = list.files("../results", pattern = "\\.rds$", full.names = T)
@@ -268,11 +278,30 @@ ggplot(data = kappas, aes(x=resolution)) +
 
 ```
 
-```{r object_accuracy, echo=F, warning=F, message=F, eval=F}
-models = readRDS(list.files("../results", pattern = "\\.rds$", full.names = T))
+```{r validation_plots, echo=F, warning=F, message=F, fig.cap="Overall Accuracy of species classification on an object basis."}
+predictions = readRDS("../../results/validation_pred.rds")
+index = predictions$index
+
+metrics = predictions %>%
+  select(-index) %>%
+  map(function(x) factor(x, levels=1:2, labels=c("BUR", "EIT"))) %>%
+  map(function(x) caret::confusionMatrix(trees$specID[index], x)) %>%
+  map(function(x) tibble(accuracy = x$overall[1], kappa = x$overall[2] ))
+
+results = do.call("rbind", metrics)
+resolutions = stringr::str_sub(names(predictions)[-10],-2,-1)
+types = stringr::str_sub(names(predictions)[-10],5, 7)
+results$resolution = as.numeric(resolutions)
+results$type = types
+
+ggplot(data = results, aes(x=resolution)) +
+  geom_point(aes(y=accuracy, shape=type, col=type), size=2)+
+  theme_minimal()
 
 ```
 
+# Discussion
+# Conclusion
 # References
 
 
