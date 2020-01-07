@@ -65,7 +65,6 @@ of clouds and fog. Recently, multi-temporal data from Sentinel-1 has been used i
 conjunction with spectral data to not only improve the species classification accuracy but
 also to retrieve additional parameters important to forest monitoring such as forest type, 
 stand density, annual phenology, and biomass production among others [@Frison2018; @Niculescu2018; @Dostalova2018; @Mngadi2019].
-
 However promising these advances, the analysis are most commonly restricted to regional analysis
 of forest structures. On a more localized level, high resolution satellite data is 
 either not available or associated with very high costs. With the rapid development of
@@ -74,27 +73,71 @@ this technology, new approaches to monitor forest structures on a very local lev
 have recently emerged [@Yao2019b].  
 
 UAVs serve as an aerial platform of different kind of sensors which can range from
-LidAR [@Fricker2019], hyper- and multi spectral sensors [@Marques2019a; @Berra2019] as well as simple RGB cameras [@Natesan2019]. A broad methodology to get species information for 
+LidAR [@Fricker2019], hyper- and multi spectral sensors [@Marques2019a; @Berra2019] 
+as well as simple RGB cameras [@Natesan2019]. A broad methodology to obtain species information for 
 single tree individuals has been developed integrating the calculation of various 
 vegetation indices from mono- and multi-temporal imagery and the use of machine learning
-models to derieve a relationship between the measured variables and the tree species [@Berra2016; @Klosterman2017; @Klosterman2018; @Sadeghi2018; @Natesan2019; @Fricker2019; @Berra2019].
-For example, @Klosterman2017 were able to estimate phenological status on the leaf-level
+models to derieve a relationship between the measured variables and the 
+tree species [@Berra2016; @Klosterman2017; @Klosterman2018; @Natesan2019; @Fricker2019; @Berra2019].
+@Berra2016 used the Green Chromatic Coordinate to monitor the Start-of-Season for
+four different tree species in decidous woodland suggesting that UAV imagery 
+can contribute to investiage the phenologocial statu of individuak trees.
+@Klosterman2017 were able to estimate phenological status on the leaf-level
 based on the calculation of the green and red chromatic coordinate (GCC and RCC) 
-during spring and autumn.  
+during spring and autumn to budburst and leaf expansion as well as leaf senescence.
+@Natesan2019 used Residual Neural Networks to classify three different tree species based on RGB
+imagery obtained over the course of three years and achived a classification accuracy
+of about 80%, and an accuracy of 51% when only the data of single years was used. 
+@Fricker2019 used hyperspectral images obtained by a UAV and a Convolutional Neural
+Network to classify tree species. They also underwent an experiment which only included RGB
+data. The hyperspectral data achieved an F-score of 0.87, while the RGB data achieved 
+a score of 0.64 in a dominantly coniferous forest.
+
 
 Additionally, the development of structure-from-motion algorithms 
-to get 3D information from 2D RGB imagery taken from slightly different angles have enriched the analysis of forest structures from low-cost sensors [@Nevalainen2017; @Yan2018a; @Onishi2018a; @Krause2019a; @Brieger2019a; @Sothe2019a]. @Krause2019a were able to retrive individual 
-tree height based on a photogrammetric point-cloud with an RMSE at about 2-3 %. 
-@Natesan2019 used a Residual Neural Network to effectivly delinate individual tree crowns
-from RGB derived point-clouds and used the spectral informaton for a species classification
-achieving an overall accuracy of 80%. 
+to get 3D information from 2D RGB imagery taken from slightly different angles 
+have enriched the analysis of forest structures from low-cost sensors 
+[@Nevalainen2017; @Yan2018a; @Onishi2018a; @Krause2019a; @Brieger2019a; @Sothe2019a]. 
+@Nevalainen2017 used RGB images and an automated matching technique to obtain 
+point clouds at a 5cm resoultion. Coupled with hyperspectral imagery this allowed 
+the tree species classification to an accuracy at 95%.
+@Yan2018a compared thier approach of retrieving tree crowns from RGB images with
+crowns delinated from LiDAR data and report an accuracy at about 90%. @Krause2019a 
+were able to retrive individual tree height based on a photogrammetric point-cloud 
+with an RMSE at about 2-3 %. @Brieger2019a used RGB derived point clouds at
+different study sites in Siberia and achived an accuracy of 67.1% in delinating 
+individual tree crowns and an RMSE of 18.46% for tree height. @Sothe2019a used
+hyperspectral images for tree delination and classification in subtropical rainforests
+and achived and Kappa score of 0.7 (overall accuracy of 72.4%) by combining spectral
+raw data, indices as well as structural parameters in the classification process using 
+a support-vector machine. 
 
-In this study, we evaluate the impact on classification accuracy in terms of 
-Kappa scores based on spatial resolution and a comparison between mono-temporal
-and seasonal artificial indices. 
+So far, in our best knowledge, there has not been any attempt reported to the
+scientific community to structurally investigate the impact of decreasing
+spatial resolution on the classification accuracy as well as the impact of
+the integration of seasonal parameters derived from multiple mono-temporal observations.
+Here, we strictly limit our analysis to the investigation of these two thematic 
+blocs and deliberatly exclude other factors such as structural variables obtained
+from point clouds. We solely focus on the analysis of the dynamic in predictive potential 
+of RGB derived mono- and multi-temporal variables to model tree species with 
+changing spatial resoulution. 
 
 
 # Data and Method
+
+## Study Area
+
+## Pre-Process
+
+### UAV orthoimages
+
+```{r dates-table, echo=F, tab.cap="Days of UAV overpass.",}
+dates = unique(readRDS("../../data/resampled/dates.rds"))
+dates = as.Date(dates, format = "%Y_%m_%d" )
+dates = data.frame(Dates=dates)
+knitr::kable(dates, align="l", caption = "Dates of the UAV overpasses.",)
+
+```
 
 In this project, AgisoftPhotoScan (???) in the version (???) was used to process the UAV imagery. Agisoft Photoscan Professional is anaffordable 3D reconstruction software from the Russian company Agisoft LLC (Agisoft, 2018) for the generation of dense point clouds and photogrammetric products such as orthorectified mosaics and DSM derived from images. Photoscan has the advantage to provide a simple workflow, from performing bundle block adjustment to calibrate the camera and orientate images after automatic tie point measurements, geo-referencing by measuring ground control points, concluding with the computation of a dense point cloud and requested final products (Mayer et al. 2018 ???? Mendely hinzuf?gen). The Airborne system (???Drohnenname) was used to acquire the UAV imagery using a commercial goPro (???Model + Objektiv. In (??? Anzahl flights) flight campaigns with a flight altitude of (40 meters???), (???Anzahlfotos) photos were acquired. The internal GPS of the GoPro was used for geotagging the images. A post referencing enabled a better processing of the images in SFM software (Version???) and more accurate orthophotos without manual referencing in Photoscan.  Photo Alignment is a process in PS for image matching and bundle block adjustment in an arbitrary system. It generates a sparse point cloud as well as the interior and exterior orientation parameters of all images in that system, including systematic error compensation such as non-linear lens distortions. Prior to the adjustment, the tie points are automatically measured by detecting and matching features in overlapping images resulting in a sparse point cloud (Mayer et al. 2018??? Mendely hinzuf?gen).The settings in this project were chosen as follows:
 - General: Accuracy: Medium; Generec preselection: yes; Reference preselection: yes
@@ -116,20 +159,17 @@ peak of mixed forests. We calculated a selection of RGB-based vegetational indic
 of the images as well as seasonal statistics which describe the development of these indices
 in the course of the vegetation period.
 
+
 - UAV orthoimages, AgiSoft (how-to), flight height
 - pre-process: crop to AOI, spatial aggregations different resolutions, indices, season parameters
 - tree shape: differential GPS points, >= 40cm DBH, 2m buffer, squares -> species
 - RF model, 5-fold cross validation, training vs. testing, kappa & accuracy,
 - plots predictors (all, indices, seasons) vs. resolutions 
 
+### Auxiliary data
 
-```{r dates-table, echo=F, tab.cap="Days of UAV overpass.",}
-dates = unique(readRDS("../../data/resampled/dates.rds"))
-dates = as.Date(dates, format = "%Y_%m_%d" )
-dates = data.frame(Dates=dates)
-knitr::kable(dates, align="l", caption = "Dates of the UAV overpasses.",)
+## Random Forest Classification and Evaluation
 
-```
 
 ```{r cv_visualization, warning=F, message=F, echo=F, fig.cap="Overview of the training and validation trees of the five-fold cross-validation."}
 trees = rgdal::readOGR("../../data/trees_buffer.shp")
@@ -179,6 +219,13 @@ tm_shape(rgbimage)+
 
 # Results
 
+# Discussion
+
+# Conclusion
+
+
+
+# Results
 
 ```{r result_plots, echo=F, warning=F, message=F, fig.cap="Kappa scores of the random fores models based varying pixel sizes and predictor variables (red - mono-temporal indices, blue - seasonal indices, green - mono-temporal and seasonal indices)"}
 
