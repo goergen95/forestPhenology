@@ -7,6 +7,8 @@ output:
     df_print: kable
     latex_engine: pdflatex
     fig_caption: true
+header-includes:
+  \usepackage{float}
 bibliography: ForestPhenology.bib
 csl: elsevier-harvard.csl
 title: "UAV imagery based tree species classification in the Marburg OpenForest"
@@ -22,7 +24,7 @@ abstract: "The monitoring of forests environments is of crucial importance since
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, fig.pos = "H", fig.align="center")
 library(tmap)
 library(caret)
 library(raster)
@@ -30,6 +32,8 @@ library(stringr)
 library(ggplot2)
 library(dplyr)
 library(purrr)
+library(rgdal)
+trees = readOGR("../../data/trees_buffer.shp")
 ```
 
 # Introduction
@@ -80,7 +84,7 @@ as well as simple RGB cameras [@Natesan2019]. A broad methodology to obtain spec
 single tree individuals has been developed integrating the calculation of various 
 vegetation indices from mono- and multi-temporal imagery and the use of machine learning
 models to derieve a relationship between the measured variables and the 
-tree species [@Berra2016; @Klosterman2017; @Klosterman2018; @Natesan2019; @Fricker2019; @Berra2019].
+tree species.
 @Berra2016 used the Green Chromatic Coordinate to monitor the Start-of-Season for
 four different tree species in decidous woodland suggesting that UAV imagery 
 can contribute to investiage the phenologocial statu of individuak trees.
@@ -97,8 +101,7 @@ a score of 0.64 in a dominantly coniferous forest.
 
 Additionally, the development of structure-from-motion algorithms 
 to get 3D information from 2D RGB imagery taken from slightly different angles 
-have enriched the analysis of forest structures from low-cost sensors 
-[@Nevalainen2017; @Yan2018a; @Onishi2018a; @Krause2019a; @Brieger2019a; @Sothe2019a]. 
+have enriched the analysis of forest structures from low-cost sensors. 
 @Nevalainen2017 used RGB images and an automated matching technique to obtain 
 point clouds at a 5cm resoultion. Coupled with hyperspectral imagery this allowed 
 the tree species classification to an accuracy at 95%.
@@ -123,19 +126,22 @@ of RGB derived mono- and multi-temporal variables to model tree species with
 changing spatial resoulution. 
 
 To this end we use the RGB imagery obtained by multiple overflights during the year 
-2019 from the Marburg OpenForest research project. This area is used as a joint
-research area from different scientists of several German universities who set out
-to investigate questions of biodiversity and natural resource management in temperate forests. 
-We artificially decrease the spatial resoultion of the imagery resulting in three different target
-resolutions of 10, 15, and 25 cm. For every single overflight we calculated a series
-of RGB indices on a pixels basis. Additionally, we calculate descriptive statistics
-(mean, maximum, minimum, amplitude, etc.) for each index over the course of the year
-to include information about the seasonality of the phenological development.
+2019 from a study side located within the Marburg Univeristy forest which is part
+of the research project [Natur 4.0](https://www.uni-marburg.de/en/fb19/natur40/). 
+This forest is used as a joint research area for a project between several German universities 
+and research institutes and sets out to investigate the potential of sensor technology for 
+biodiversity and natural resource management in natural envrionments forests. 
+We artificially decreased the spatial resoultion of aerial imagery obtained in this
+area resulting in three different target resolutions of 10, 15, and 25 cm. 
+For every single overflight we calculated a series of RGB indices on a pixels basis. 
+Additionally, we calculate descriptive statistics (mean, maximum, minimum, amplitude, etc.) 
+for each index over the course of the year to include information about the 
+seasonality of the phenological development.
 
-The resulting input data is used to establish 9 distinct random forest models, one
-for each resolution including either only mono-temporal predictor variables, only seasonal
-variables or both types of variables. On the basis of a forward-feature selection
-the variables who bare the most relevant information content for the tree species
+The resulting input data is used to establish a total of nine distinct random forest models, one
+for each resolution including either only mono-temporal or seasonal predictor variables 
+or both types of variables. On the basis of a forward-feature selection
+the variables which carry the most relevant information content for the tree species
 classification are then selected and used in the species prediction. The evaluation
 of the classification accuracies is compared on a pixel and object basis to draw
 conclusions on the importance of spatial resolution as well as the importance
@@ -146,16 +152,39 @@ of mono- vs. multi-temporal input data.
 
 ## Study Area
 
-## Pre-Processing
+The study area is located at 50.8°N 8.7°E in the German low mountain range in Hesse.
+It is part of the University Forest Caldern where the recently initiated joint research
+project Natur 4.0 aims at investigating the use of networked sensor technology for 
+biodversity and ecosystem managment and protection. It is in this context, that the aerial images 
+which we used here were obtained in an observation campaign during 2019 (see Tab. 1).
+The area is approximatley 37,500 m² and continously covered by trees. In this
+specific location, only two distinct species are present with stem diameters
+at breast height (DBH) greater than 40 cm, namely _fagus sylvatica_ and
+_quercus robur_.
 
-### UAV orthoimages
-
-```{r dates-table, echo=F, tab.cap="Days of UAV overpass.",}
+```{r dates-table, tab.cap="Days of UAV overpass.",}
 dates = unique(readRDS("../../data/resampled/dates.rds"))
 dates = as.Date(dates, format = "%Y_%m_%d" )
 dates = data.frame(Dates=dates)
 knitr::kable(dates, align="l", caption = "Dates of the UAV overpasses.",)
+```
 
+
+## Pre-Processing of the UAV orthoimages
+
+```{r plot_aoi, warning=F, message=F,fig.cap="RGB image of the study area from May 16th 2019 with central positions of tree stems superimposed (Coordinates are presented in UTM32N).", out.width="70%"}
+
+rgb = brick("../../data/resampled/res25.tif")[[10:12]]
+projection = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+
+tm_shape(rgb)+
+  tm_rgb()+
+  tm_shape(trees)+
+  tm_borders(lwd=1, lty="solid", col="black")+
+  tm_graticules(ticks=T, projection=projection, lines=F, 
+                labels.format=list(digits=0),
+                n.y=6, n.x=4)+
+  tm_layout(inner.margins = 0)
 ```
 
 In this project, AgisoftPhotoScan (???) in the version (???) was used to process the UAV imagery. Agisoft Photoscan Professional is anaffordable 3D reconstruction software from the Russian company Agisoft LLC (Agisoft, 2018) for the generation of dense point clouds and photogrammetric products such as orthorectified mosaics and DSM derived from images. Photoscan has the advantage to provide a simple workflow, from performing bundle block adjustment to calibrate the camera and orientate images after automatic tie point measurements, geo-referencing by measuring ground control points, concluding with the computation of a dense point cloud and requested final products (Mayer et al. 2018 ???? Mendely hinzuf?gen). The Airborne system (???Drohnenname) was used to acquire the UAV imagery using a commercial goPro (???Model + Objektiv. In (??? Anzahl flights) flight campaigns with a flight altitude of (40 meters???), (???Anzahlfotos) photos were acquired. The internal GPS of the GoPro was used for geotagging the images. A post referencing enabled a better processing of the images in SFM software (Version???) and more accurate orthophotos without manual referencing in Photoscan.  Photo Alignment is a process in PS for image matching and bundle block adjustment in an arbitrary system. It generates a sparse point cloud as well as the interior and exterior orientation parameters of all images in that system, including systematic error compensation such as non-linear lens distortions. Prior to the adjustment, the tie points are automatically measured by detecting and matching features in overlapping images resulting in a sparse point cloud (Mayer et al. 2018??? Mendely hinzuf?gen).The settings in this project were chosen as follows:
@@ -185,59 +214,30 @@ in the course of the vegetation period.
 - RF model, 5-fold cross validation, training vs. testing, kappa & accuracy,
 - plots predictors (all, indices, seasons) vs. resolutions 
 
-### Auxiliary data
+## Auxiliary data
+
+With the use of a diferential GPS the position of tree stems within the study area
+was logged during a field campaign. Associated with the positional data, the
+tree species as well as the DBH was gathered. As stated before, here we only focused
+on the determination of the impact of changing resolutions and multi-temporal
+predictor variables on the classification accuracy. Therefore, we simplified the
+delination of tree crowns corresponding to the needs of the investigation. First,
+we excluded all trees with a DBH below 40 cm, because we assumed that the crowns
+of greater trees would cover the smaller ones and thus they could not be observed
+on aerial images. Secondly, we buffered the central positions of the residual trees
+by a square of 2 x 2 m, assuming that with this size we would essentially cover 
+substantial proportions of the associated tree crown. However, some
+of these buffered polygons intersected. In these cases, we decided to exclude both
+intersecting polygons since any decision to keep one over the other would be arbitrary.
+In the end, we obtained 161 tree individuals of which 92 (57%) were _fagus sylvatica_ 
+and 69 (43%) were _quercus robur_.
+
 
 ## Classification and Validation
 
-```{r cv_visualization, warning=F, message=F, echo=F, fig.cap="Overview of the training and validation trees of the five-fold cross-validation."}
-trees = rgdal::readOGR("../../data/trees_buffer.shp")
-trees@data$polID = seq(nrow(trees@data))
-set.seed(1899)
-index = caret::createDataPartition(y = trees@data$polID, p = .70, list = FALSE)
-pred = trees@data[-index, ]
-ind = CAST::CreateSpacetimeFolds(pred, spacevar = "polID", k = 5)
-
-trees@data$train[index] = 0
-trees@data$train[-index] = 1
-
-trees@data$cv1[trees$id %in%pred$id[ind$index[[1]]]] = 1
-trees@data$cv1[trees$id %in%pred$id[ind$indexOut[[1]]]] = 0
-
-trees@data$cv2[trees$id %in%pred$id[ind$index[[2]]]] = 1
-trees@data$cv2[trees$id %in%pred$id[ind$indexOut[[2]]]] = 0
-
-trees@data$cv3[trees$id %in%pred$id[ind$index[[3]]]] = 1
-trees@data$cv3[trees$id %in%pred$id[ind$indexOut[[3]]]] = 0
-
-trees@data$cv4[trees$id %in%pred$id[ind$index[[4]]]] = 1
-trees@data$cv4[trees$id %in%pred$id[ind$indexOut[[4]]]] = 0
-
-trees@data$cv5[trees$id %in%pred$id[ind$index[[5]]]] = 1
-trees@data$cv5[trees$id %in%pred$id[ind$indexOut[[5]]]] = 0
-
-rgbimage = raster::stack("../../data/resampled/res25.tif")
-rgb_names = readRDS("../../data/resampled/names_RGB_stack.rds")
-names(rgbimage) = rgb_names 
-
-rgbimage = rgbimage[[13:15]]
-
-
-# tm_shape(rgbimage)+
-#   tm_rgb()+
-#   tm_shape(trees)+
-#   tm_fill(col = "train", palette = "RdBu")
-
-
-tm_shape(rgbimage)+
-  tm_rgb()+
-  tm_shape(trees, col = c("red","blue","grey"))+
-  tm_polygons(c("cv1","cv2","cv3","cv4","cv5"))
-
-```
-
 # Results
 
-```{r result_plots, echo=F, warning=F, message=F, fig.cap="Kappa scores of the random fores models based varying pixel sizes and predictor variables (red - mono-temporal indices, blue - seasonal indices, green - mono-temporal and seasonal indices)"}
+```{r result_plots,  warning=F, message=F, fig.cap="Kappa scores of the random fores models based varying pixel sizes and predictor variables (red - mono-temporal indices, blue - seasonal indices, green - mono-temporal and seasonal indices)", out.width="60%"}
 
 models = list.files("../results", pattern = "\\.rds$", full.names = T)
 
@@ -278,7 +278,7 @@ ggplot(data = kappas, aes(x=resolution)) +
 
 ```
 
-```{r validation_plots, echo=F, warning=F, message=F, fig.cap="Overall Accuracy of species classification on an object basis."}
+```{r validation_plots, warning=F, message=F, fig.cap="Overall Accuracy of species classification on an object basis.", out.width="60%"}
 predictions = readRDS("../../results/validation_pred.rds")
 index = predictions$index
 
