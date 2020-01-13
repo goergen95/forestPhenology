@@ -33,6 +33,9 @@ library(ggplot2)
 library(dplyr)
 library(purrr)
 library(rgdal)
+library(knitr)
+library(kableExtra)
+library(tidyr)
 trees = readOGR("../../data/trees_buffer.shp")
 ```
 
@@ -162,17 +165,8 @@ specific location, only two distinct species are present with stem diameters
 at breast height (DBH) greater than 40 cm, namely _fagus sylvatica_ and
 _quercus robur_.
 
-```{r dates-table, tab.cap="Days of UAV overpass.",}
-dates = unique(readRDS("../../data/resampled/dates.rds"))
-dates = as.Date(dates, format = "%Y_%m_%d" )
-dates = data.frame(Dates=dates)
-knitr::kable(dates, align="l", caption = "Dates of the UAV overpasses.",)
-```
 
-
-## Pre-Processing of the UAV orthoimages
-
-```{r plot_aoi, warning=F, message=F,fig.cap="RGB image of the study area from May 16th 2019 with central positions of tree stems superimposed (Coordinates are presented in UTM32N).", out.width="70%"}
+```{r plot_aoi, warning=F, message=F,fig.cap="RGB image of the study area from May 16th 2019 with central positions of tree stems superimposed (Coordinates are presented in UTM32N).", out.width="70%", fig.pos="H"}
 
 rgb = brick("../../data/resampled/res25.tif")[[10:12]]
 projection = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
@@ -187,12 +181,25 @@ tm_shape(rgb)+
   tm_layout(inner.margins = 0)
 ```
 
+## Pre-Processing of the UAV orthoimages
+
+
 In this project, AgisoftPhotoScan (???) in the version (???) was used to process the UAV imagery. Agisoft Photoscan Professional is anaffordable 3D reconstruction software from the Russian company Agisoft LLC (Agisoft, 2018) for the generation of dense point clouds and photogrammetric products such as orthorectified mosaics and DSM derived from images. Photoscan has the advantage to provide a simple workflow, from performing bundle block adjustment to calibrate the camera and orientate images after automatic tie point measurements, geo-referencing by measuring ground control points, concluding with the computation of a dense point cloud and requested final products (Mayer et al. 2018 ???? Mendely hinzuf?gen). The Airborne system (???Drohnenname) was used to acquire the UAV imagery using a commercial goPro (???Model + Objektiv. In (??? Anzahl flights) flight campaigns with a flight altitude of (40 meters???), (???Anzahlfotos) photos were acquired. The internal GPS of the GoPro was used for geotagging the images. A post referencing enabled a better processing of the images in SFM software (Version???) and more accurate orthophotos without manual referencing in Photoscan.  Photo Alignment is a process in PS for image matching and bundle block adjustment in an arbitrary system. It generates a sparse point cloud as well as the interior and exterior orientation parameters of all images in that system, including systematic error compensation such as non-linear lens distortions. Prior to the adjustment, the tie points are automatically measured by detecting and matching features in overlapping images resulting in a sparse point cloud (Mayer et al. 2018??? Mendely hinzuf?gen).The settings in this project were chosen as follows:
 - General: Accuracy: Medium; Generec preselection: yes; Reference preselection: yes
 - Advances: Key Piont limit: 40000; Tie point limit: 4000; apply mask: no; Adaptive camera model fitting: yes
 
 Sparse cloud filtering was performed under the following settings:
 -gradual Selection: reprojection error: 0.26; reconstruction uncertainty: 189.461; projection accuracy:12.4621; reconstruction uncertainty:6.72951; reprojectionerror:0.122199
+
+```{r dates-table, tab.cap="Days of UAV overpass.",}
+dates = unique(readRDS("../../data/resampled/dates.rds"))
+dates = as.Date(dates, format = "%Y_%m_%d" )
+dates = data.frame(Dates=dates)
+knitr::kable(dates, format = "latex", linesep="", align = "l", booktabs = T,
+             caption = "Dates of the UAV overpasses.") %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  row_spec(0,bold=TRUE)
+```
 
 Based on the information of the point cloud (Sparse Cloud, Dense Cloudetc  ...) PhotoScan can construct a polygon model (Mesh) (Agisoft 2018??? Mendeley hinzuf?gen) In this Project the Mesh was build by following setting:
 - General: surface type: Height field (2.5D); source data: sparse cloud; face count: medium
@@ -214,7 +221,125 @@ in the course of the vegetation period.
 - RF model, 5-fold cross validation, training vs. testing, kappa & accuracy,
 - plots predictors (all, indices, seasons) vs. resolutions 
 
-## Auxiliary data
+## RGB indices
+
+We calculated a number of seven color vegetation indices (VI) which can be found in **Tabel 2**. 
+These color indices were suspected to bare information content on the phenological 
+development of tree species during a year. They were calculated for each 
+UAV overpass resulting in (7 VIs + RGB) x 6 observations = 60 mono-temporal predictor
+variables. Additionally, we calculated the maximum (MAX), minimum (MIN), sum (SUM), standard
+deviation (SD), amplitude (AMP) as well as the 25%- (Q25) and 75%-percentile (Q75) values
+for each VI and the raw channels resulting in additional 70 seasonal predictors. 
+
+```{r indices, echo=F, message=F, warning=F}
+indices = data.frame(name = c("Triangular greeness index",
+                              "Green Leaf Index",
+                              "Color Index of Vegetation",
+                              "Iron Oxide Index",
+                              "Visible Vegetation Index",
+                              "Green Chromatic Coordinate",
+                              "Red Chromatic Coordinate"),
+                     abbreviation = c("TGI", 
+                                      "GLI", 
+                                      "CIVE", 
+                                      "IO", 
+                                      "VVI", 
+                                      "GCC",
+                                      "RCC"),
+                     formula = c("-0.5 * (190*(R-G) - 120*(R-B))",
+                                 "(2*G-R-B) / (2*G+R+B)",
+                                 "(0.441*R-0.881*G + 0.385*B + 18.787)",
+                                 "R/B",
+                                 "(1-abs((R-30) / (R+30))) * \n
+                                 (1-abs((G-50) / (G+50))) * \n 
+                                 (1-abs((B-1) / (B+1)))",
+                                 "G / (R+G+B)",
+                                 "R / (R+G+B)"))
+
+kable(indices, format = "latex", linesep="", align = "l", booktabs = T,
+      caption = "Names and formulas of RGB indices.") %>%
+  kable_styling(latex_options = c("scale_down","HOLD_position")) %>%
+  row_spec(0,bold=TRUE)
+```
+
+
+
+```{r predictor_plots_indices, echo=F, message=F, warning=F, fig.cap="Temporal dynamic of calculated VIs over the course of the year by tree species at 25 cm resolution (dashed lines represent plus and minus one standard deviation)."}
+
+if (!file.exists("ind_data.rds")){
+indices_names = readRDS("../../data/indices/names_indices_stack.rds")
+indices = raster::stack(list.files("../../data/indices", pattern="25", full.names=TRUE))
+names(indices) = indices_names
+fagus =  rasterize(trees[trees$specID == "BUR",], rgb, 1)
+quercus =  rasterize(trees[trees$specID == "EIT",], rgb, 1)
+}
+
+if (!file.exists("ses_data.rds")){
+seasonal_names = readRDS("../../data/season/season_names.rds")
+seasons = raster::stack(list.files("../../data/season", pattern="25", full.names=TRUE))
+names(seasons) = seasonal_names
+fagus =  rasterize(trees[trees$specID == "BUR",], rgb, 1)
+quercus =  rasterize(trees[trees$specID == "EIT",], rgb, 1)
+}
+
+if (!file.exists("ind_data.rds")){
+  ind_fagus = as_tibble(indices[fagus])
+  ind_fagus$class = "fagus"
+  ind_quercus = as_tibble(indices[quercus])
+  ind_quercus$class = "quercus"
+  ind = bind_rows(ind_fagus, ind_quercus)
+  substr(names(ind)[1:42], 12, 12) = "-"
+  ind = ind %>%
+  gather(key, value, -class) %>%
+  separate(key, c("date", "index"), "-") %>%
+  mutate(date = as.Date(date, format = "X%Y_%m_%d"))
+  saveRDS(ind, "ind_data.rds")
+} else {
+  ind = readRDS("ind_data.rds")
+}
+
+max_sd = function(x) { mean(x) + sd(x)}
+min_sd = function(x) { mean(x) - sd(x)}
+
+ggplot(ind, aes(x=date, y=value, col=class)) +
+  stat_summary(fun.y = "mean", geom = "line") +
+  stat_summary(fun.y = max_sd, geom = "line", lty = "dashed")+
+  stat_summary(fun.y = min_sd, geom = "line", lty = "dashed")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  facet_wrap(. ~ index, scales = "free")
+
+```
+
+
+```{r example_seasonal_plots, echo=F, warning=F, message=F, fig.cap="Exampalary histogramm plot of seasonal parameters for RCC by tree species at 25 cm resolution."}
+
+if (!file.exists("ses_data.rds")){
+  ses_fagus = as_tibble(seasons[fagus])
+  ses_fagus$class = "fagus"
+  ses_quercus = as_tibble(seasons[quercus])
+  ses_quercus$class = "quercus"
+  ses = bind_rows(ses_fagus, ses_quercus)
+  paras = c("MAX", "MIN", "AMP", "SD", "SUM", "Q25", "Q75")
+  for (i in paras){ names(ses) = str_replace(names(ses),i, paste("-", i, sep =  ""))}
+  names(ses) = str_remove(names(ses), "season_")
+  ses = ses %>%
+  gather(key, value, -class) %>%
+  separate(key, c("index", "parameter"), "-")
+  saveRDS(ses, "ses_data.rds")
+} else {
+  ses = readRDS("ses_data.rds")
+}
+
+ggplot(filter(ses, index == "GCC"), aes(value, fill=class)) +
+  facet_wrap(. ~ parameter, scales = "free")+
+  geom_histogram()+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+## Tree species data
 
 With the use of a diferential GPS the position of tree stems within the study area
 was logged during a field campaign. Associated with the positional data, the
@@ -224,9 +349,9 @@ predictor variables on the classification accuracy. Therefore, we simplified the
 delination of tree crowns corresponding to the needs of the investigation. First,
 we excluded all trees with a DBH below 40 cm, because we assumed that the crowns
 of greater trees would cover the smaller ones and thus they could not be observed
-on aerial images. Secondly, we buffered the central positions of the residual trees
+on aerial images from above the crown cover. Secondly, we buffered the central positions of the residual trees
 by a square of 2 x 2 m, assuming that with this size we would essentially cover 
-substantial proportions of the associated tree crown. However, some
+substantial proportions of the associated tree crown (**Fig. 1**). However, some
 of these buffered polygons intersected. In these cases, we decided to exclude both
 intersecting polygons since any decision to keep one over the other would be arbitrary.
 In the end, we obtained 161 tree individuals of which 92 (57%) were _fagus sylvatica_ 
@@ -242,27 +367,27 @@ and 69 (43%) were _quercus robur_.
 models = list.files("../results", pattern = "\\.rds$", full.names = T)
 
 getModelMetric <- function(model, metric){
-    decomp = str_split(str_split(model, "/")[[1]][3], "_")[[1]]
-    if (length(decomp) == 2){
-      res = str_sub(decomp[2],4,5)
-      type = "all"
-    } else {
-      res =  str_sub(decomp[3],4,5)
-      type = decomp[2]
-    }
-    
-    model = readRDS(model)
-    besthyper = as.numeric(model$bestTune)
-    if (!metric %in% c("Kappa", "Accuracy")) stop("chosen metric not valid.")
-    if (metric == "Kappa"){
-      metricVal = model$results$Kappa[which(model$results$mtry == besthyper)]}
-    if (metric == "Accuracy"){
-      metricVal = model$results$Accuracy[which(model$results$mtry == besthyper)]}
-    df_return = data.frame(resolution=res, type=type, metric=metricVal)
-    names(df_return)[3] = metric
-   return(df_return)
+  decomp = str_split(str_split(model, "/")[[1]][3], "_")[[1]]
+  if (length(decomp) == 2){
+    res = str_sub(decomp[2],4,5)
+    type = "all"
+  } else {
+    res =  str_sub(decomp[3],4,5)
+    type = decomp[2]
   }
   
+  model = readRDS(model)
+  besthyper = as.numeric(model$bestTune)
+  if (!metric %in% c("Kappa", "Accuracy")) stop("chosen metric not valid.")
+  if (metric == "Kappa"){
+    metricVal = model$results$Kappa[which(model$results$mtry == besthyper)]}
+  if (metric == "Accuracy"){
+    metricVal = model$results$Accuracy[which(model$results$mtry == besthyper)]}
+  df_return = data.frame(resolution=res, type=type, metric=metricVal)
+  names(df_return)[3] = metric
+  return(df_return)
+}
+
 kappas = do.call("rbind", lapply(models, getModelMetric, metric="Kappa"))
 kappas$type = factor(kappas$type, levels(kappas$type)[c(2,1,3)])
 ggplot(data = kappas, aes(x=resolution)) +
@@ -304,6 +429,37 @@ ggplot(data = results, aes(x=resolution)) +
   theme_minimal()
 
 ```
+
+```{r var_imp}
+getVarImp <- function(model){
+  decomp = str_split(str_split(model, "/")[[1]][3], "_")[[1]]
+  if (length(decomp) == 2){
+    res = str_sub(decomp[2],4,5)
+    type = "all"
+  } else {
+    res =  str_sub(decomp[3],4,5)
+    type = decomp[2]
+  }
+  
+  model = readRDS(model)
+  vars = model$selectedvars
+  perf = model$selectedvars_perf
+  perf = c(0, perf)
+  perf[1] = perf[2] / 2
+  perf[2] = perf[2] / 2
+  results_df = data.frame(variable=vars, Kappa=perf, resolution=res, type=type)
+  return(results_df)
+}
+
+varImpList = lapply(models, getVarImp)
+varImpDf = do.call("rbind", varImpList)
+
+weighted_varImp = varImpDf %>%
+  group_by(type) 
+
+
+```
+
 
 # Discussion
 # Conclusion
