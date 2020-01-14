@@ -7,10 +7,13 @@ output:
     df_print: kable
     latex_engine: pdflatex
     fig_caption: true
+    keep_tex: true
 header-includes:
   \usepackage{float}
-bibliography: ForestPhenology.bib
+bibliography: ["ForestPhenology.bib", "r-bib.bib"] 
 csl: elsevier-harvard.csl
+nocite: |
+   @Broge2001, @Gobron2000, @Wan2018, @Rowan2003, @Laboratory2015, @Sonnentag2012, @Richardson2009, @Hunt2012
 title: "UAV imagery based tree species classification in the Marburg OpenForest"
 author: 
 - Darius A. Görgen
@@ -19,7 +22,7 @@ author:
 - Eike Schott
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 
-abstract: "The monitoring of forests environments is of crucial importance since they serve as natural habitats and constitute a main source of biological diversity on the planet. Yet, it is very costly and labor intensive to monitor forests by traditional means and classical remote sensing technologies restrict the analysis to the regional level. To overcome these challenges there have been several attempts to use UAV-borne imagery in forest monitoring. By the use of drones images can be obtained at low cost and can be associated with both, high spatial and temporal resolution. This enables scientists and practitioners to comprehensively monitor forest environments. Tree species identification is primary interest, since the identification of species allows to draw conclusions about the structure and biodiversity in given areas of a forest. When using simple RGB images, species classification still remains a challenge. In this paper we present our results of an experiment exploring the influence of spatial resolution of RGB imagery, artificially derived vegetation indices as well as seasonal parameters on the accuracy of tree species classification within the Marburg OpenForest. We used a resolution of 5 cm, 10 cm, 15 cm, and 25 cm in a forward-feature-selection based on the Random Forest classification algorithm. Additionally we tested the obtained accuracy when only mono-temporal or multi-temporal variables are included as well as both types of variables. Our results show that ..."
+abstract: "The monitoring of forests environments is of crucial importance since they serve as natural habitats and constitute a main source of biological diversity on the planet. Yet, it is very costly and labor intensive to monitor forests by traditional means and classical remote sensing technologies restrict the analysis to the regional level. To overcome these challenges there have been several attempts to use UAV-borne imagery in forest monitoring. By the use of drones images can be obtained at low cost and can be associated with both, high spatial and temporal resolution. This enables scientists and practitioners to comprehensively monitor forest environments. Tree species identification is primary interest, since the identification of species allows to draw conclusions about the structure and biodiversity in given areas of a forest. When using simple RGB images, species classification still remains a challenge. In this paper we present our results of an experiment exploring the influence of spatial resolution of RGB imagery, artificially derived vegetation indices as well as seasonal parameters on the accuracy of tree species classification within the Marburg OpenForest. We used a resolution of 10 cm, 15 cm, and 25 cm in a forward-feature-selection based on the Random Forest classification algorithm. Additionally we tested the obtained accuracy when only mono-temporal or multi-temporal variables are included as well as both types of variables. Our results show that ..."
 
 ---
 
@@ -221,18 +224,42 @@ in the course of the vegetation period.
 - RF model, 5-fold cross validation, training vs. testing, kappa & accuracy,
 - plots predictors (all, indices, seasons) vs. resolutions 
 
+
+## Tree species data
+
+With the use of a diferential GPS the position of tree stems within the study area
+was logged during a field campaign. Associated with the positional data, the
+tree species as well as the DBH was gathered. As stated before, here we only focused
+on the determination of the impact of changing resolutions and multi-temporal
+predictor variables on the classification accuracy. Therefore, we simplified the
+delination of tree crowns corresponding to the needs of the investigation. First,
+we excluded all trees with a DBH below 40 cm, because we assumed that the crowns
+of greater trees would cover the smaller ones and thus they could not be observed
+on aerial images from above the crown cover. Secondly, we buffered the central 
+positions of the residual trees by a square of 2 x 2 m, assuming that with this
+size we would essentially cover substantial proportions of the associated tree 
+crown (**Fig. 1**). However, some of these buffered polygons intersected. 
+In these cases, we decided to exclude both intersecting polygons since any 
+decision to keep one over the other would be arbitrary.In the end, we obtained 
+`r nrow(trees@data)` tree individuals of which `r length(which(trees$specID == "BUR"))` 
+(`r round(length(which(trees$specID == "BUR")) / nrow(trees@data) * 100)`%)  were _fagus sylvatica_ 
+and `r length(which(trees$specID == "EIT"))` 
+(`r round(length(which(trees$specID == "EIT")) / nrow(trees@data) * 100)`%) were _quercus robur_.
+
 ## RGB indices
 
-We calculated a number of seven color vegetation indices (VI) which can be found in **Tabel 2**. 
+We calculated a number of seven color vegetation indices (VI) which can be found in Tabel 2. 
 These color indices were suspected to bare information content on the phenological 
-development of tree species during a year. They were calculated for each 
-UAV overpass resulting in (7 VIs + RGB) x 6 observations = 60 mono-temporal predictor
+development of tree species during a year. Indices are frequently used in remote sensing
+studies due to their relational nature which compensates for influences of illumination and viewing 
+geometry on the measured reflectance values of the RGB channels.
+They were calculated for each UAV overpass resulting in (7 VIs + RGB) x 6 observations = 60 mono-temporal predictor
 variables. Additionally, we calculated the maximum (MAX), minimum (MIN), sum (SUM), standard
 deviation (SD), amplitude (AMP) as well as the 25%- (Q25) and 75%-percentile (Q75) values
 for each VI and the raw channels resulting in additional 70 seasonal predictors. 
 
 ```{r indices, echo=F, message=F, warning=F}
-indices = data.frame(name = c("Triangular greeness index",
+indicesdf = data.frame(name = c("Triangular greeness index",
                               "Green Leaf Index",
                               "Color Index of Vegetation",
                               "Iron Oxide Index",
@@ -250,49 +277,56 @@ indices = data.frame(name = c("Triangular greeness index",
                                  "(2*G-R-B) / (2*G+R+B)",
                                  "(0.441*R-0.881*G + 0.385*B + 18.787)",
                                  "R/B",
-                                 "(1-abs((R-30) / (R+30))) * \n
-                                 (1-abs((G-50) / (G+50))) * \n 
-                                 (1-abs((B-1) / (B+1)))",
+                                 "(1-|R-30| / |R+30|) * \n
+                                 (1- |G-50| / |G+50|) * \n 
+                                 (1-|B-1| / |B+1|)",
                                  "G / (R+G+B)",
-                                 "R / (R+G+B)"))
+                                 "R / (R+G+B)"),
+                     reference = c("Broge and Leblanc (2001)",
+                                   "Gobron et al. (2000)",
+                                   "Wan et al. (2018)",
+                                   "Rowan and Mars (2003)",
+                                   "Planetary Habitability Labratory (2015)",
+                                   "Sonnentag et al. (2012)",
+                                   "Richardson et al. (2009)"))
 
-kable(indices, format = "latex", linesep="", align = "l", booktabs = T,
+kable(indicesdf, format = "latex", linesep="", align = "l", booktabs = T,
       caption = "Names and formulas of RGB indices.") %>%
   kable_styling(latex_options = c("scale_down","HOLD_position")) %>%
-  row_spec(0,bold=TRUE)
+  row_spec(0,bold=TRUE) %>%
+  footnote(general = "R: 580-670 nm, G: 480-610 nm, B: 400-520 nm, for digital cameras according to Hunt et al. (2012).")
 ```
 
-
+Fig. 2 shows the trajectory of the calculated VIs according to the tree species
+indicating the mean value (solid line) as well as one standard deviation from the mean
+(dashed lines) based on all pixels within tree polygons. The trajectories are very
+similar for both classes, however, for almost all VIs there are substantial differences
+between the classes during the first observations during the month of May.  
 
 ```{r predictor_plots_indices, echo=F, message=F, warning=F, fig.cap="Temporal dynamic of calculated VIs over the course of the year by tree species at 25 cm resolution (dashed lines represent plus and minus one standard deviation)."}
 
 if (!file.exists("ind_data.rds")){
-indices_names = readRDS("../../data/indices/names_indices_stack.rds")
-indices = raster::stack(list.files("../../data/indices", pattern="25", full.names=TRUE))
-names(indices) = indices_names
-fagus =  rasterize(trees[trees$specID == "BUR",], rgb, 1)
-quercus =  rasterize(trees[trees$specID == "EIT",], rgb, 1)
+  indices_names = readRDS("../../data/indices/names_indices_stack.rds")
+  indices = raster::stack(list.files("../../data/indices", pattern="25", full.names=TRUE))
+  names(indices) = indices_names
+  fagus =  rasterize(trees[trees$specID == "BUR",], rgb, 1)
+  quercus =  rasterize(trees[trees$specID == "EIT",], rgb, 1)
 }
 
-if (!file.exists("ses_data.rds")){
-seasonal_names = readRDS("../../data/season/season_names.rds")
-seasons = raster::stack(list.files("../../data/season", pattern="25", full.names=TRUE))
-names(seasons) = seasonal_names
-fagus =  rasterize(trees[trees$specID == "BUR",], rgb, 1)
-quercus =  rasterize(trees[trees$specID == "EIT",], rgb, 1)
-}
 
 if (!file.exists("ind_data.rds")){
   ind_fagus = as_tibble(indices[fagus])
-  ind_fagus$class = "fagus"
+  ind_fagus$species = "fagus"
+  
   ind_quercus = as_tibble(indices[quercus])
-  ind_quercus$class = "quercus"
+  ind_quercus$species = "quercus"
   ind = bind_rows(ind_fagus, ind_quercus)
   substr(names(ind)[1:42], 12, 12) = "-"
+  
   ind = ind %>%
-  gather(key, value, -class) %>%
-  separate(key, c("date", "index"), "-") %>%
-  mutate(date = as.Date(date, format = "X%Y_%m_%d"))
+    gather(key, value, -species) %>%
+    separate(key, c("date", "index"), "-") %>%
+    mutate(date = as.Date(date, format = "X%Y_%m_%d"))
   saveRDS(ind, "ind_data.rds")
 } else {
   ind = readRDS("ind_data.rds")
@@ -301,7 +335,7 @@ if (!file.exists("ind_data.rds")){
 max_sd = function(x) { mean(x) + sd(x)}
 min_sd = function(x) { mean(x) - sd(x)}
 
-ggplot(ind, aes(x=date, y=value, col=class)) +
+ggplot(ind, aes(x=date, y=value, col=species)) +
   stat_summary(fun.y = "mean", geom = "line") +
   stat_summary(fun.y = max_sd, geom = "line", lty = "dashed")+
   stat_summary(fun.y = min_sd, geom = "line", lty = "dashed")+
@@ -311,27 +345,39 @@ ggplot(ind, aes(x=date, y=value, col=class)) +
 
 ```
 
+Concerning the frequency of the seasonal predictor variables both tree species
+are charachterised by a very similar distribution (Fig. 3).  
+
+
 
 ```{r example_seasonal_plots, echo=F, warning=F, message=F, fig.cap="Exampalary histogramm plot of seasonal parameters for RCC by tree species at 25 cm resolution."}
 
 if (!file.exists("ses_data.rds")){
+  seasonal_names = readRDS("../../data/season/season_names.rds")
+  seasons = raster::stack(list.files("../../data/season", pattern="25", full.names=TRUE))
+  names(seasons) = seasonal_names
+  fagus =  rasterize(trees[trees$specID == "BUR",], rgb, 1)
+  quercus =  rasterize(trees[trees$specID == "EIT",], rgb, 1)
+}
+
+if (!file.exists("ses_data.rds")){
   ses_fagus = as_tibble(seasons[fagus])
-  ses_fagus$class = "fagus"
+  ses_fagus$species = "fagus"
   ses_quercus = as_tibble(seasons[quercus])
-  ses_quercus$class = "quercus"
+  ses_quercus$species = "quercus"
   ses = bind_rows(ses_fagus, ses_quercus)
   paras = c("MAX", "MIN", "AMP", "SD", "SUM", "Q25", "Q75")
   for (i in paras){ names(ses) = str_replace(names(ses),i, paste("-", i, sep =  ""))}
   names(ses) = str_remove(names(ses), "season_")
   ses = ses %>%
-  gather(key, value, -class) %>%
-  separate(key, c("index", "parameter"), "-")
+    gather(key, value, -species) %>%
+    separate(key, c("index", "parameter"), "-")
   saveRDS(ses, "ses_data.rds")
 } else {
   ses = readRDS("ses_data.rds")
 }
 
-ggplot(filter(ses, index == "GCC"), aes(value, fill=class)) +
+ggplot(filter(ses, index == "GCC"), aes(value, fill=species)) +
   facet_wrap(. ~ parameter, scales = "free")+
   geom_histogram()+
   theme_minimal()+
@@ -339,26 +385,16 @@ ggplot(filter(ses, index == "GCC"), aes(value, fill=class)) +
 ```
 
 
-## Tree species data
-
-With the use of a diferential GPS the position of tree stems within the study area
-was logged during a field campaign. Associated with the positional data, the
-tree species as well as the DBH was gathered. As stated before, here we only focused
-on the determination of the impact of changing resolutions and multi-temporal
-predictor variables on the classification accuracy. Therefore, we simplified the
-delination of tree crowns corresponding to the needs of the investigation. First,
-we excluded all trees with a DBH below 40 cm, because we assumed that the crowns
-of greater trees would cover the smaller ones and thus they could not be observed
-on aerial images from above the crown cover. Secondly, we buffered the central positions of the residual trees
-by a square of 2 x 2 m, assuming that with this size we would essentially cover 
-substantial proportions of the associated tree crown (**Fig. 1**). However, some
-of these buffered polygons intersected. In these cases, we decided to exclude both
-intersecting polygons since any decision to keep one over the other would be arbitrary.
-In the end, we obtained 161 tree individuals of which 92 (57%) were _fagus sylvatica_ 
-and 69 (43%) were _quercus robur_.
-
-
 ## Classification and Validation
+
+For the classification of tree species we used a Random Forest model based
+on a forward-feature selection of predictor variables stratfied by a leave-location-out
+five-fold cross-validation technique. Random Forest is a non-parametric model, both suitable
+for regression and classification problems. It was developed by @Breimann2001 and 
+is works by the establishment of a number of decision trees, the forest, each 
+constructed on a random split of predictor variables. The final class decision is
+made by a majority vote of all trees in the forest. We used the implementation
+in the `caret` package [@R-caret]. 
 
 # Results
 
@@ -430,7 +466,7 @@ ggplot(data = results, aes(x=resolution)) +
 
 ```
 
-```{r var_imp}
+```{r var_imp_indices, echo=F, warning=F, message=F, fig.cap="Variable importance for mono-temporal predictors by resolutions."}
 getVarImp <- function(model){
   decomp = str_split(str_split(model, "/")[[1]][3], "_")[[1]]
   if (length(decomp) == 2){
@@ -443,6 +479,14 @@ getVarImp <- function(model){
   
   model = readRDS(model)
   vars = model$selectedvars
+  indexR = which(str_detect(vars, "res5.1"))
+  indexG = which(str_detect(vars, "res5.2"))
+  indexB = which(str_detect(vars, "res5.3"))
+  
+  if( length(indexR) > 0) vars[indexR] = str_replace(vars[indexR], "res5.1", "R")
+  if( length(indexG) > 0) vars[indexG] = str_replace(vars[indexG], "res5.2", "G")
+  if( length(indexB) > 0) vars[indexB] =str_replace(vars[indexB], "res5.3", "B")
+  
   perf = model$selectedvars_perf
   perf = c(0, perf)
   perf[1] = perf[2] / 2
@@ -452,18 +496,61 @@ getVarImp <- function(model){
 }
 
 varImpList = lapply(models, getVarImp)
-varImpDf = do.call("rbind", varImpList)
+varImTb = as_tibble(do.call("rbind", varImpList))
+paras = c("MAX", "MIN", "AMP", "SD", "SUM", "Q25", "Q75")
+for (i in paras){ varImTb$variable = str_replace(varImTb$variable,i, paste("-", i, sep =  ""))}
+for (i in as.character(indicesdf$abbreviation)) {varImTb$variable = str_replace(varImTb$variable, paste0("_",i), paste("-", i, sep =  ""))}
+varImTb$variable = str_replace(varImTb$variable, "X2","2")
+varImTb$variable = str_remove(varImTb$variable, "season-")
+varImTb$variable = str_replace_all(varImTb$variable ,"_","/")
+varImTb$variable = as.factor(varImTb$variable)
 
-weighted_varImp = varImpDf %>%
-  group_by(type) 
+varImpInd = filter(varImTb, type == "indices")
+varImpInd$variable = droplevels(varImpInd$variable)
+varImpInd$variable = reorder(varImpInd$variable, varImpInd$Kappa)
 
+varImpSes = filter(varImTb, type == "season")
+varImpSes$variable = droplevels(varImpSes$variable)
+varImpSes$variable = reorder(varImpSes$variable, varImpSes$Kappa)
+
+varImpAll = filter(varImTb, type == "all")
+varImpAll$variable = droplevels(varImpAll$variable)
+varImpAll$variable = reorder(varImpAll$variable, varImpAll$Kappa)
+
+ggplot(varImpInd, aes(y=Kappa, x = reorder(variable, Kappa))) +
+  geom_point(aes(shape=resolution, col=resolution)) +
+  geom_segment(aes(x=reorder(variable, Kappa), xend=variable, y=0, yend=Kappa, col = resolution))+
+  coord_flip() +
+  facet_wrap(. ~ resolution) +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
 
+```{r var_imp_season, echo=F, warning=F, message=F, fig.cap="Variable importance for seasonal predictors by resolutions."}
+
+ggplot(varImpSes, aes(y=Kappa, x = reorder(variable, Kappa))) +
+  geom_point(aes(shape=resolution, col=resolution)) +
+  geom_segment(aes(x=reorder(variable, Kappa), xend=variable, y=0, yend=Kappa, col = resolution))+
+  coord_flip() +
+  facet_wrap(. ~ resolution) +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r var_imp_all, echo=F, warning=F, message=F, fig.cap="Variable importance for mono-temporal and seasonal predictors by resolutions."}
+
+ggplot(varImpAll, aes(y=Kappa, x = reorder(variable, Kappa))) +
+  geom_point(aes(shape=resolution, col=resolution)) +
+  geom_segment(aes(x=reorder(variable, Kappa), xend=variable, y=0, yend=Kappa, col = resolution))+
+  coord_flip() +
+  facet_wrap(. ~ resolution) +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
 
 # Discussion
 # Conclusion
 # References
-
 
 

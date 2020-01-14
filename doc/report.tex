@@ -1,0 +1,731 @@
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provides euro and other symbols
+\else % if luatex or xelatex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\usepackage{hyperref}
+\hypersetup{
+            pdftitle={UAV imagery based tree species classification in the Marburg OpenForest},
+            pdfauthor={Darius A. Görgen; Tobias Koch; Marvin Müsgen; Eike Schott},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+
+\title{UAV imagery based tree species classification in the Marburg OpenForest}
+\author{Darius A. Görgen \and Tobias Koch \and Marvin Müsgen \and Eike Schott}
+\date{January 14, 2020}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+The monitoring of forests environments is of crucial importance since
+they serve as natural habitats and constitute a main source of
+biological diversity on the planet. Yet, it is very costly and labor
+intensive to monitor forests by traditional means and classical remote
+sensing technologies restrict the analysis to the regional level. To
+overcome these challenges there have been several attempts to use
+UAV-borne imagery in forest monitoring. By the use of drones images can
+be obtained at low cost and can be associated with both, high spatial
+and temporal resolution. This enables scientists and practitioners to
+comprehensively monitor forest environments. Tree species identification
+is primary interest, since the identification of species allows to draw
+conclusions about the structure and biodiversity in given areas of a
+forest. When using simple RGB images, species classification still
+remains a challenge. In this paper we present our results of an
+experiment exploring the influence of spatial resolution of RGB imagery,
+artificially derived vegetation indices as well as seasonal parameters
+on the accuracy of tree species classification within the Marburg
+OpenForest. We used a resolution of 10 cm, 15 cm, and 25 cm in a
+forward-feature-selection based on the Random Forest classification
+algorithm. Additionally we tested the obtained accuracy when only
+mono-temporal or multi-temporal variables are included as well as both
+types of variables. Our results show that \ldots{}
+\end{abstract}
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+Forests environments provide valuable services to the human well being
+as well as supporting services to the function of ecosystems.
+Additionally, they count to the main biodiversity hotspots on earth
+(Brockerhoff et al., 2017). However, the most recent Global Forest
+Resource Assessment of the FAO states, that the global forest area
+shrinked between 1990 and 2015 from 31.6\% of the global land cover to
+30.6\%, or in other numbers from 4,128 Mio. ha to 3,999 Mio. ha - a
+decrease of 3.1\% (Food and Agriculture Organsiation of the United
+Nations, 2015). Simultaneously, the percentage of planted trees
+increased by over 105 Mio. ha, reducing the share of natural forest
+areas. Over the last decades, we can find growing scholar interests on
+ecosystem services and functions which are sustained by forests, mainly
+the habitat provision for endangered or native species, the provision of
+material goods such as wood biomass, soil formation and composition, as
+well as climatic regulation functions, such as carbon sequestration
+(Brockerhoff et al., 2017). One of the main critical variables in
+assessing the quality of forest environments, their biodiversity, and
+their structural attributes is the tree species, either on the
+individual tree level or the dominating species for coarser areas of
+interest.
+
+Identifying tree species, however, on an operative scale for larger
+areas, remains a challenge. Recently, different remote sensing
+approaches proved that tree species identification from above the
+earth's surface is feasible, but there still remain significant
+trade-offs between the costs, computational demand and spatial-temporal
+resolution of remotely sensed imagery. Some studies have used satellite
+imagery which most frequently also include information in the infrared
+spectrum (Elatawneh et al., 2013; Grabska et al., 2019; Persson et al.,
+2018; Ulsig et al., 2017; Zhang et al., 2003) but generally shows a
+relatively low spatial resolution limiting the analysis to a level of
+stand rather than individuals. Additionally, depended on the platform's
+orbit and current weather conditions, the temporal resolution may vary
+significantly and is not completely planable.
+
+One technology to partly overcome these restrictions is the use of Radio
+Detection And Ranging (RADAR) sensors which show a lower dependency of
+data quality to the presence of clouds and fog. Recently, multi-temporal
+data from Sentinel-1 has been used in conjunction with spectral data to
+not only improve the species classification accuracy but also to
+retrieve additional parameters important to forest monitoring such as
+forest type, stand density, annual phenology, and biomass production
+among others (Dostálová et al., 2018; Frison et al., 2018; Mngadi et
+al., 2019; Niculescu et al., 2018). However promising these advances,
+the analysis are most commonly restricted to regional analysis of forest
+structures. On a more localized level, high resolution satellite data is
+either not available or associated with very high costs. With the rapid
+development of unmanned aerial vehicles (UAV) during the last years and
+a significant decrease in price for this technology, new approaches to
+monitor forest structures on a very local level have recently emerged
+(Yao et al., 2019).
+
+UAVs serve as an aerial platform of different kind of sensors which can
+range from LidAR (Fricker et al., 2019), hyper- and multi spectral
+sensors (Berra et al., 2019; Marques et al., 2019) as well as simple RGB
+cameras (Natesan et al., 2019). A broad methodology to obtain species
+information for single tree individuals has been developed integrating
+the calculation of various vegetation indices from mono- and
+multi-temporal imagery and the use of machine learning models to derieve
+a relationship between the measured variables and the tree species.
+Berra et al. (2016) used the Green Chromatic Coordinate to monitor the
+Start-of-Season for four different tree species in decidous woodland
+suggesting that UAV imagery can contribute to investiage the
+phenologocial statu of individuak trees. Klosterman and Richardson
+(2017) were able to estimate phenological status on the leaf-level based
+on the calculation of the green and red chromatic coordinate (GCC and
+RCC) during spring and autumn to budburst and leaf expansion as well as
+leaf senescence. Natesan et al. (2019) used Residual Neural Networks to
+classify three different tree species based on RGB imagery obtained over
+the course of three years and achived a classification accuracy of about
+80\%, and an accuracy of 51\% when only the data of single years was
+used. Fricker et al. (2019) used hyperspectral images obtained by a UAV
+and a Convolutional Neural Network to classify tree species. They also
+underwent an experiment which only included RGB data. The hyperspectral
+data achieved an F-score of 0.87, while the RGB data achieved a score of
+0.64 in a dominantly coniferous forest.
+
+Additionally, the development of structure-from-motion algorithms to get
+3D information from 2D RGB imagery taken from slightly different angles
+have enriched the analysis of forest structures from low-cost sensors.
+Nevalainen et al. (2017) used RGB images and an automated matching
+technique to obtain point clouds at a 5cm resoultion. Coupled with
+hyperspectral imagery this allowed the tree species classification to an
+accuracy at 95\%. Yan et al. (2018) compared thier approach of
+retrieving tree crowns from RGB images with crowns delinated from LiDAR
+data and report an accuracy at about 90\%. Krause et al. (2019) were
+able to retrive individual tree height based on a photogrammetric
+point-cloud with an RMSE at about 2-3 \%. Brieger et al. (2019) used RGB
+derived point clouds at different study sites in Siberia and achived an
+accuracy of 67.1\% in delinating individual tree crowns and an RMSE of
+18.46\% for tree height. Sothe et al. (2019) used hyperspectral images
+for tree delination and classification in subtropical rainforests and
+achived and Kappa score of 0.7 (overall accuracy of 72.4\%) by combining
+spectral raw data, indices as well as structural parameters in the
+classification process using a support-vector machine.
+
+However, little efforts have been done to structurally investigate the
+impact of decreasing spatial resolution on the classification accuracy
+as well as the impact of the integration of seasonal parameters derived
+from multiple mono-temporal observations. Here, we strictly limit our
+analysis to the investigation of these two thematic blocs and
+deliberatly exclude other factors such as structural variables obtained
+from point clouds. We solely focus on the analysis of the dynamic in
+predictive potential of RGB derived mono- and multi-temporal variables
+to model tree species with changing spatial resoulution.
+
+To this end we use the RGB imagery obtained by multiple overflights
+during the year 2019 from a study side located within the Marburg
+Univeristy forest which is part of the research project
+\href{https://www.uni-marburg.de/en/fb19/natur40/}{Natur 4.0}. This
+forest is used as a joint research area for a project between several
+German universities and research institutes and sets out to investigate
+the potential of sensor technology for biodiversity and natural resource
+management in natural envrionments forests. We artificially decreased
+the spatial resoultion of aerial imagery obtained in this area resulting
+in three different target resolutions of 10, 15, and 25 cm. For every
+single overflight we calculated a series of RGB indices on a pixels
+basis. Additionally, we calculate descriptive statistics (mean, maximum,
+minimum, amplitude, etc.) for each index over the course of the year to
+include information about the seasonality of the phenological
+development.
+
+The resulting input data is used to establish a total of nine distinct
+random forest models, one for each resolution including either only
+mono-temporal or seasonal predictor variables or both types of
+variables. On the basis of a forward-feature selection the variables
+which carry the most relevant information content for the tree species
+classification are then selected and used in the species prediction. The
+evaluation of the classification accuracies is compared on a pixel and
+object basis to draw conclusions on the importance of spatial resolution
+as well as the importance of mono- vs.~multi-temporal input data.
+
+\hypertarget{data-and-methods}{%
+\section{Data and Methods}\label{data-and-methods}}
+
+\hypertarget{study-area}{%
+\subsection{Study Area}\label{study-area}}
+
+The study area is located at 50.8°N 8.7°E in the German low mountain
+range in Hesse. It is part of the University Forest Caldern where the
+recently initiated joint research project Natur 4.0 aims at
+investigating the use of networked sensor technology for biodversity and
+ecosystem managment and protection. It is in this context, that the
+aerial images which we used here were obtained in an observation
+campaign during 2019 (see Tab. 1). The area is approximatley 37,500 m²
+and continously covered by trees. In this specific location, only two
+distinct species are present with stem diameters at breast height (DBH)
+greater than 40 cm, namely \emph{fagus sylvatica} and \emph{quercus
+robur}.
+
+\begin{figure}[H]
+
+{\centering \includegraphics[width=0.7\linewidth]{report_files/figure-latex/plot_aoi-1} 
+
+}
+
+\caption{RGB image of the study area from May 16th 2019 with central positions of tree stems superimposed (Coordinates are presented in UTM32N).}\label{fig:plot_aoi}
+\end{figure}
+
+\hypertarget{pre-processing-of-the-uav-orthoimages}{%
+\subsection{Pre-Processing of the UAV
+orthoimages}\label{pre-processing-of-the-uav-orthoimages}}
+
+In this project, AgisoftPhotoScan (???) in the version (???) was used to
+process the UAV imagery. Agisoft Photoscan Professional is anaffordable
+3D reconstruction software from the Russian company Agisoft LLC
+(Agisoft, 2018) for the generation of dense point clouds and
+photogrammetric products such as orthorectified mosaics and DSM derived
+from images. Photoscan has the advantage to provide a simple workflow,
+from performing bundle block adjustment to calibrate the camera and
+orientate images after automatic tie point measurements, geo-referencing
+by measuring ground control points, concluding with the computation of a
+dense point cloud and requested final products (Mayer et al.~2018 ????
+Mendely hinzuf?gen). The Airborne system (???Drohnenname) was used to
+acquire the UAV imagery using a commercial goPro (???Model + Objektiv.
+In (??? Anzahl flights) flight campaigns with a flight altitude of (40
+meters???), (???Anzahlfotos) photos were acquired. The internal GPS of
+the GoPro was used for geotagging the images. A post referencing enabled
+a better processing of the images in SFM software (Version???) and more
+accurate orthophotos without manual referencing in Photoscan. Photo
+Alignment is a process in PS for image matching and bundle block
+adjustment in an arbitrary system. It generates a sparse point cloud as
+well as the interior and exterior orientation parameters of all images
+in that system, including systematic error compensation such as
+non-linear lens distortions. Prior to the adjustment, the tie points are
+automatically measured by detecting and matching features in overlapping
+images resulting in a sparse point cloud (Mayer et al.~2018??? Mendely
+hinzuf?gen).The settings in this project were chosen as follows: -
+General: Accuracy: Medium; Generec preselection: yes; Reference
+preselection: yes - Advances: Key Piont limit: 40000; Tie point limit:
+4000; apply mask: no; Adaptive camera model fitting: yes
+
+Sparse cloud filtering was performed under the following settings:
+-gradual Selection: reprojection error: 0.26; reconstruction
+uncertainty: 189.461; projection accuracy:12.4621; reconstruction
+uncertainty:6.72951; reprojectionerror:0.122199
+
+\begin{table}[!h]
+
+\caption{\label{tab:dates-table}\textbf{Dates} of the UAV overpasses.}
+\centering
+\begin{tabular}[t]{l}
+\toprule
+Dates\\
+\midrule
+2019-04-29\\
+2019-05-03\\
+2019-05-10\\
+2019-05-16\\
+2019-06-05\\
+2019-06-20\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Based on the information of the point cloud (Sparse Cloud, Dense
+Cloudetc \ldots{}) PhotoScan can construct a polygon model (Mesh)
+(Agisoft 2018??? Mendeley hinzuf?gen) In this Project the Mesh was build
+by following setting: - General: surface type: Height field (2.5D);
+source data: sparse cloud; face count: medium - advanced: Interpolation:
+enabled; Point classes: all; calculate vertex colors
+
+The different pixel values from different photos are combined by the
+Mosaic type in the final texture. Mosiac type implies a two-step
+approach. Low frequency components are blended for overlapping images to
+avoid seam line problems. The high-frequency component, on the other
+hand, which is responsible for the image details, is only captured from
+a single image.
+
+In total we worked on 6 images which were obtained between the end of
+April to the end of June. In the mitlatitudes of central Europe these
+are the months of vegetational peak of mixed forests. We calculated a
+selection of RGB-based vegetational indices for each of the images as
+well as seasonal statistics which describe the development of these
+indices in the course of the vegetation period.
+
+\begin{itemize}
+\tightlist
+\item
+  UAV orthoimages, AgiSoft (how-to), flight height
+\item
+  pre-process: crop to AOI, spatial aggregations different resolutions,
+  indices, season parameters
+\item
+  tree shape: differential GPS points, \textgreater{}= 40cm DBH, 2m
+  buffer, squares -\textgreater{} species
+\item
+  RF model, 5-fold cross validation, training vs.~testing, kappa \&
+  accuracy,
+\item
+  plots predictors (all, indices, seasons) vs.~resolutions
+\end{itemize}
+
+\hypertarget{tree-species-data}{%
+\subsection{Tree species data}\label{tree-species-data}}
+
+With the use of a diferential GPS the position of tree stems within the
+study area was logged during a field campaign. Associated with the
+positional data, the tree species as well as the DBH was gathered. As
+stated before, here we only focused on the determination of the impact
+of changing resolutions and multi-temporal predictor variables on the
+classification accuracy. Therefore, we simplified the delination of tree
+crowns corresponding to the needs of the investigation. First, we
+excluded all trees with a DBH below 40 cm, because we assumed that the
+crowns of greater trees would cover the smaller ones and thus they could
+not be observed on aerial images from above the crown cover. Secondly,
+we buffered the central positions of the residual trees by a square of 2
+x 2 m, assuming that with this size we would essentially cover
+substantial proportions of the associated tree crown (\textbf{Fig. 1}).
+However, some of these buffered polygons intersected. In these cases, we
+decided to exclude both intersecting polygons since any decision to keep
+one over the other would be arbitrary.In the end, we obtained 161 tree
+individuals of which 92 (57\%) were \emph{fagus sylvatica} and 69 (43\%)
+were \emph{quercus robur}.
+
+\hypertarget{rgb-indices}{%
+\subsection{RGB indices}\label{rgb-indices}}
+
+We calculated a number of seven color vegetation indices (VI) which can
+be found in Tabel 2. These color indices were suspected to bare
+information content on the phenological development of tree species
+during a year. Indices are frequently used in remote sensing studies due
+to their relational nature which compensates for influences of
+illumination and viewing geometry on the measured reflectance values of
+the RGB channels. They were calculated for each UAV overpass resulting
+in (7 VIs + RGB) x 6 observations = 60 mono-temporal predictor
+variables. Additionally, we calculated the maximum (MAX), minimum (MIN),
+sum (SUM), standard deviation (SD), amplitude (AMP) as well as the 25\%-
+(Q25) and 75\%-percentile (Q75) values for each VI and the raw channels
+resulting in additional 70 seasonal predictors.
+
+\begin{table}[H]
+
+\caption{\label{tab:indices}Names and formulas of RGB indices.}
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}[t]{llll}
+\toprule
+\textbf{name} & \textbf{abbreviation} & \textbf{formula} & \textbf{reference}\\
+\midrule
+Triangular greeness index & TGI & -0.5 * (190*(R-G) - 120*(R-B)) & Broge and Leblanc (2001)\\
+Green Leaf Index & GLI & (2*G-R-B) / (2*G+R+B) & Gobron et al. (2000)\\
+Color Index of Vegetation & CIVE & (0.441*R-0.881*G + 0.385*B + 18.787) & Wan et al. (2018)\\
+Iron Oxide Index & IO & R/B & Rowan and Mars (2003)\\
+Visible Vegetation Index & VVI & (1-|R-30| / |R+30|) * 
+
+                                 (1- |G-50| / |G+50|) * 
+ 
+                                 (1-|B-1| / |B+1|) & Planetary Habitability Labratory (2015)\\
+Green Chromatic Coordinate & GCC & G / (R+G+B) & Sonnentag et al. (2012)\\
+Red Chromatic Coordinate & RCC & R / (R+G+B) & Richardson et al. (2009)\\
+\bottomrule
+\multicolumn{4}{l}{\textit{Note: }}\\
+\multicolumn{4}{l}{R: 580-670 nm, G: 480-610 nm, B: 400-520 nm, for digital cameras according to Hunt et al. (2012).}\\
+\end{tabular}}
+\end{table}
+
+Fig. 2 shows the trajectory of the calculated VIs according to the tree
+species indicating the mean value (solid line) as well as one standard
+deviation from the mean (dashed lines) based on all pixels within tree
+polygons. The trajectories are very similar for both classes, however,
+for almost all VIs there are substantial differences between the classes
+during the first observations during the month of May.
+
+\begin{figure}[H]
+
+{\centering \includegraphics{report_files/figure-latex/predictor_plots_indices-1} 
+
+}
+
+\caption{Temporal dynamic of calculated VIs over the course of the year by tree species at 25 cm resolution (dashed lines represent plus and minus one standard deviation).}\label{fig:predictor_plots_indices}
+\end{figure}
+
+Concerning the frequency of the seasonal predictor variables both tree
+species are charachterised by a very similar distribution (Fig. 3).
+
+\begin{figure}[H]
+
+{\centering \includegraphics{report_files/figure-latex/example_seasonal_plots-1} 
+
+}
+
+\caption{Exampalary histogramm plot of seasonal parameters for RCC by tree species at 25 cm resolution.}\label{fig:example_seasonal_plots}
+\end{figure}
+
+\hypertarget{classification-and-validation}{%
+\subsection{Classification and
+Validation}\label{classification-and-validation}}
+
+For the classification of tree species we used a Random Forest model
+based on a forward-feature selection of predictor variables stratfied by
+a leave-location-out five-fold cross-validation technique. Random Forest
+is a non-parametric model, both suitable for regression and
+classification problems. It was developed by ({\textbf{???}}) and is
+works by the establishment of a number of decision trees, the forest,
+each constructed on a random split of predictor variables. The final
+class decision is made by a majority vote of all trees in the forest. We
+used the implementation in the \texttt{caret} package (Kuhn, 2019).
+
+\hypertarget{results}{%
+\section{Results}\label{results}}
+
+\begin{figure}[H]
+
+{\centering \includegraphics[width=0.6\linewidth]{report_files/figure-latex/result_plots-1} 
+
+}
+
+\caption{Kappa scores of the random fores models based varying pixel sizes and predictor variables (red - mono-temporal indices, blue - seasonal indices, green - mono-temporal and seasonal indices)}\label{fig:result_plots}
+\end{figure}
+
+\begin{figure}[H]
+
+{\centering \includegraphics[width=0.6\linewidth]{report_files/figure-latex/validation_plots-1} 
+
+}
+
+\caption{Overall Accuracy of species classification on an object basis.}\label{fig:validation_plots}
+\end{figure}
+
+\begin{figure}[H]
+
+{\centering \includegraphics{report_files/figure-latex/var_imp_indices-1} 
+
+}
+
+\caption{Variable importance for mono-temporal predictors by resolutions.}\label{fig:var_imp_indices}
+\end{figure}
+
+\begin{figure}[H]
+
+{\centering \includegraphics{report_files/figure-latex/var_imp_season-1} 
+
+}
+
+\caption{Variable importance for seasonal predictors by resolutions.}\label{fig:var_imp_season}
+\end{figure}
+
+\begin{figure}[H]
+
+{\centering \includegraphics{report_files/figure-latex/var_imp_all-1} 
+
+}
+
+\caption{Variable importance for mono-temporal and seasonal predictors by resolutions.}\label{fig:var_imp_all}
+\end{figure}
+
+\hypertarget{discussion}{%
+\section{Discussion}\label{discussion}}
+
+\hypertarget{conclusion}{%
+\section{Conclusion}\label{conclusion}}
+
+\hypertarget{references}{%
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-Berra2019}{}%
+Berra, E.F., Gaulton, R., Barr, S., 2019. Assessing spring phenology of
+a temperate woodland: A multiscale comparison of ground, unmanned aerial
+vehicle and Landsat satellite observations. Remote Sensing of
+Environment 223, 229--242.
+\url{https://doi.org/10.1016/j.rse.2019.01.010}
+
+\leavevmode\hypertarget{ref-Berra2016}{}%
+Berra, E.F., Gaulton, R., Barr, S., 2016. Use of a digital camera
+onboard a UAV to monitor spring phenology at individual tree level, in:
+2016 Ieee International Geoscience and Remote Sensing Symposium
+(Igarss). pp. 3496--3499.
+\url{https://doi.org/10.1109/IGARSS.2016.7729904}
+
+\leavevmode\hypertarget{ref-Brieger2019a}{}%
+Brieger, F., Herzschuh, U., Pestryakova, L.A., Bookhagen, B., Zakharov,
+E.S., Kruse, S., 2019. Advances in the derivation of Northeast Siberian
+forest metrics using high-resolution UAV-based photogrammetric point
+clouds. Remote Sensing 11, 1447.
+\url{https://doi.org/10.3390/rs11121447}
+
+\leavevmode\hypertarget{ref-Brockerhoff2017}{}%
+Brockerhoff, E.G., Barbaro, L., Castagneyrol, B., Forrester, D.I.,
+Gardiner, B., González-Olabarria, J.R., Lyver, P.O., Meurisse, N.,
+Oxbrough, A., Taki, H., Thompson, I.D., Plas, F. van der, Jactel, H.,
+2017. Forest biodiversity, ecosystem functioning and the provision of
+ecosystem services. Biodiversity and Conservation 26, 3005--3035.
+\url{https://doi.org/10.1007/s10531-017-1453-2}
+
+\leavevmode\hypertarget{ref-Broge2001}{}%
+Broge, N.H., Leblanc, E., 2001. Comparing prediction power and stability
+of broadband and hyperspectral vegetation indices for estimation of
+green leaf area index and canopy chlorophyll density. Remote Sensing of
+Environment 76, 156--172.
+\url{https://doi.org/10.1016/S0034-4257(00)00197-8}
+
+\leavevmode\hypertarget{ref-Dostalova2018}{}%
+Dostálová, A., Wagner, W., Milenković, M., Hollaus, M., 2018. Annual
+seasonality in Sentinel-1 signal for forest mapping and forest type
+classification. International Journal of Remote Sensing 39, 7738--7760.
+\url{https://doi.org/10.1080/01431161.2018.1479788}
+
+\leavevmode\hypertarget{ref-Elatawneh2013}{}%
+Elatawneh, A., Rappl, A., Rehush, N., Schneider, T., Knoke, T., 2013.
+Forest tree species communities identification using multi phenological
+stages RapidEye data : case study in the forest of Freising. 5. RESA
+Workshop 4/2013 1--10.
+
+\leavevmode\hypertarget{ref-FoodandAgricultureOrgansiationoftheUnitedNations2015}{}%
+Food and Agriculture Organsiation of the United Nations, 2015. Global
+Forest Resources Assessment 2015.
+\url{https://doi.org/10.1002/2014GB005021}
+
+\leavevmode\hypertarget{ref-Fricker2019}{}%
+Fricker, G.A., Ventura, J.D., Wolf, J.A., North, M.P., Davis, F.W.,
+Franklin, J., 2019. A Convolutional Neural Network Classifier Identifies
+Tree Species in Mixed-Conifer Forest from Hyperspectral Imagery. Remote
+Sensing 11, 2326. \url{https://doi.org/10.3390/rs11192326}
+
+\leavevmode\hypertarget{ref-Frison2018}{}%
+Frison, P.L., Fruneau, B., Kmiha, S., Soudani, K., Dufrêne, E., Le Toan,
+T., Koleck, T., Villard, L., Mougin, E., Rudant, J.P., 2018. Potential
+of Sentinel-1 data for monitoring temperate mixed forest phenology.
+\url{https://doi.org/10.3390/rs10122049}
+
+\leavevmode\hypertarget{ref-Gobron2000}{}%
+Gobron, N., Pinty, B., Verstraete, M.M., Widlowski, J.L., 2000. Advanced
+vegetation indices optimized for up-coming sensors: design, performance,
+and applications. IEEE Transactions on Geoscience and Remote Sensing 38,
+2489--2505. \url{https://doi.org/10.1109/36.885197}
+
+\leavevmode\hypertarget{ref-Grabska2019}{}%
+Grabska, E., Hostert, P., Pflugmacher, D., Ostapowicz, K., 2019. Forest
+stand species mapping using the sentinel-2 time series. Remote Sensing
+11, 1--24. \url{https://doi.org/10.3390/rs11101197}
+
+\leavevmode\hypertarget{ref-Hunt2012}{}%
+Hunt, E.R., Doraiswamy, P.C., McMurtrey, J.E., Daughtry, C.S., Perry,
+E.M., Akhmedov, B., 2012. A visible band index for remote sensing leaf
+chlorophyll content at the Canopy scale. International Journal of
+Applied Earth Observation and Geoinformation 21, 103--112.
+\url{https://doi.org/10.1016/j.jag.2012.07.020}
+
+\leavevmode\hypertarget{ref-Klosterman2017}{}%
+Klosterman, S., Richardson, A.D., 2017. Observing spring and fall
+phenology in a deciduous forest with aerial drone imagery. Sensors
+(Switzerland) 17. \url{https://doi.org/10.3390/s17122852}
+
+\leavevmode\hypertarget{ref-Krause2019a}{}%
+Krause, S., Sanders, T.G., Mund, J.P., Greve, K., 2019. UAV-based
+photogrammetric tree height measurement for intensive forest monitoring.
+Remote Sensing 11, 758. \url{https://doi.org/10.3390/rs11070758}
+
+\leavevmode\hypertarget{ref-R-caret}{}%
+Kuhn, M., 2019. Caret: Classification and regression training,
+https://CRAN.R-project.org/package=caret.
+
+\leavevmode\hypertarget{ref-Laboratory2015}{}%
+Laboratory, P.H., 2015. Visible Vegetation Index (VVI).
+
+\leavevmode\hypertarget{ref-Marques2019a}{}%
+Marques, P., Pádua, L., Adão, T., Hruška, J., Peres, E., Sousa, A.,
+Sousa, J.J., 2019. UAV-based automatic detection and monitoring of
+chestnut trees. Remote Sensing 11, 855.
+\url{https://doi.org/10.3390/RS11070855}
+
+\leavevmode\hypertarget{ref-Mngadi2019}{}%
+Mngadi, M., Odindi, J., Peerbhay, K., Mutanga, O., 2019. Examining the
+effectiveness of Sentinel-1 and 2 imagery for commercial forest species
+mapping. Geocarto International 0, 1--12.
+\url{https://doi.org/10.1080/10106049.2019.1585483}
+
+\leavevmode\hypertarget{ref-Natesan2019}{}%
+Natesan, S., Armenakis, C., Vepakomma, U., 2019. Resnet-based tree
+species classification using uav images. International Archives of the
+Photogrammetry, Remote Sensing and Spatial Information Sciences - ISPRS
+Archives 42, 475--481.
+\url{https://doi.org/10.5194/isprs-archives-XLII-2-W13-475-2019}
+
+\leavevmode\hypertarget{ref-Nevalainen2017}{}%
+Nevalainen, O., Honkavaara, E., Tuominen, S., Viljanen, N., Hakala, T.,
+Yu, X., Hyyppä, J., Saari, H., Pölönen, I., Imai, N.N., Tommaselli,
+A.M., 2017. Individual tree detection and classification with UAV-Based
+photogrammetric point clouds and hyperspectral imaging. Remote Sensing
+9. \url{https://doi.org/10.3390/rs9030185}
+
+\leavevmode\hypertarget{ref-Niculescu2018}{}%
+Niculescu, S., Talab Ou Ali, H., Billey, A., 2018. Random forest
+classification using Sentinel-1 and Sentinel-2 series for vegetation
+monitoring in the Pays de Brest (France), in:. p. 6.
+\url{https://doi.org/10.1117/12.2325546}
+
+\leavevmode\hypertarget{ref-Persson2018}{}%
+Persson, M., Lindberg, E., Reese, H., 2018. Tree species classification
+with multi-temporal Sentinel-2 data. Remote Sensing 10, 1--17.
+\url{https://doi.org/10.3390/rs10111794}
+
+\leavevmode\hypertarget{ref-Richardson2009}{}%
+Richardson, A.D., Braswell, B.H., Hollinger, D.Y., Jenkins, J.P.,
+Ollinger, S.V., 2009. Near-surface remote sensing of spatial and
+temporal variation in canopy phenology. Ecological Applications 19,
+1417--1428. \url{https://doi.org/10.1890/08-2022.1}
+
+\leavevmode\hypertarget{ref-Rowan2003}{}%
+Rowan, L.C., Mars, J.C., 2003. Lithologic mapping in the Mountain Pass,
+California area using Advanced Spaceborne Thermal Emission and
+Reflection Radiometer (ASTER) data. Remote Sensing of Environment 84,
+350--366. \url{https://doi.org/10.1016/S0034-4257(02)00127-X}
+
+\leavevmode\hypertarget{ref-Sonnentag2012}{}%
+Sonnentag, O., Hufkens, K., Teshera-Sterne, C., Young, A.M., Friedl, M.,
+Braswell, B.H., Milliman, T., O'Keefe, J., Richardson, A.D., 2012.
+Digital repeat photography for phenological research in forest
+ecosystems. Agricultural and Forest Meteorology 152, 159--177.
+\url{https://doi.org/10.1016/j.agrformet.2011.09.009}
+
+\leavevmode\hypertarget{ref-Sothe2019a}{}%
+Sothe, C., Dalponte, M., Almeida, C.M. de, Schimalski, M.B., Lima, C.L.,
+Liesenberg, V., Miyoshi, G.T., Tommaselli, A.M.G., 2019. Tree species
+classification in a highly diverse subtropical forest integrating
+UAV-based photogrammetric point cloud and hyperspectral data. Remote
+Sensing 11, 1338. \url{https://doi.org/10.3390/rs11111338}
+
+\leavevmode\hypertarget{ref-Ulsig2017a}{}%
+Ulsig, L., Nichol, C.J., Huemmrich, K.F., Landis, D.R., Middleton, E.M.,
+Lyapustin, A.I., Mammarella, I., Levula, J., Porcar-Castell, A., 2017.
+Detecting inter-annual variations in the phenology of evergreen conifers
+using long-term MODIS vegetation index time series. Remote Sensing 9.
+\url{https://doi.org/10.3390/rs9010049}
+
+\leavevmode\hypertarget{ref-Wan2018}{}%
+Wan, L., Li, Y., Cen, H., Zhu, J., Yin, W., Wu, W., Zhu, H., Sun, D.,
+Zhou, W., He, Y., 2018. Combining UAV-Based Vegetation Indices and Image
+Classification to Estimate Flower Number in Oilseed Rape. Remote Sensing
+10, 1484. \url{https://doi.org/10.3390/rs10091484}
+
+\leavevmode\hypertarget{ref-Yan2018a}{}%
+Yan, W., Guan, H., Cao, L., Yu, Y., Gao, S., Lu, J.Y., 2018. An
+automated hierarchical approach for three-dimensional segmentation of
+single trees using UAV LiDAR data. Remote Sensing 10, 1999.
+\url{https://doi.org/10.3390/rs10121999}
+
+\leavevmode\hypertarget{ref-Yao2019b}{}%
+Yao, H., Qin, R., Chen, X., 2019. Unmanned aerial vehicle for remote
+sensing applications - A review.
+\url{https://doi.org/10.3390/rs11121443}
+
+\leavevmode\hypertarget{ref-Zhang2003}{}%
+Zhang, X., Friedl, M.A., Schaaf, C.B., Strahler, A.H., Hodges, J.C.,
+Gao, F., Reed, B.C., Huete, A., 2003. Monitoring vegetation phenology
+using MODIS. Remote Sensing of Environment 84, 471--475.
+\url{https://doi.org/10.1016/S0034-4257(02)00135-9}
+
+\end{document}
