@@ -479,10 +479,10 @@ getVarImp <- function(model){
   
   model = readRDS(model)
   vars = model$selectedvars
+  
   indexR = which(str_detect(vars, "res5.1"))
   indexG = which(str_detect(vars, "res5.2"))
   indexB = which(str_detect(vars, "res5.3"))
-  
   if( length(indexR) > 0) vars[indexR] = str_replace(vars[indexR], "res5.1", "R")
   if( length(indexG) > 0) vars[indexG] = str_replace(vars[indexG], "res5.2", "G")
   if( length(indexB) > 0) vars[indexB] =str_replace(vars[indexB], "res5.3", "B")
