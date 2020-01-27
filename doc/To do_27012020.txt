@@ -1,5 +1,6 @@
 To Do: (Stand 27012020)
-
+-Achtung: 70:30 verhältnis
+ 	- Überprüfen Buchen zu Eichen im 30er Bereich. Entspricht realem verhältnis?
 - Verzerrte Bilder im Trainingsgebiet beschreiben (Agisoft Photoscan)
 - Results Text schreiben, ggfls. weitere Abbildung:
 	- Res -> je größer desto besserer Kappa
