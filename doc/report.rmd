@@ -426,6 +426,7 @@ getModelMetric <- function(model, metric){
 
 kappas = do.call("rbind", lapply(models, getModelMetric, metric="Kappa"))
 kappas$type = factor(kappas$type, levels(kappas$type)[c(2,1,3)])
+
 ggplot(data = kappas, aes(x=resolution)) +
   geom_point(aes(y=Kappa, shape=type, col=type), size=2)+
   theme_minimal()
@@ -456,7 +457,7 @@ types = stringr::str_sub(names(predictions)[-10],5, 7)
 types[types=="IND"] = "indices"
 types[types=="SES"] = "seasons"
 types[types=="ALL"] = "all"
-results$resolution = as.numeric(resolutions)
+results$resolution = factor(resolutions)
 results$type = factor(types) 
 
 
