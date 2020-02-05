@@ -1,0 +1,17 @@
+To Do: (Stand 27012020)
+-Achtung: 70:30 verhältnis
+ 	- Überprüfen Buchen zu Eichen im 30er Bereich. Entspricht realem verhältnis?
+- Verzerrte Bilder im Trainingsgebiet beschreiben (Agisoft Photoscan)
+- Results Text schreiben, ggfls. weitere Abbildung:
+	- Res -> je größer desto besserer Kappa
+ 	- Abbildung extern Pixelbasiert
+	- Monotemperale Indizes kommen ziemlich nah an das Ergebnis ran wie wenn man ALL verwendet also Seasonal hinzufügt (Rechenzeit vs. Erklärung von 2 bis 3 %).
+	- 
+- Discussion:
+ 	- Ergebnisse unbrauchbar -> verzerrte Bilder
+ 	- Erklärungen Spekualtius Resolution verbessert Kappa
+ 	- Monotemperale Indizes zu welchem zeitpunkt berechnet. Führt der Zeitpunkt zu einer repräsentativen Darstellung?
+	- Res -> je größer desto besserer Kappa (Warum? im Mittel mer baumartengleiche Pixel?)
+	- Objektpasierte prediciton gut weil ? 70% buhen im trainingsgebiet führen dazu das im Training mehr buchen sind und als Objekte klassifiziert werden. Trefferquote hoch)
+	- Objektbasiert vs Pixelbasiert diskutieren.
+	- variable importance änderung mit vergrößerung der resolution? warum?
