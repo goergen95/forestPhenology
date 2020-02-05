@@ -479,7 +479,9 @@ getVarImp <- function(model){
   }
   
   model = readRDS(model)
-  vars = model$selectedvars
+  imp = varImp(model)
+  
+  vars = rownames(imp$importance)
   
   indexR = which(str_detect(vars, "res5.1"))
   indexG = which(str_detect(vars, "res5.2"))
@@ -488,11 +490,8 @@ getVarImp <- function(model){
   if( length(indexG) > 0) vars[indexG] = str_replace(vars[indexG], "res5.2", "G")
   if( length(indexB) > 0) vars[indexB] =str_replace(vars[indexB], "res5.3", "B")
   
-  perf = model$selectedvars_perf
-  perf = c(0, perf)
-  perf[1] = perf[2] / 2
-  perf[2] = perf[2] / 2
-  results_df = data.frame(variable=vars, Kappa=perf, resolution=res, type=type)
+  perf = imp$importance[,1]
+  results_df = data.frame(variable=vars, varImp=perf, resolution=res, type=type)
   return(results_df)
 }
 
@@ -508,19 +507,19 @@ varImTb$variable = as.factor(varImTb$variable)
 
 varImpInd = filter(varImTb, type == "indices")
 varImpInd$variable = droplevels(varImpInd$variable)
-varImpInd$variable = reorder(varImpInd$variable, varImpInd$Kappa)
+varImpInd$variable = reorder(varImpInd$variable, varImpInd$varImp)
 
 varImpSes = filter(varImTb, type == "season")
 varImpSes$variable = droplevels(varImpSes$variable)
-varImpSes$variable = reorder(varImpSes$variable, varImpSes$Kappa)
+varImpSes$variable = reorder(varImpSes$variable, varImpSes$varImp)
 
 varImpAll = filter(varImTb, type == "all")
 varImpAll$variable = droplevels(varImpAll$variable)
-varImpAll$variable = reorder(varImpAll$variable, varImpAll$Kappa)
+varImpAll$variable = reorder(varImpAll$variable, varImpAll$varImp)
 
-ggplot(varImpInd, aes(y=Kappa, x = reorder(variable, Kappa))) +
+ggplot(varImpInd, aes(y=varImp, x = reorder(variable, varImp))) +
   geom_point(aes(shape=resolution, col=resolution)) +
-  geom_segment(aes(x=reorder(variable, Kappa), xend=variable, y=0, yend=Kappa, col = resolution))+
+  geom_segment(aes(x=reorder(variable, varImp), xend=variable, y=0, yend=varImp, col = resolution))+
   coord_flip() +
   facet_wrap(. ~ resolution) +
   theme_minimal()+
@@ -530,9 +529,9 @@ ggplot(varImpInd, aes(y=Kappa, x = reorder(variable, Kappa))) +
 
 ```{r var_imp_season, echo=F, warning=F, message=F, fig.cap="Variable importance for seasonal predictors by resolutions."}
 
-ggplot(varImpSes, aes(y=Kappa, x = reorder(variable, Kappa))) +
+ggplot(varImpSes, aes(y=varImp, x = reorder(variable, varImp))) +
   geom_point(aes(shape=resolution, col=resolution)) +
-  geom_segment(aes(x=reorder(variable, Kappa), xend=variable, y=0, yend=Kappa, col = resolution))+
+  geom_segment(aes(x=reorder(variable, varImp), xend=variable, y=0, yend=varImp, col = resolution))+
   coord_flip() +
   facet_wrap(. ~ resolution) +
   theme_minimal()+
@@ -541,9 +540,9 @@ ggplot(varImpSes, aes(y=Kappa, x = reorder(variable, Kappa))) +
 
 ```{r var_imp_all, echo=F, warning=F, message=F, fig.cap="Variable importance for mono-temporal and seasonal predictors by resolutions."}
 
-ggplot(varImpAll, aes(y=Kappa, x = reorder(variable, Kappa))) +
+ggplot(varImpAll, aes(y=varImp, x = reorder(variable, varImp))) +
   geom_point(aes(shape=resolution, col=resolution)) +
-  geom_segment(aes(x=reorder(variable, Kappa), xend=variable, y=0, yend=Kappa, col = resolution))+
+  geom_segment(aes(x=reorder(variable, varImp), xend=variable, y=0, yend=varImp, col = resolution))+
   coord_flip() +
   facet_wrap(. ~ resolution) +
   theme_minimal()+
