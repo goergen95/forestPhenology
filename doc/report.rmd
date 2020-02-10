@@ -398,6 +398,11 @@ in the `caret` package [@R-caret].
 
 # Results
 
+To validate the models, the Kappa value is first determined. If the raters agree in all their judgments, the kappa value is equal to 1, and if there are only matches between the two raters that mathematically correspond to the extent of the randomness, it assumes a value of zero @Greve1997. Kappa values between 0.6 and 0.4 are still considered acceptable, values below 0.40 should be regarded with scepticism. Interrater reliability values of 0.75 are considered good to excellent @Greve1997.
+
+Figure 4 shows that all models, regardless of the use of seasonal, vegetation indices and resolution, have a Kappa value that falls well below the acceptable limit of 0.4. The Kappa value for mono-temperal and seasonal indices increases with decreasing resolution. The comparison shows that the models calculated exclusively with mono-temperal indices show a significantly higher Kappa value than the models calculated exclusively with seasonal indices. Overall, it can be seen that the models with a lowest resolution of 25 cm achieve significantly better Kappa values than the models with a high resolution of 10 cm.
+
+
 ```{r result_plots,  warning=F, message=F, fig.cap="Kappa scores of the random fores models based varying pixel sizes and predictor variables (red - mono-temporal indices, blue - seasonal indices, green - mono-temporal and seasonal indices)", out.width="60%"}
 
 models = list.files("../results", pattern = "\\.rds$", full.names = T)
@@ -440,6 +445,10 @@ ggplot(data = kappas, aes(x=resolution)) +
 
 ```
 
+As a further statistical measure of quality, the accuracy of species classification on an object basis is investigated. An object is considered correctly classified if a majority of the pixels belonging to the object type exist. 
+
+(Weiter arbeiten nach dem Abbildungen krrigiert wurden)
+
 ```{r validation_plots, warning=F, message=F, fig.cap="Overall Accuracy of species classification on an object basis.", out.width="60%"}
 predictions = readRDS("../../results/validation_pred.rds")
 index = predictions$index
@@ -466,6 +475,8 @@ ggplot(data = results, aes(x=resolution)) +
   theme_minimal()
 
 ```
+
+The variable Importance describes the increase in importance of the selected variable for the explanation of the model. The variable selected first is always used in combination with another variable. Since the model does not offer an explanation at the beginning, the explanation gain of the first variable combination is always 100%. The next selected ones then offer the second largest explanation increase. The following figures show how the explanatory increase has developed for the individual models of the Mono-Temperals and Seasonal Indices, as well as both in combination for the different selected resolutions.
 
 ```{r var_imp_indices, echo=F, warning=F, message=F, fig.cap="Variable importance for mono-temporal predictors by resolutions."}
 getVarImp <- function(model){

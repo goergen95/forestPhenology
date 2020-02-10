@@ -3,10 +3,10 @@ To Do: (Stand 27012020)
  	- Überprüfen Buchen zu Eichen im 30er Bereich. Entspricht realem verhältnis?
 - Verzerrte Bilder im Trainingsgebiet beschreiben (Agisoft Photoscan)
 - Results Text schreiben, ggfls. weitere Abbildung:
-	- Res -> je größer desto besserer Kappa
- 	- Abbildung extern Pixelbasiert
 	- Monotemperale Indizes kommen ziemlich nah an das Ergebnis ran wie wenn man ALL verwendet also Seasonal hinzufügt (Rechenzeit vs. Erklärung von 2 bis 3 %).
-	- 
+	- Abbildung überschriften farben falschen indices zugeordnet Abb. 4 und 5
+	- Abbildung 5 Achsenbeschriftung (Kappa durch accuracy ersetzen)
+	- Abbildung 5 ( wo ist res 25 indices?)
 - Discussion:
  	- Ergebnisse unbrauchbar -> verzerrte Bilder
  	- Erklärungen Spekualtius Resolution verbessert Kappa
