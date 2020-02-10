@@ -39,6 +39,7 @@ library(rgdal)
 library(knitr)
 library(kableExtra)
 library(tidyr)
+library(png)
 trees = readOGR("../../data/trees_buffer.shp")
 ```
 
@@ -217,12 +218,13 @@ peak of mixed forests. We calculated a selection of RGB-based vegetational indic
 of the images as well as seasonal statistics which describe the development of these indices
 in the course of the vegetation period.
 
+The images provided by the "Nature 4.0" project could not be geotagged completely cleanly at the start of our investigation. Therefore, some images are not optimally overlaid, which leads to image distortions. The following figure shows the image distortion by looking at the transporter in the image.
 
-- UAV orthoimages, AgiSoft (how-to), flight height
-- pre-process: crop to AOI, spatial aggregations different resolutions, indices, season parameters
-- tree shape: differential GPS points, >= 40cm DBH, 2m buffer, squares -> species
-- RF model, 5-fold cross validation, training vs. testing, kappa & accuracy,
-- plots predictors (all, indices, seasons) vs. resolutions 
+```{r Image distortion, echo=F, message=F, warning=F, fig.cap="Display of the image distortion in the data basis"}
+ imgr <- stack("C:/Users/mmues/Documents/Umweltinformationssysteme/forestPhenology/doc/Bild_verzerrung.tif")
+plotRGB(imgr)
+
+```
 
 
 ## Tree species data
