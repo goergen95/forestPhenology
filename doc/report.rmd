@@ -13,7 +13,7 @@ header-includes:
 bibliography: ["ForestPhenology.bib", "r-bib.bib"] 
 csl: elsevier-harvard.csl
 nocite: |
-   @Broge2001, @Gobron2000, @Wan2018, @Rowan2003, @Laboratory2015, @Sonnentag2012, @Richardson2009, @Hunt2012
+  @Broge2001, @Gobron2000, @Wan2018, @Rowan2003, @Laboratory2015, @Sonnentag2012, @Richardson2009, @Hunt2012
 title: "UAV imagery based tree species classification in the Marburg OpenForest"
 author: 
 - Darius A. Görgen
@@ -40,6 +40,8 @@ library(knitr)
 library(kableExtra)
 library(tidyr)
 library(png)
+library(forcats)
+library(randomForest)
 trees = readOGR("../../data/trees_buffer.shp")
 ```
 
@@ -221,7 +223,7 @@ in the course of the vegetation period.
 The images provided by the "Nature 4.0" project could not be geotagged completely cleanly at the start of our investigation. Therefore, some images are not optimally overlaid, which leads to image distortions. The following figure shows the image distortion by looking at the transporter in the image.
 
 ```{r Image distortion, echo=F, message=F, warning=F, fig.cap="Display of the image distortion in the data basis"}
- imgr <- stack("C:/Users/mmues/Documents/Umweltinformationssysteme/forestPhenology/doc/Bild_verzerrung.tif")
+imgr <- stack("Bild_verzerrung.tif")
 plotRGB(imgr)
 
 ```
@@ -262,35 +264,35 @@ for each VI and the raw channels resulting in additional 70 seasonal predictors.
 
 ```{r indices, echo=F, message=F, warning=F}
 indicesdf = data.frame(name = c("Triangular greeness index",
-                              "Green Leaf Index",
-                              "Color Index of Vegetation",
-                              "Iron Oxide Index",
-                              "Visible Vegetation Index",
-                              "Green Chromatic Coordinate",
-                              "Red Chromatic Coordinate"),
-                     abbreviation = c("TGI", 
-                                      "GLI", 
-                                      "CIVE", 
-                                      "IO", 
-                                      "VVI", 
-                                      "GCC",
-                                      "RCC"),
-                     formula = c("-0.5 * (190*(R-G) - 120*(R-B))",
-                                 "(2*G-R-B) / (2*G+R+B)",
-                                 "(0.441*R-0.881*G + 0.385*B + 18.787)",
-                                 "R/B",
-                                 "(1-|R-30| / |R+30|) * \n
+                                "Green Leaf Index",
+                                "Color Index of Vegetation",
+                                "Iron Oxide Index",
+                                "Visible Vegetation Index",
+                                "Green Chromatic Coordinate",
+                                "Red Chromatic Coordinate"),
+                       abbreviation = c("TGI", 
+                                        "GLI", 
+                                        "CIVE", 
+                                        "IO", 
+                                        "VVI", 
+                                        "GCC",
+                                        "RCC"),
+                       formula = c("-0.5 * (190*(R-G) - 120*(R-B))",
+                                   "(2*G-R-B) / (2*G+R+B)",
+                                   "(0.441*R-0.881*G + 0.385*B + 18.787)",
+                                   "R/B",
+                                   "(1-|R-30| / |R+30|) * \n
                                  (1- |G-50| / |G+50|) * \n 
                                  (1-|B-1| / |B+1|)",
                                  "G / (R+G+B)",
                                  "R / (R+G+B)"),
-                     reference = c("Broge and Leblanc (2001)",
-                                   "Gobron et al. (2000)",
-                                   "Wan et al. (2018)",
-                                   "Rowan and Mars (2003)",
-                                   "Planetary Habitability Labratory (2015)",
-                                   "Sonnentag et al. (2012)",
-                                   "Richardson et al. (2009)"))
+                       reference = c("Broge and Leblanc (2001)",
+                                     "Gobron et al. (2000)",
+                                     "Wan et al. (2018)",
+                                     "Rowan and Mars (2003)",
+                                     "Planetary Habitability Labratory (2015)",
+                                     "Sonnentag et al. (2012)",
+                                     "Richardson et al. (2009)"))
 
 kable(indicesdf, format = "latex", linesep="", align = "l", booktabs = T,
       caption = "Names and formulas of RGB indices.") %>%
@@ -492,9 +494,8 @@ getVarImp <- function(model){
   }
   
   model = readRDS(model)
-  imp = varImp(model)
-  
-  vars = rownames(imp$importance)
+  tmp = importance(model$finalModel)[,3]
+  vars = names(tmp)
   
   indexR = which(str_detect(vars, "res5.1"))
   indexG = which(str_detect(vars, "res5.2"))
@@ -503,63 +504,90 @@ getVarImp <- function(model){
   if( length(indexG) > 0) vars[indexG] = str_replace(vars[indexG], "res5.2", "G")
   if( length(indexB) > 0) vars[indexB] =str_replace(vars[indexB], "res5.3", "B")
   
-  perf = imp$importance[,1]
-  results_df = data.frame(variable=vars, varImp=perf, resolution=res, type=type)
+  results_df = data.frame(variable=vars, varImp=tmp, resolution=res, type=type)
+  rownames(results_df) = NULL
   return(results_df)
 }
 
-varImpList = lapply(models, getVarImp)
-varImTb = as_tibble(do.call("rbind", varImpList))
+metric = lapply(models, getVarImp)
+metrics = as_tibble(do.call("rbind", metric))
 paras = c("MAX", "MIN", "AMP", "SD", "SUM", "Q25", "Q75")
-for (i in paras){ varImTb$variable = str_replace(varImTb$variable,i, paste("-", i, sep =  ""))}
-for (i in as.character(indicesdf$abbreviation)) {varImTb$variable = str_replace(varImTb$variable, paste0("_",i), paste("-", i, sep =  ""))}
-varImTb$variable = str_replace(varImTb$variable, "X2","2")
-varImTb$variable = str_remove(varImTb$variable, "season-")
-varImTb$variable = str_replace_all(varImTb$variable ,"_","/")
-varImTb$variable = as.factor(varImTb$variable)
+for (i in paras){ metrics$variable = str_replace(metrics$variable,i, paste("-", i, sep =  ""))}
+for (i in as.character(indicesdf$abbreviation)) {metrics$variable = str_replace(metrics$variable, paste0("_",i), paste("-", i, sep =  ""))}
+metrics$variable = str_replace(metrics$variable, "X2","2")
+metrics$variable = str_remove(metrics$variable, "season-")
+metrics$variable = str_replace_all(metrics$variable ,"_","/")
+metrics$variable = factor(metrics$variable)
 
-varImpInd = filter(varImTb, type == "indices")
+varImpInd = filter(metrics, type == "indices")
 varImpInd$variable = droplevels(varImpInd$variable)
 varImpInd$variable = reorder(varImpInd$variable, varImpInd$varImp)
 
-varImpSes = filter(varImTb, type == "season")
+varImpSes = filter(metrics, type == "season")
 varImpSes$variable = droplevels(varImpSes$variable)
 varImpSes$variable = reorder(varImpSes$variable, varImpSes$varImp)
 
-varImpAll = filter(varImTb, type == "all")
+varImpAll = filter(metrics, type == "all")
 varImpAll$variable = droplevels(varImpAll$variable)
 varImpAll$variable = reorder(varImpAll$variable, varImpAll$varImp)
 
-ggplot(varImpInd, aes(y=varImp, x = reorder(variable, varImp))) +
-  geom_point(aes(shape=resolution, col=resolution)) +
-  geom_segment(aes(x=reorder(variable, varImp), xend=variable, y=0, yend=varImp, col = resolution))+
-  coord_flip() +
-  facet_wrap(. ~ resolution) +
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+
+varImpInd %>%
+  group_by(variable) %>%
+  summarise(value = sum(varImp, n = n())) %>%
+  ungroup() %>%
+  mutate(variable = fct_reorder(variable, value)) %>%
+  mutate(value = value / max(value) * 100) %>%
+  ggplot(aes(x=variable, y=value))+
+  geom_bar(stat="identity", fill = "dodgerblue1")+
+  theme_minimal()+
+  coord_flip()
 ```
 
 ```{r var_imp_season, echo=F, warning=F, message=F, fig.cap="Variable importance for seasonal predictors by resolutions."}
 
-ggplot(varImpSes, aes(y=varImp, x = reorder(variable, varImp))) +
-  geom_point(aes(shape=resolution, col=resolution)) +
-  geom_segment(aes(x=reorder(variable, varImp), xend=variable, y=0, yend=varImp, col = resolution))+
-  coord_flip() +
-  facet_wrap(. ~ resolution) +
+varImpSes %>%
+  group_by(variable) %>%
+  summarise(value = sum(varImp, n = n())) %>%
+  ungroup() %>%
+  mutate(variable = fct_reorder(variable, value)) %>%
+  mutate(value = value / max(value) * 100) %>%
+  ggplot(aes(x=variable, y=value))+
+  geom_bar(stat="identity", fill = "dodgerblue1")+
   theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  coord_flip()
 ```
 
 ```{r var_imp_all, echo=F, warning=F, message=F, fig.cap="Variable importance for mono-temporal and seasonal predictors by resolutions."}
 
-ggplot(varImpAll, aes(y=varImp, x = reorder(variable, varImp))) +
-  geom_point(aes(shape=resolution, col=resolution)) +
-  geom_segment(aes(x=reorder(variable, varImp), xend=variable, y=0, yend=varImp, col = resolution))+
-  coord_flip() +
-  facet_wrap(. ~ resolution) +
+
+varImpAll %>%
+  group_by(variable) %>%
+  summarise(value = sum(varImp, n = n())) %>%
+  ungroup() %>%
+  mutate(variable = fct_reorder(variable, value)) %>%
+  mutate(value = value / max(value) * 100) %>%
+  ggplot(aes(x=variable, y=value))+
+  geom_bar(stat="identity", fill = "dodgerblue1")+
   theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  coord_flip()
+```
+
+
+```{r var_imp_together, echo=F, warning=F, message=F, fig.cap="Variable importance across all models."}
+
+
+metrics %>%
+  group_by(variable) %>%
+  summarise(value = sum(varImp, n = n())) %>%
+  ungroup() %>%
+  mutate(variable = fct_reorder(variable, value)) %>%
+  mutate(value = value / max(value) * 100) %>%
+  ggplot(aes(x=variable, y=value))+
+  geom_bar(stat="identity", fill = "dodgerblue1")+
+  theme_minimal()+
+  coord_flip()
 ```
 
 # Discussion
