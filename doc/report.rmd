@@ -475,7 +475,8 @@ results$type = factor(types)
 
 
 ggplot(data = results, aes(x=resolution)) +
-  geom_point(aes(y=kappa, shape=type, col=type), size=2)+
+  geom_point(aes(y=kappa, shape=type, col=type), size=2) +
+  ggplot2::labs(y = "accuracy") +
   theme_minimal()
 
 ```
@@ -591,6 +592,11 @@ metrics %>%
 ```
 
 # Discussion
+
+Due to several sources of error the obtained results do not allow a consistent interpretation on the effects of resolution and the selection of predictor variables. As mentioned above and shown in figure 2 the pre-proccessing and georeferencing of the drone images introduced distortion artifacts which lead to false pixel readouts at the sampling trees locations. Further the representation of trees in our training data as described in 2.3, in combination with the described image distortion is a massive source of error, that can't be ignored.
+
+The results indicate that models trained with mono-temporal and seasonal indices performed best overall closely followed by models trained with mono-temporal indices only. Thus leading us to the conclusion, that mono-temporal predictors are more important than seasonal predictors but a combination of both improve model performance slightly. Comparing those results with object based validation accuracy scores seen in figure 6 a big discripancy is noticable. A possible explenation may be the overrepresentation of fagus sylvatica pixels when predicting tree species on all available tree objects.
+
 # Conclusion
 # References
 
