@@ -597,8 +597,18 @@ metrics %>%
 # Discussion
 
 Due to several sources of error the obtained results do not allow a consistent interpretation on the effects of resolution and the selection of predictor variables. As mentioned above and shown in **figure 2** the pre-processing and georeferencing of the drone images introduced distortion artifacts which lead to false pixel readouts at the sampling trees locations. Further the representation of trees in our training data as described in **2.3**, in combination with the described image distortion is a massive source of error, that can't be ignored.
+--> im Endeffekt sagt der Kappa ja, dass kein Modell annehmbar ist. 
+--> Vielleicht nochmal erwähnen, dass das die grundlage war und nicht unser verschulden?
 
 The models results, measured by the kappa score indicate a stronger, but not much stronger ability than random chance to predict tree species at our study site. Although the results do not appear to be too promising for an overall tree species classification they are very well capable of highlighting key differences resulting from changed methodologies during the model training process. Models trained with both mono-temporal and seasonal indices performed best overall closely followed by models trained with mono-temporal indices only. Thus leading us to the conclusion, that mono-temporal predictors are more important than seasonal predictors but a combination of both improve model performance slightly. Comparing those results with object based validation accuracy scores seen in **figure 6** a big discrepancy is noticeable. A possible explanation may be the over representation of fagus sylvatica pixels when predicting tree species on all available tree objects. A contributing factor to that over representation may be the decreasing resolution, as more "fagus sylvatica" pixels are crunched into bigger sized pixels and thus smoothing out the already underrepresented quercus robur pixels. 
+
+--> Vielleicht erwhnen, dass saisonale indices besser sein könnten, nur für den geeigneten zeitraum evtl kein Bild vorhanden war, beispielsweise irgendein saisonales merkmal wegen der zeit verpasst wurde. ich denke da an abbildung 3 in unserem bericht?
+--> vielelicht noch auf die indices eingehen warum gerade diese ausgewählt wurden?
+https://www.researchgate.net/figure/Vegetation-canopy-greenness-as-quantified-by-green-chromatic-coordinate-GCC-using_fig1_296618875 sowas vielleicht?
+also warum wurden gerade RCC GCC GLI UND VVI ausgewählt? kenne da gerade keine Begründung. gibts da eine=
+-->  WIe siehts damit aus, dass die indices eigentlich für satelliten und luftbilder entwickelt wurden. hat das einen einfluss auf drohnenbilde und daher auf die auswahl. also werden bestimmte indices aufgrund des anders einfallenden lichts bevorzugt? und deshalb ausgewöhlt?
+--> gibts nen bezug den man zur einleitung ziehen kann?
+--> WIr haben mehr buchen im untersuchung und traininsgebiet führt das dazu, dass buchen besser vorhergesagt werden und daher die Modellgüte künstlich erhöht wird?
 
 In order to conduct further analysis on that topic it is strongly recommended to improve the image pre processing steps involved in this study.
 
