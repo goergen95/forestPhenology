@@ -605,6 +605,8 @@ The models results, measured by the kappa score indicate a stronger, but not muc
 --> Vielleicht erwhnen, dass saisonale indices besser sein könnten, nur für den geeigneten zeitraum evtl kein Bild vorhanden war, beispielsweise irgendein saisonales merkmal wegen der zeit verpasst wurde. ich denke da an abbildung 3 in unserem bericht?
 --> vielelicht noch auf die indices eingehen warum gerade diese ausgewählt wurden?
 https://www.researchgate.net/figure/Vegetation-canopy-greenness-as-quantified-by-green-chromatic-coordinate-GCC-using_fig1_296618875 sowas vielleicht?
+https://www.researchgate.net/figure/Daily-green-red-and-blue-chromatic-coordinates-GCC-RCC-BCC-and-excess-indices_fig4_312257742
+hatte da irgendwas einfluss auf die auswahl der indice irgendein faktor?
 also warum wurden gerade RCC GCC GLI UND VVI ausgewählt? kenne da gerade keine Begründung. gibts da eine=
 -->  WIe siehts damit aus, dass die indices eigentlich für satelliten und luftbilder entwickelt wurden. hat das einen einfluss auf drohnenbilde und daher auf die auswahl. also werden bestimmte indices aufgrund des anders einfallenden lichts bevorzugt? und deshalb ausgewöhlt?
 --> gibts nen bezug den man zur einleitung ziehen kann?
