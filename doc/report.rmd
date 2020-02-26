@@ -197,7 +197,7 @@ In this project, AgisoftPhotoScan was used to process the UAV imagery. Agisoft P
 Sparse cloud filtering was performed under the following settings:
 -gradual Selection: reprojection error: 0.26; reconstruction uncertainty: 189.461; projection accuracy:12.4621; reconstruction uncertainty:6.72951; reprojection error:0.122199
 
-```{r dates-table, tab.cap="Days of UAV overpass.",}
+```{r dates-table, tab.cap="Days of UAV overpasses.",}
 dates = unique(readRDS("../../data/resampled/dates.rds"))
 dates = as.Date(dates, format = "%Y_%m_%d" )
 dates = data.frame(Dates=dates)
@@ -222,7 +222,7 @@ in the course of the vegetation period.
 
 The images provided by the "Nature 4.0" project could not be geotagged completely cleanly at the start of our investigation. Therefore, some images are not optimally overlaid, which leads to image distortions. The following figure shows the image distortion by looking at the transporter in the image.
 
-```{r Image distortion, echo=F, message=F, warning=F, fig.cap="Display of the image distortion in the data basis"}
+```{r Image distortion, echo=F, message=F, warning=F, fig.cap="Exempelary display of the image distortion in the dataset."}
 imgr <- stack("Bild_verzerrung.tif")
 plotRGB(imgr)
 
@@ -295,7 +295,7 @@ indicesdf = data.frame(name = c("Triangular greenness index",
                                      "Richardson et al. (2009)"))
 
 kable(indicesdf, format = "latex", linesep="", align = "l", booktabs = T,
-      caption = "Names and formulas of RGB indices.") %>%
+      caption = "Names and formulas of calculated RGB indices.") %>%
   kable_styling(latex_options = c("scale_down","HOLD_position")) %>%
   row_spec(0,bold=TRUE) %>%
   footnote(general = "R: 580-670 nm, G: 480-610 nm, B: 400-520 nm, for digital cameras according to Hunt et al. (2012).")
@@ -307,7 +307,7 @@ indicating the mean value (solid line) as well as one standard deviation from th
 similar for both classes, however, for almost all VIs there are substantial differences
 between the classes during the first observations during the month of May.  
 
-```{r predictor_plots_indices, echo=F, message=F, warning=F, fig.cap="Temporal dynamic of calculated VIs over the course of the year by tree species at 25 cm resolution (dashed lines represent plus and minus one standard deviation)."}
+```{r predictor_plots_indices, echo=F, message=F, warning=F, fig.cap="Temporal dynamic of calculated VIs over the course of the year by tree species at 25 cm resolution (dashed lines represent +/- one standard deviation)."}
 
 if (!file.exists("ind_data.rds")){
   indices_names = readRDS("../../data/indices/names_indices_stack.rds")
@@ -354,7 +354,7 @@ are characterized by a very similar distribution (Fig. 3).
 
 
 
-```{r example_seasonal_plots, echo=F, warning=F, message=F, fig.cap="Exampalary histogramm plot of seasonal parameters for RCC by tree species at 25 cm resolution."}
+```{r example_seasonal_plots, echo=F, warning=F, message=F, fig.cap="Exampalary histogramm plot of seasonal parameters for RCC by tree species at 25 cm resolution (counts are in pixel) ."}
 
 if (!file.exists("ses_data.rds")){
   seasonal_names = readRDS("../../data/season/season_names.rds")
@@ -407,7 +407,7 @@ To validate the models, the Kappa value is first determined. If the raters agree
 Figure 4 shows that all models excluding the model with a resolution of 25cm and all variables used, regardless of the use of seasonal and vegetation indices and resolution, have a kappa value significantly below the acceptable limit of 0.4. The Kappa value for mono-temporal and seasonal indices increases with decreasing resolution. The comparison shows that the models calculated exclusively with mono-temporal indices show a significantly higher Kappa value than the models calculated exclusively with seasonal indices. Overall, it can be seen that the models with a lowest resolution of 25 cm achieve significantly better Kappa values than the models with a high resolution of 10 cm.
 
 
-```{r result_plots,  warning=F, message=F, fig.cap="Kappa scores of the random forest models based varying pixel sizes and predictor variables (red - mono-temporal indices, blue - seasonal indices, green - mono-temporal and seasonal indices)", out.width="60%"}
+```{r result_plots,  warning=F, message=F, fig.cap="Kappa scores of the random forest models based on varying pixel sizes and predictor variables (green - mono-temporal indices, blue - seasonal indices, red - mono-temporal and seasonal indices).", out.width="60%"}
 
 models = list.files("../results", pattern = "\\.rds$", full.names = T)
 
@@ -451,7 +451,7 @@ ggplot(data = kappas, aes(x=resolution)) +
 
 As a further statistical measure of quality, the accuracy of species classification on an object basis is investigated. An object is considered correctly classified if a majority of the pixels belonging to the object type exist. Figure 6 shows the percentage of objects classified as correct species based on the pixels classified in it. It is clearly shown that, regardless of the variables used, the accuracy of object classification increases from a resolution of 10 cm to a resolution of 15 cm. The next worse resolution, on contrast, has a negative effect respectively for the model with all used variables a stagnating effect regarding the object classification. It is striking that the models where mono-temporal and seasonal indices were used in combination had the lowest accuracy in object classification but the highest kappa values compared to Figure 5.
 
-```{r validation_plots, warning=F, message=F, fig.cap="Overall Accuracy of species classification on an object basis.", out.width="60%"}
+```{r validation_plots, warning=F, message=F, fig.cap="Overall Accuracy (OA) of species classification for tree object classification based on varying pixel sizes and predictor variables (green - mono-temporal indices, blue - seasonal indices, red - mono-temporal and seasonal indices). Note that for the 25cm resolution the OA for mono-temporal indices and all predictor variables is equally at 0.89.", out.width="60%"}
 predictions = readRDS("../../results/validation_pred.rds")
 index = predictions$index
 
@@ -486,7 +486,7 @@ For models with mono-temporal predictors, the GCC, GLI and VVI indices are of pa
 
 Looking at the explanatory share for models calculated using a combination of mono-temporal and seasonal indices, it is noticeable that significantly more mono-temporal predictors are important than seasonal predictors. Furthermore, it can be seen that the significance of mono-temporal predictors for model explanation changes (Fig.9). Thus, it is shown that the GCC index of April 29th is of higher importance than the models for which only mono-temporal predictors were used. In addition, completely different predictors, irrespective of whether they are mono-temporal or seasonal, have an influence on the model explanation than in the models shown above with exclusively mono-temporal or seasonal predictors. It is also striking that June 5 is still of great importance for the model explanation. The situation is similar for the GCC, RCC, VVI and GLI indices.
 
-```{r var_imp_indices, echo=F, warning=F, message=F, fig.cap="Variable importance for mono-temporal predictors by resolutions."}
+```{r var_imp_indices, echo=F, warning=F, message=F, fig.cap="Scaled relative variable importance for models with mono-temporal predictors and across all resolutions."}
 getVarImp <- function(model){
   decomp = str_split(str_split(model, "/")[[1]][3], "_")[[1]]
   if (length(decomp) == 2){
@@ -517,7 +517,7 @@ metric = lapply(models, getVarImp)
 metrics = as_tibble(do.call("rbind", metric))
 paras = c("MAX", "MIN", "AMP", "SD", "SUM", "Q25", "Q75")
 for (i in paras){ metrics$variable = str_replace(metrics$variable,i, paste("-", i, sep =  ""))}
-for (i in as.character(indicesdf$abbreviation)) {metrics$variable = str_replace(metrics$variable, paste0("_",i), paste("-", i, sep =  ""))}
+for (i in as.character(metrics$abbreviation)) {metrics$variable = str_replace(metrics$variable, paste0("_",i), paste("-", i, sep =  ""))}
 metrics$variable = str_replace(metrics$variable, "X2","2")
 metrics$variable = str_remove(metrics$variable, "season-")
 metrics$variable = str_replace_all(metrics$variable ,"_","/")
@@ -549,7 +549,7 @@ varImpInd %>%
   coord_flip()
 ```
 
-```{r var_imp_season, echo=F, warning=F, message=F, fig.cap="Variable importance for seasonal predictors by resolutions."}
+```{r var_imp_season, echo=F, warning=F, message=F, fig.cap="Scaled relative variable importance for models with seasonal predictors and across all resolutions."}
 
 varImpSes %>%
   group_by(variable) %>%
@@ -563,7 +563,7 @@ varImpSes %>%
   coord_flip()
 ```
 
-```{r var_imp_all, echo=F, warning=F, message=F, fig.cap="Variable importance for mono-temporal and seasonal predictors by resolutions."}
+```{r var_imp_all, echo=F, warning=F, message=F, fig.cap="Scaled relative variable importance for models with all predictors variables and across all resolutions."}
 
 
 varImpAll %>%
@@ -579,7 +579,7 @@ varImpAll %>%
 ```
 
 
-```{r var_imp_together, echo=F, warning=F, message=F, fig.cap="Variable importance across all models."}
+```{r var_imp_together, echo=F, warning=F, message=F, fig.cap="Scaled relative variable importance across all models and accross all resolutions."}
 
 
 metrics %>%
@@ -598,19 +598,19 @@ metrics %>%
 
 Due to several sources of error the obtained results do not allow a consistent interpretation on the effects of resolution and the selection of predictor variables. As mentioned above and shown in **figure 2** the pre-processing and georeferencing of the drone images introduced distortion artifacts which lead to false pixel readouts at the sampling trees locations. Further the representation of trees in our training data as described in **2.3**, in combination with the described image distortion is a massive source of error, that can't be ignored.
 --> im Endeffekt sagt der Kappa ja, dass kein Modell annehmbar ist. 
---> Vielleicht nochmal erwähnen, dass das die grundlage war und nicht unser verschulden?
+--> Vielleicht nochmal erw?hnen, dass das die grundlage war und nicht unser verschulden?
 
 The models results, measured by the kappa score indicate a stronger, but not much stronger ability than random chance to predict tree species at our study site. Although the results do not appear to be too promising for an overall tree species classification they are very well capable of highlighting key differences resulting from changed methodologies during the model training process. Models trained with both mono-temporal and seasonal indices performed best overall closely followed by models trained with mono-temporal indices only. Thus leading us to the conclusion, that mono-temporal predictors are more important than seasonal predictors but a combination of both improve model performance slightly. Comparing those results with object based validation accuracy scores seen in **figure 6** a big discrepancy is noticeable. A possible explanation may be the over representation of fagus sylvatica pixels when predicting tree species on all available tree objects. A contributing factor to that over representation may be the decreasing resolution, as more "fagus sylvatica" pixels are crunched into bigger sized pixels and thus smoothing out the already underrepresented quercus robur pixels. 
 
---> Vielleicht erwhnen, dass saisonale indices besser sein könnten, nur für den geeigneten zeitraum evtl kein Bild vorhanden war, beispielsweise irgendein saisonales merkmal wegen der zeit verpasst wurde. ich denke da an abbildung 3 in unserem bericht?
---> vielelicht noch auf die indices eingehen warum gerade diese ausgewählt wurden?
+--> Vielleicht erwhnen, dass saisonale indices besser sein k?nnten, nur f?r den geeigneten zeitraum evtl kein Bild vorhanden war, beispielsweise irgendein saisonales merkmal wegen der zeit verpasst wurde. ich denke da an abbildung 3 in unserem bericht?
+--> vielelicht noch auf die indices eingehen warum gerade diese ausgew?hlt wurden?
 https://www.researchgate.net/figure/Vegetation-canopy-greenness-as-quantified-by-green-chromatic-coordinate-GCC-using_fig1_296618875 sowas vielleicht?
 https://www.researchgate.net/figure/Daily-green-red-and-blue-chromatic-coordinates-GCC-RCC-BCC-and-excess-indices_fig4_312257742
 hatte da irgendwas einfluss auf die auswahl der indice irgendein faktor?
-also warum wurden gerade RCC GCC GLI UND VVI ausgewählt? kenne da gerade keine Begründung. gibts da eine=
--->  WIe siehts damit aus, dass die indices eigentlich für satelliten und luftbilder entwickelt wurden. hat das einen einfluss auf drohnenbilde und daher auf die auswahl. also werden bestimmte indices aufgrund des anders einfallenden lichts bevorzugt? und deshalb ausgewöhlt?
+also warum wurden gerade RCC GCC GLI UND VVI ausgew?hlt? kenne da gerade keine Begr?ndung. gibts da eine=
+-->  WIe siehts damit aus, dass die indices eigentlich f?r satelliten und luftbilder entwickelt wurden. hat das einen einfluss auf drohnenbilde und daher auf die auswahl. also werden bestimmte indices aufgrund des anders einfallenden lichts bevorzugt? und deshalb ausgew?hlt?
 --> gibts nen bezug den man zur einleitung ziehen kann?
---> WIr haben mehr buchen im untersuchung und traininsgebiet führt das dazu, dass buchen besser vorhergesagt werden und daher die Modellgüte künstlich erhöht wird?
+--> WIr haben mehr buchen im untersuchung und traininsgebiet f?hrt das dazu, dass buchen besser vorhergesagt werden und daher die Modellg?te k?nstlich erh?ht wird?
 
 In order to conduct further analysis on that topic it is strongly recommended to improve the image pre processing steps involved in this study.
 

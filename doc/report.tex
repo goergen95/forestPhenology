@@ -81,7 +81,7 @@
 
 \title{UAV imagery based tree species classification in the Marburg OpenForest}
 \author{Darius A. Görgen \and Tobias Koch \and Marvin Müsgen \and Eike Schott}
-\date{February 17, 2020}
+\date{February 26, 2020}
 
 \begin{document}
 \maketitle
@@ -175,63 +175,63 @@ sensors (Berra et al., 2019; Marques et al., 2019) as well as simple RGB
 cameras (Natesan et al., 2019). A broad methodology to obtain species
 information for single tree individuals has been developed integrating
 the calculation of various vegetation indices from mono- and
-multi-temporal imagery and the use of machine learning models to derieve
+multi-temporal imagery and the use of machine learning models to derive
 a relationship between the measured variables and the tree species.
 Berra et al. (2016) used the Green Chromatic Coordinate to monitor the
-Start-of-Season for four different tree species in decidous woodland
-suggesting that UAV imagery can contribute to investiage the
-phenologocial statu of individuak trees. Klosterman and Richardson
+Start-of-Season for four different tree species in deciduous woodland
+suggesting that UAV imagery can contribute to investigate the
+phenological status of individual trees. Klosterman and Richardson
 (2017) were able to estimate phenological status on the leaf-level based
 on the calculation of the green and red chromatic coordinate (GCC and
-RCC) during spring and autumn to budburst and leaf expansion as well as
+RCC) during spring and autumn to bud burst and leaf expansion as well as
 leaf senescence. Natesan et al. (2019) used Residual Neural Networks to
 classify three different tree species based on RGB imagery obtained over
-the course of three years and achived a classification accuracy of about
-80\%, and an accuracy of 51\% when only the data of single years was
-used. Fricker et al. (2019) used hyperspectral images obtained by a UAV
-and a Convolutional Neural Network to classify tree species. They also
-underwent an experiment which only included RGB data. The hyperspectral
-data achieved an F-score of 0.87, while the RGB data achieved a score of
-0.64 in a dominantly coniferous forest.
+the course of three years and achieved a classification accuracy of
+about 80\%, and an accuracy of 51\% when only the data of single years
+was used. Fricker et al. (2019) used hyperspectral images obtained by a
+UAV and a Convolutional Neural Network to classify tree species. They
+also underwent an experiment which only included RGB data. The
+hyperspectral data achieved an F-score of 0.87, while the RGB data
+achieved a score of 0.64 in a dominantly coniferous forest.
 
 Additionally, the development of structure-from-motion algorithms to get
 3D information from 2D RGB imagery taken from slightly different angles
 have enriched the analysis of forest structures from low-cost sensors.
 Nevalainen et al. (2017) used RGB images and an automated matching
-technique to obtain point clouds at a 5cm resoultion. Coupled with
+technique to obtain point clouds at a 5cm resolution. Coupled with
 hyperspectral imagery this allowed the tree species classification to an
-accuracy at 95\%. Yan et al. (2018) compared thier approach of
-retrieving tree crowns from RGB images with crowns delinated from LiDAR
+accuracy at 95\%. Yan et al. (2018) compared their approach of
+retrieving tree crowns from RGB images with crowns delineated from LiDAR
 data and report an accuracy at about 90\%. Krause et al. (2019) were
-able to retrive individual tree height based on a photogrammetric
+able to retrieve individual tree height based on a photogrammetric
 point-cloud with an RMSE at about 2-3 \%. Brieger et al. (2019) used RGB
-derived point clouds at different study sites in Siberia and achived an
-accuracy of 67.1\% in delinating individual tree crowns and an RMSE of
+derived point clouds at different study sites in Siberia and achieved an
+accuracy of 67.1\% in delineating individual tree crowns and an RMSE of
 18.46\% for tree height. Sothe et al. (2019) used hyperspectral images
-for tree delination and classification in subtropical rainforests and
-achived and Kappa score of 0.7 (overall accuracy of 72.4\%) by combining
-spectral raw data, indices as well as structural parameters in the
-classification process using a support-vector machine.
+for tree delineation and classification in subtropical rain forests and
+achieved and Kappa score of 0.7 (overall accuracy of 72.4\%) by
+combining spectral raw data, indices as well as structural parameters in
+the classification process using a support-vector machine.
 
 However, little efforts have been done to structurally investigate the
 impact of decreasing spatial resolution on the classification accuracy
 as well as the impact of the integration of seasonal parameters derived
 from multiple mono-temporal observations. Here, we strictly limit our
 analysis to the investigation of these two thematic blocs and
-deliberatly exclude other factors such as structural variables obtained
+deliberately exclude other factors such as structural variables obtained
 from point clouds. We solely focus on the analysis of the dynamic in
 predictive potential of RGB derived mono- and multi-temporal variables
-to model tree species with changing spatial resoulution.
+to model tree species with changing spatial resolution.
 
 To this end we use the RGB imagery obtained by multiple overflights
 during the year 2019 from a study side located within the Marburg
-Univeristy forest which is part of the research project
+University forest which is part of the research project
 \href{https://www.uni-marburg.de/en/fb19/natur40/}{Natur 4.0}. This
 forest is used as a joint research area for a project between several
 German universities and research institutes and sets out to investigate
 the potential of sensor technology for biodiversity and natural resource
-management in natural envrionments forests. We artificially decreased
-the spatial resoultion of aerial imagery obtained in this area resulting
+management in natural environments forests. We artificially decreased
+the spatial resolution of aerial imagery obtained in this area resulting
 in three different target resolutions of 10, 15, and 25 cm. For every
 single overflight we calculated a series of RGB indices on a pixels
 basis. Additionally, we calculate descriptive statistics (mean, maximum,
@@ -258,11 +258,11 @@ as well as the importance of mono- vs.~multi-temporal input data.
 The study area is located at 50.8°N 8.7°E in the German low mountain
 range in Hesse. It is part of the University Forest Caldern where the
 recently initiated joint research project Natur 4.0 aims at
-investigating the use of networked sensor technology for biodversity and
-ecosystem managment and protection. It is in this context, that the
+investigating the use of networked sensor technology for biodiversity
+and ecosystem management and protection. It is in this context, that the
 aerial images which we used here were obtained in an observation
-campaign during 2019 (see Tab. 1). The area is approximatley 37,500 m²
-and continously covered by trees. In this specific location, only two
+campaign during 2019 (see Tab. 1). The area is approximately 37,500 m²
+and continuously covered by trees. In this specific location, only two
 distinct species are present with stem diameters at breast height (DBH)
 greater than 40 cm, namely \emph{fagus sylvatica} and \emph{quercus
 robur}.
@@ -280,38 +280,37 @@ robur}.
 \subsection{Pre-Processing of the UAV
 orthoimages}\label{pre-processing-of-the-uav-orthoimages}}
 
-In this project, AgisoftPhotoScan (???) in the version (???) was used to
-process the UAV imagery. Agisoft Photoscan Professional is anaffordable
-3D reconstruction software from the Russian company Agisoft LLC Agisoft
-(2019) for the generation of dense point clouds and photogrammetric
-products such as orthorectified mosaics and DSM derived from images.
-Photoscan has the advantage to provide a simple workflow, from
-performing bundle block adjustment to calibrate the camera and orientate
-images after automatic tie point measurements, geo-referencing by
-measuring ground control points, concluding with the computation of a
-dense point cloud and requested final products Mayer and Kersten (2018).
-The Airborne system (???Drohnenname) was used to acquire the UAV imagery
-using a commercial goPro (???Model + Objektiv. In (??? Anzahl flights)
-flight campaigns with a flight altitude of 40 meters, (???Anzahlfotos)
-photos were acquired. The internal GPS of the GoPro was used for
-geotagging the images. A post referencing enabled a better processing of
-the images in SFM software (Version???) and more accurate orthophotos
-without manual referencing in Photoscan. Photo Alignment is a process in
-PS for image matching and bundle block adjustment in an arbitrary
-system. It generates a sparse point cloud as well as the interior and
-exterior orientation parameters of all images in that system, including
-systematic error compensation such as non-linear lens distortions. Prior
-to the adjustment, the tie points are automatically measured by
-detecting and matching features in overlapping images resulting in a
-sparse point cloud ({\textbf{???}}) settings in this project were chosen
-as follows: - General: Accuracy: Medium; Generec preselection: yes;
-Reference preselection: yes - Advances: Key Piont limit: 40000; Tie
-point limit: 4000; apply mask: no; Adaptive camera model fitting: yes
+In this project, AgisoftPhotoScan was used to process the UAV imagery.
+Agisoft Photoscan Professional is an affordable 3D reconstruction
+software from the Russian company Agisoft LLC Agisoft (2019) for the
+generation of dense point clouds and photogrammetric products such as
+orthorectified mosaics and DSM derived from images. Photoscan has the
+advantage to provide a simple workflow, from performing bundle block
+adjustment to calibrate the camera and orientate images after automatic
+tie point measurements, geo-referencing by measuring ground control
+points, concluding with the computation of a dense point cloud and
+requested final products Mayer and Kersten (2018). The Airborne system
+was used to acquire the UAV imagery using a commercial GoPro in several
+flight campaigns with a flight altitude of 40 meters The internal GPS of
+the GoPro was used for geotagging the images. A post referencing enabled
+a better processing of the images in SFM software and more accurate
+orthophotos without manual referencing in Photoscan. Photo Alignment is
+a process in PS for image matching and bundle block adjustment in an
+arbitrary system. It generates a sparse point cloud as well as the
+interior and exterior orientation parameters of all images in that
+system, including systematic error compensation such as non-linear lens
+distortions. Prior to the adjustment, the tie points are automatically
+measured by detecting and matching features in overlapping images
+resulting in a sparse point cloud ({\textbf{???}}) settings in this
+project were chosen as follows: - General: Accuracy: Medium; Generic
+preselection: yes; Reference preselection: yes - Advances: Key Point
+limit: 40000; Tie point limit: 4000; apply mask: no; Adaptive camera
+model fitting: yes
 
 Sparse cloud filtering was performed under the following settings:
 -gradual Selection: reprojection error: 0.26; reconstruction
 uncertainty: 189.461; projection accuracy:12.4621; reconstruction
-uncertainty:6.72951; reprojectionerror:0.122199
+uncertainty:6.72951; reprojection error:0.122199
 
 \begin{table}[!h]
 
@@ -331,22 +330,22 @@ Dates\\
 \end{tabular}
 \end{table}
 
-Based on the information of the point cloud (Sparse Cloud, Dense
-Cloudetc \ldots{}) PhotoScan can construct a polygon model (Mesh)
-Agisoft (2019). In this Project the Mesh was build by following setting:
-- General: surface type: Height field (2.5D); source data: sparse cloud;
+Based on the information of the point cloud (Sparse Cloud, Dense Cloud
+etc \ldots{}) PhotoScan can construct a polygon model (Mesh) Agisoft
+(2019). In this Project the Mesh was build by following setting: -
+General: surface type: Height field (2.5D); source data: sparse cloud;
 face count: medium - advanced: Interpolation: enabled; Point classes:
 all; calculate vertex colors
 
 The different pixel values from different photos are combined by the
-Mosaic type in the final texture. Mosiac type implies a two-step
+Mosaic type in the final texture. Mosaic type implies a two-step
 approach. Low frequency components are blended for overlapping images to
 avoid seam line problems. The high-frequency component, on the other
 hand, which is responsible for the image details, is only captured from
 a single image.
 
 In total we worked on 6 images which were obtained between the end of
-April to the end of June. In the mitlatitudes of central Europe these
+April to the end of June. In the mid latitudes of central Europe these
 are the months of vegetational peak of mixed forests. We calculated a
 selection of RGB-based vegetational indices for each of the images as
 well as seasonal statistics which describe the development of these
@@ -364,19 +363,19 @@ transporter in the image.
 
 }
 
-\caption{Display of the image distortion in the data basis}\label{fig:Image distortion}
+\caption{Exempelary display of the image distortion in the dataset.}\label{fig:Image distortion}
 \end{figure}
 
 \hypertarget{tree-species-data}{%
 \subsection{Tree species data}\label{tree-species-data}}
 
-With the use of a diferential GPS the position of tree stems within the
+With the use of a differential GPS the position of tree stems within the
 study area was logged during a field campaign. Associated with the
 positional data, the tree species as well as the DBH was gathered. As
 stated before, here we only focused on the determination of the impact
 of changing resolutions and multi-temporal predictor variables on the
-classification accuracy. Therefore, we simplified the delination of tree
-crowns corresponding to the needs of the investigation. First, we
+classification accuracy. Therefore, we simplified the delineation of
+tree crowns corresponding to the needs of the investigation. First, we
 excluded all trees with a DBH below 40 cm, because we assumed that the
 crowns of greater trees would cover the smaller ones and thus they could
 not be observed on aerial images from above the crown cover. Secondly,
@@ -393,7 +392,7 @@ were \emph{quercus robur}.
 \subsection{RGB indices}\label{rgb-indices}}
 
 We calculated a number of seven color vegetation indices (VI) which can
-be found in Tabel 2. These color indices were suspected to bare
+be found in Table 2. These color indices were suspected to bare
 information content on the phenological development of tree species
 during a year. Indices are frequently used in remote sensing studies due
 to their relational nature which compensates for influences of
@@ -407,14 +406,14 @@ resulting in additional 70 seasonal predictors.
 
 \begin{table}[H]
 
-\caption{\label{tab:indices}Names and formulas of RGB indices.}
+\caption{\label{tab:indices}Names and formulas of calculated RGB indices.}
 \centering
 \resizebox{\linewidth}{!}{
 \begin{tabular}[t]{llll}
 \toprule
 \textbf{name} & \textbf{abbreviation} & \textbf{formula} & \textbf{reference}\\
 \midrule
-Triangular greeness index & TGI & -0.5 * (190*(R-G) - 120*(R-B)) & Broge and Leblanc (2001)\\
+Triangular greenness index & TGI & -0.5 * (190*(R-G) - 120*(R-B)) & Broge and Leblanc (2001)\\
 Green Leaf Index & GLI & (2*G-R-B) / (2*G+R+B) & Gobron et al. (2000)\\
 Color Index of Vegetation & CIVE & (0.441*R-0.881*G + 0.385*B + 18.787) & Wan et al. (2018)\\
 Iron Oxide Index & IO & R/B & Rowan and Mars (2003)\\
@@ -422,7 +421,7 @@ Visible Vegetation Index & VVI & (1-|R-30| / |R+30|) *
 
                                  (1- |G-50| / |G+50|) * 
  
-                                 (1-|B-1| / |B+1|) & Planetary Habitability Labratory (2015)\\
+                                 (1-|B-1| / |B+1|) & Planetary Habitability Laboratory (2015)\\
 Green Chromatic Coordinate & GCC & G / (R+G+B) & Sonnentag et al. (2012)\\
 Red Chromatic Coordinate & RCC & R / (R+G+B) & Richardson et al. (2009)\\
 \bottomrule
@@ -444,11 +443,11 @@ during the first observations during the month of May.
 
 }
 
-\caption{Temporal dynamic of calculated VIs over the course of the year by tree species at 25 cm resolution (dashed lines represent plus and minus one standard deviation).}\label{fig:predictor_plots_indices}
+\caption{Temporal dynamic of calculated VIs over the course of the year by tree species at 25 cm resolution (dashed lines represent +/- one standard deviation).}\label{fig:predictor_plots_indices}
 \end{figure}
 
 Concerning the frequency of the seasonal predictor variables both tree
-species are charachterised by a very similar distribution (Fig. 3).
+species are characterized by a very similar distribution (Fig. 3).
 
 \begin{figure}[H]
 
@@ -456,7 +455,7 @@ species are charachterised by a very similar distribution (Fig. 3).
 
 }
 
-\caption{Exampalary histogramm plot of seasonal parameters for RCC by tree species at 25 cm resolution.}\label{fig:example_seasonal_plots}
+\caption{Exampalary histogramm plot of seasonal parameters for RCC by tree species at 25 cm resolution (counts are in pixel) .}\label{fig:example_seasonal_plots}
 \end{figure}
 
 \hypertarget{classification-and-validation}{%
@@ -464,9 +463,9 @@ species are charachterised by a very similar distribution (Fig. 3).
 Validation}\label{classification-and-validation}}
 
 For the classification of tree species we used a Random Forest model
-based on a forward-feature selection of predictor variables stratfied by
-a leave-location-out five-fold cross-validation technique. Random Forest
-is a non-parametric model, both suitable for regression and
+based on a forward-feature selection of predictor variables stratified
+by a leave-location-out five-fold cross-validation technique. Random
+Forest is a non-parametric model, both suitable for regression and
 classification problems. It was developed by ({\textbf{???}}) and is
 works by the establishment of a number of decision trees, the forest,
 each constructed on a random split of predictor variables. The final
@@ -482,14 +481,15 @@ if there are only matches between the two raters that mathematically
 correspond to the extent of the randomness, it assumes a value of zero
 Greve and Wentura (1997). Kappa values between 0.6 and 0.4 are still
 considered acceptable, values below 0.40 should be regarded with
-scepticism. Interrater reliability values of 0.75 are considered good to
+skepticism. Interrater reliability values of 0.75 are considered good to
 excellent Greve and Wentura (1997).
 
-Figure 4 shows that all models, regardless of the use of seasonal,
-vegetation indices and resolution, have a Kappa value that falls well
-below the acceptable limit of 0.4. The Kappa value for mono-temperal and
+Figure 4 shows that all models excluding the model with a resolution of
+25cm and all variables used, regardless of the use of seasonal and
+vegetation indices and resolution, have a kappa value significantly
+below the acceptable limit of 0.4. The Kappa value for mono-temporal and
 seasonal indices increases with decreasing resolution. The comparison
-shows that the models calculated exclusively with mono-temperal indices
+shows that the models calculated exclusively with mono-temporal indices
 show a significantly higher Kappa value than the models calculated
 exclusively with seasonal indices. Overall, it can be seen that the
 models with a lowest resolution of 25 cm achieve significantly better
@@ -501,15 +501,22 @@ Kappa values than the models with a high resolution of 10 cm.
 
 }
 
-\caption{Kappa scores of the random fores models based varying pixel sizes and predictor variables (red - mono-temporal indices, blue - seasonal indices, green - mono-temporal and seasonal indices)}\label{fig:result_plots}
+\caption{Kappa scores of the random forest models based on varying pixel sizes and predictor variables (green - mono-temporal indices, blue - seasonal indices, red - mono-temporal and seasonal indices).}\label{fig:result_plots}
 \end{figure}
 
 As a further statistical measure of quality, the accuracy of species
 classification on an object basis is investigated. An object is
 considered correctly classified if a majority of the pixels belonging to
-the object type exist.
-
-(Weiter arbeiten nach dem Abbildungen krrigiert wurden)
+the object type exist. Figure 6 shows the percentage of objects
+classified as correct species based on the pixels classified in it. It
+is clearly shown that, regardless of the variables used, the accuracy of
+object classification increases from a resolution of 10 cm to a
+resolution of 15 cm. The next worse resolution, on contrast, has a
+negative effect respectively for the model with all used variables a
+stagnating effect regarding the object classification. It is striking
+that the models where mono-temporal and seasonal indices were used in
+combination had the lowest accuracy in object classification but the
+highest kappa values compared to Figure 5.
 
 \begin{figure}[H]
 
@@ -517,18 +524,38 @@ the object type exist.
 
 }
 
-\caption{Overall Accuracy of species classification on an object basis.}\label{fig:validation_plots}
+\caption{Overall Accuracy (OA) of species classification for tree object classification based on varying pixel sizes and predictor variables (green - mono-temporal indices, blue - seasonal indices, red - mono-temporal and seasonal indices). Note that for the 25cm resolution the OA for mono-temporal indices and all predictor variables is equally at 0.89.}\label{fig:validation_plots}
 \end{figure}
 
-The variable Importance describes the increase in importance of the
-selected variable for the explanation of the model. The variable
-selected first is always used in combination with another variable.
-Since the model does not offer an explanation at the beginning, the
-explanation gain of the first variable combination is always 100\%. The
-next selected ones then offer the second largest explanation increase.
-The following figures show how the explanatory increase has developed
-for the individual models of the Mono-Temperals and Seasonal Indices, as
-well as both in combination for the different selected resolutions.
+The variable importance describes the explanatory part a variable has in
+the model in percent. Figures 7, 8 and 9 show predictor and explanatory
+parts of the model for the models with mono-temporal indices, seasonal
+indices and both in combination. The explanation percentages of the
+individual predictors were calculated from the respective models. The
+variable with the highest explanatory share is shown as 100\%. The
+explanation share of the remaining variables is shown in relation to the
+variable with the highest explanation share.
+
+For models with mono-temporal predictors, the GCC, GLI and VVI indices
+are of particular importance (Fig. 7). It is noticeable that the aerial
+photographs of June 5th play an important role in the model calculation.
+When seasonal predictors are used for model calculation, Figure 8 shows
+that the RCC index is of great importance (Fig.8). A significant
+statistical measure of model explanation is not apparent.
+
+Looking at the explanatory share for models calculated using a
+combination of mono-temporal and seasonal indices, it is noticeable that
+significantly more mono-temporal predictors are important than seasonal
+predictors. Furthermore, it can be seen that the significance of
+mono-temporal predictors for model explanation changes (Fig.9). Thus, it
+is shown that the GCC index of April 29th is of higher importance than
+the models for which only mono-temporal predictors were used. In
+addition, completely different predictors, irrespective of whether they
+are mono-temporal or seasonal, have an influence on the model
+explanation than in the models shown above with exclusively
+mono-temporal or seasonal predictors. It is also striking that June 5 is
+still of great importance for the model explanation. The situation is
+similar for the GCC, RCC, VVI and GLI indices.
 
 \begin{figure}[H]
 
@@ -536,7 +563,7 @@ well as both in combination for the different selected resolutions.
 
 }
 
-\caption{Variable importance for mono-temporal predictors by resolutions.}\label{fig:var_imp_indices}
+\caption{Scaled relative variable importance for models with mono-temporal predictors and across all resolutions.}\label{fig:var_imp_indices}
 \end{figure}
 
 \begin{figure}[H]
@@ -545,7 +572,7 @@ well as both in combination for the different selected resolutions.
 
 }
 
-\caption{Variable importance for seasonal predictors by resolutions.}\label{fig:var_imp_season}
+\caption{Scaled relative variable importance for models with seasonal predictors and across all resolutions.}\label{fig:var_imp_season}
 \end{figure}
 
 \begin{figure}[H]
@@ -554,7 +581,7 @@ well as both in combination for the different selected resolutions.
 
 }
 
-\caption{Variable importance for mono-temporal and seasonal predictors by resolutions.}\label{fig:var_imp_all}
+\caption{Scaled relative variable importance for models with all predictors variables and across all resolutions.}\label{fig:var_imp_all}
 \end{figure}
 
 \begin{figure}[H]
@@ -563,14 +590,73 @@ well as both in combination for the different selected resolutions.
 
 }
 
-\caption{Variable importance across all models.}\label{fig:var_imp_together}
+\caption{Scaled relative variable importance across all models and accross all resolutions.}\label{fig:var_imp_together}
 \end{figure}
 
 \hypertarget{discussion}{%
 \section{Discussion}\label{discussion}}
 
+Due to several sources of error the obtained results do not allow a
+consistent interpretation on the effects of resolution and the selection
+of predictor variables. As mentioned above and shown in \textbf{figure
+2} the pre-processing and georeferencing of the drone images introduced
+distortion artifacts which lead to false pixel readouts at the sampling
+trees locations. Further the representation of trees in our training
+data as described in \textbf{2.3}, in combination with the described
+image distortion is a massive source of error, that can't be ignored.
+--\textgreater{} im Endeffekt sagt der Kappa ja, dass kein Modell
+annehmbar ist. --\textgreater{} Vielleicht nochmal erw?hnen, dass das
+die grundlage war und nicht unser verschulden?
+
+The models results, measured by the kappa score indicate a stronger, but
+not much stronger ability than random chance to predict tree species at
+our study site. Although the results do not appear to be too promising
+for an overall tree species classification they are very well capable of
+highlighting key differences resulting from changed methodologies during
+the model training process. Models trained with both mono-temporal and
+seasonal indices performed best overall closely followed by models
+trained with mono-temporal indices only. Thus leading us to the
+conclusion, that mono-temporal predictors are more important than
+seasonal predictors but a combination of both improve model performance
+slightly. Comparing those results with object based validation accuracy
+scores seen in \textbf{figure 6} a big discrepancy is noticeable. A
+possible explanation may be the over representation of fagus sylvatica
+pixels when predicting tree species on all available tree objects. A
+contributing factor to that over representation may be the decreasing
+resolution, as more ``fagus sylvatica'' pixels are crunched into bigger
+sized pixels and thus smoothing out the already underrepresented quercus
+robur pixels.
+
+--\textgreater{} Vielleicht erwhnen, dass saisonale indices besser sein
+k?nnten, nur f?r den geeigneten zeitraum evtl kein Bild vorhanden war,
+beispielsweise irgendein saisonales merkmal wegen der zeit verpasst
+wurde. ich denke da an abbildung 3 in unserem bericht? --\textgreater{}
+vielelicht noch auf die indices eingehen warum gerade diese ausgew?hlt
+wurden?
+\url{https://www.researchgate.net/figure/Vegetation-canopy-greenness-as-quantified-by-green-chromatic-coordinate-GCC-using_fig1_296618875}
+sowas vielleicht?
+\url{https://www.researchgate.net/figure/Daily-green-red-and-blue-chromatic-coordinates-GCC-RCC-BCC-and-excess-indices_fig4_312257742}
+hatte da irgendwas einfluss auf die auswahl der indice irgendein faktor?
+also warum wurden gerade RCC GCC GLI UND VVI ausgew?hlt? kenne da gerade
+keine Begr?ndung. gibts da eine= --\textgreater{} WIe siehts damit aus,
+dass die indices eigentlich f?r satelliten und luftbilder entwickelt
+wurden. hat das einen einfluss auf drohnenbilde und daher auf die
+auswahl. also werden bestimmte indices aufgrund des anders einfallenden
+lichts bevorzugt? und deshalb ausgew?hlt? --\textgreater{} gibts nen
+bezug den man zur einleitung ziehen kann? --\textgreater{} WIr haben
+mehr buchen im untersuchung und traininsgebiet f?hrt das dazu, dass
+buchen besser vorhergesagt werden und daher die Modellg?te k?nstlich
+erh?ht wird?
+
+In order to conduct further analysis on that topic it is strongly
+recommended to improve the image pre processing steps involved in this
+study.
+
 \hypertarget{conclusion}{%
 \section{Conclusion}\label{conclusion}}
+
+Overall the models performances, described by the kappa score showed a
+better than random ability to predict tree species at our study area
 
 \hypertarget{references}{%
 \section*{References}\label{references}}
