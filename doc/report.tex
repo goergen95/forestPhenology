@@ -81,7 +81,7 @@
 
 \title{UAV imagery based tree species classification in the Marburg OpenForest}
 \author{Darius A. Görgen \and Tobias Koch \and Marvin Müsgen \and Eike Schott}
-\date{April 05, 2020}
+\date{April 07, 2020}
 
 \begin{document}
 \maketitle
@@ -211,7 +211,10 @@ accuracy of 67.1\% in delineating individual tree crowns and an RMSE of
 for tree delineation and classification in subtropical rain forests and
 achieved and Kappa score of 0.7 (overall accuracy of 72.4\%) by
 combining spectral raw data, indices as well as structural parameters in
-the classification process using a support-vector machine.
+the classification process using a support-vector machine. Richardson et
+al. (2009) proved, that simple RGB images can contribute to seasonally
+differntiate tree green-up and senescence in different forest
+envrionments.
 
 However, little efforts have been done to structurally investigate the
 impact of decreasing spatial resolution on the classification accuracy
@@ -414,10 +417,12 @@ information content on the phenological development of tree species
 during a year. Indices are frequently used in remote sensing studies due
 to their relational nature which compensates for influences of
 illumination and viewing geometry on the measured reflectance values of
-the RGB channels. They were calculated for each UAV overpass resulting
-in (7VIs+R+G+B) x 6 observations = 60 mono-temporal predictor variables.
-Additionally, we calculated the maximum (MAX), minimum (MIN), sum (SUM),
-standard deviation (SD), amplitude (AMP) as well as the 25\%- (Q25) and
+the RGB channels. The chosen indices delivered satisfying results in
+prior studies, which corresponding sources are reported in Table 2. They
+were calculated for each UAV overpass resulting in (7VIs+R+G+B) x 6
+observations = 60 mono-temporal predictor variables. Additionally, we
+calculated the maximum (MAX), minimum (MIN), sum (SUM), standard
+deviation (SD), amplitude (AMP) as well as the 25\%- (Q25) and
 75\%-percentile (Q75) values for each VI and the raw channels across the
 time series resulting in additional 70 seasonal predictors.
 
@@ -496,25 +501,21 @@ well as the \texttt{CAST} package to implement the LLOCV (Meyer, 2018).
 \hypertarget{results}{%
 \section{Results}\label{results}}
 
-To validate the models, the Kappa value is first determined. If the
-raters agree in all their judgments, the kappa value is equal to 1, and
-if there are only matches between the two raters that mathematically
-correspond to the extent of the randomness, it assumes a value of zero
-(Greve and Wentura, 1997). Kappa values between 0.6 and 0.4 are still
-considered acceptable, values below 0.40 should be regarded with
-skepticism. Interrater reliability values of 0.75 are considered good to
-excellent (Greve and Wentura, 1997).
+To validate the models, the overall accuracy (OA) is determined. OA
+describes the number of correctly classified observations divided by the
+total number of observations and is used in a number of studies to
+determine the validity of classification models (Natesan et al., 2019;
+Onishi and Ise, 2018; Sothe et al., 2019).
 
 Figure 5 shows that all models, excluding the model at a 25cm resolution
 including all variables, regardless of the use of seasonal and
-vegetation indices and resolution, have a kappa value significantly
-below the acceptable limit of 0.4. The Kappa value for mono-temporal and
-seasonal indices increases with decreasing resolution. The comparison
-shows that the models calculated exclusively with mono-temporal indices
-show a significantly higher Kappa value than the models calculated
-exclusively with seasonal indices. Overall, it can be seen that the
-models with th lowest resolution of 25cm achieve significantly better
-Kappa values than the models with higher resolutions.
+vegetation indices and resolution, show an OA below 0.65. The OA
+increases for all predictor combinations with an increase in spatial
+resolution. The comparison shows that the models calculated exclusively
+with mono-temporal indices show a substantially higher OA than the
+models calculated exclusively with seasonal indices
+(\textasciitilde{}3\%). The inclusion of both, mono- temporal and
+seasonal paramters, increases the OA at a rate of about 1\%.
 
 \begin{figure}[H]
 
@@ -522,7 +523,7 @@ Kappa values than the models with higher resolutions.
 
 }
 
-\caption{Kappa scores of the random forest models based varying pixel sizes and predictor variables (green - mono-temporal indices, blue - seasonal indices, red - mono-temporal and seasonal indices)}\label{fig:result_plots}
+\caption{Overall accuracy of the random forest models based varying pixel sizes and predictor variables (green - mono-temporal indices, blue - seasonal indices, red - mono-temporal and seasonal indices)}\label{fig:result_plots}
 \end{figure}
 
 As a another statistical measure of quality, the accuracy of species
@@ -532,12 +533,12 @@ the object corresponds to the class of this object. Figure 6 shows the
 percentage of objects classified as the correct species based on the
 majority of pixels within its boundaries. It is clearly shown that,
 regardless of the variables used, the accuracy of object classification
-increases from a resolution of 10 cm to a r esolution of 15 cm. The
+increases from a resolution of 10 cm to a resolution of 15 cm. The
 resolution of 20cm, on contrast, has either a negative effect or not
 effect at all on the accuracy for all models. It is striking that the
 models where mono-temporal and seasonal indices were used in combination
 had the lowest accuracy in object classification but achieved the
-highest Kappa values on a pixels basis (Figure 5).
+highest OA on a pixels basis (Figure 5).
 
 \begin{figure}[H]
 
@@ -617,60 +618,102 @@ importance explanatory variables than other indices.
 \caption{Variable importance across all model types and resoultions.}\label{fig:var_imp_together}
 \end{figure}
 
-\hypertarget{discussion}{%
-\section{Discussion}\label{discussion}}
+\hypertarget{discussion-conclusion}{%
+\section{Discussion \& Conclusion}\label{discussion-conclusion}}
 
-The presented results are prone to a number of sources of errors. First,
-there is the inconsistent georefferencing which led to rather large
-image distortions (Fig. 2). This error is amplified by a second source
-of errors, namely the rather coarse localizations of tree crowns within
-the images (Fig. 1). With the chosen approach in this study, it is
-possible that pixels which belong to another tree with another species
-are considered as the wrong class.
+By combining mono-temporal and seasonal parameters we were able to
+achieve an OA accuracy of 64.8\% at a spatial resolution of 25 cm. It
+seems that the spatial aggregation of RGB information into coarser
+resolutions can help to correctly identify tree species. On a
+pseudo-object based level, without incorporating a true crown
+delineation, we achieved an maximum OA of 97.1 \%. On a pixel basis, we
+achieve slightly lower OA compared to other studies, conducting similar
+research in distinct forest environments of the world (Fricker et al.,
+2019; Natesan et al., 2019; Onishi and Ise, 2018; Sothe et al., 2019).
+Onishi and Ise (2018) achieved an OA of 83.1 \% by incorporating a tree
+crown segmentation and training the GoogLeNet neural-network with six
+different tree species in a forest stand in the warm and humid climate
+close to Kyoto. Sothe et al. (2019) achieved a maximum OA of 72.4 \%
+when next to predictor variables of the visible and near infrared
+spectrum other variables from a photogrammetric point cloud and the
+canopy height model were included in a support-vector-machine. They
+differentiated between 12 tree species in a subtropical forest in
+Southern Brazil. Fricker et al. (2019) used an
+convolutional-neural-network in a mixed-conifer forest in Northern
+America and report an F-Score of 64 \% for RGB predictors only to
+differentiate 10 tree species. Natesan et al. (2019) trained a residual
+network on RGB based predictors to classify between pine trees and
+non-pine trees in a tree crown segmented image and achieved an OA of 80
+\%. When comparing our results to other studies, we have to note that
+our study area is of less complexity, than for example tropical or
+sub-tropical forests. We only have two different species in our area and
+the training data set is slightly unbalanced towards the class of
+\emph{fagus sylvatica}. This can contribute to an over-classification of
+this class, leading the trained model to more frequently assign the
+\emph{fagus sylvatica} class to pixels, and by chance increasing the OA.
+Next to applying several iterations of cross-validations to account for
+this error, a more balanced training set could prove useful to achieve
+more stable results. Concerning the results of the pseudo-object based
+classification, it is indicated by this study that object-based
+approaches can significantly increase the OA. As reported by other
+studies, with the use of neural-networks and a thorough tree crown
+delineation, very high accuracies can be achieved only based on RGB data
+even in more complex forest environments (Fricker et al., 2019; Natesan
+et al., 2019).
 
-The results of the Kappa scores per pixels indicate the potential of the
-models to classify tree species a little better than by random chance at
-our study site. The very high accuracies achieved on the object basis,
-however, indicate that the predictors are capable of modelling tree
-species. The very high differences between per pixel and object based
-classification results can be explained through the inclusion of wrongly
-classifed pixels in the trainig process. This reduces the accuracy of
-per pixel classification, however, the error can be accounted for by
-classifiying objects.
+Additionally, sources of error in the database should can significantly
+influence the outcome of any classification process. The images used in
+this study are prone to a number of sources of errors. Firstly, we
+observed inconsistencies in the process of georefferencing the images
+which led to rather large image distortions (Fig. 2). In dense canopy
+structures, such as our study area, the generation of tie points to
+correctly match objects from different images, is a function of flight
+path and height as well as the chosen sensor and can lead to very high
+margins of error (Fraser and Congalton, 2018). Another issue, are the
+differences in illumination and viewing geometry which seriously limits
+the comparability of images from different days or different paths
+(Fraser and Congalton, 2018; Fricker et al., 2019; Sonnentag et al.,
+2012). These errors are amplified in the current study by our negligent
+approach to the localization of individual trees within and across the
+image time series (Fig. 1). The chosen approach was intended to focus
+solely on the analysis of the influence of spatial resolution and
+mono-temporal vs.~multi-temporal predictors. However, this makes our
+results less comparable to other studies and, in fact, useful for
+practitioners of forestry environmental protection. Without a clear
+approach to delineate tree crowns and track their development trough a
+time-series of images, the results presented here remain of academic
+interest only.
 
-Another source of error, closley associated with the very high accuracy
-results of the object based classification, is the dominance of
-\emph{fagus sylvatica} in the training dataset. Model performance might
-solely increase due to a more frequent classification of fagus, since
-the majority of objects belongs to this class. Another contributing
-factor amplifing that over representation may be the decreasing spatial
-resolution, as more pixels belonging to the class \emph{fagus sylvatica}
-are crunched into bigger sized pixels and thus smoothing out the already
-underrepresented \emph{quercus robur} pixels.
+The results of the influences of different resolutions and the
+incorporation of mono- and seasonal-predictors, still have the potential
+to highlight valid insights. Models trained with both mono-temporal and
+seasonal indices performed best overall closely followed by models
+trained with mono-temporal indices. Thus leading us to the conclusion,
+that mono-temporal predictors are more important than seasonal
+predictors but a combination of both improves model performance
+slightly. A reason for the rather poor performance of the seasonal
+parameters might be the temporal resolution of available UAV overpasses.
+It is possible that with low-frequency observation flights, the
+important development processes of vegetation growth and plant
+senescence might not be captured. Concerning the influence of the
+spatial resolution, there is an indication that averaging high
+resolution pixels towards larger spatial units can improve the
+classification. The results, however, remain inconclusive when the
+pixel-based approach is compared to the object-based, since in the
+latter we observe a decrease in OA above a certain threshold in
+resolution.
 
-The present approach thus is in high need for improvment for the
-localization of training trees. The results of the influences of
-different resolutions and the incorporation of mono- and
-seasonal-predictors, still have the potential to highlight valid
-insights. Models trained with both mono-temporal and seasonal indices
-performed best overall closely followed by models trained with
-mono-temporal indices only. Thus leading us to the conclusion, that
-mono-temporal predictors are more important than seasonal predictors but
-a combination of both improves model performance slightly. A reason for
-the rather poor performance of the seasonal parameters might be the
-temporal resolution of available UAV overpasses. It is possible that
-with low-frequency observation flights, the important development
-processes of vegetation growth might not captured and therefore cannot
-be accounted for in modeling the tree species.
-
-In order to conduct further analysis into that important topic and to
-bring UAV imagery to good use in tree species classification it is
-strongly recommended to improve the image pre-processing steps involved
-in this study in order to minimize the localization error of pixels.
-Secondly, a robust scheme of crown delination seems to be of high
-importance in order to get a valid, error-free trainig dataset. Under
+It is thus highly recommended to further analyse the impact of
+object-based classification strategies on the achievable accuracy. The
+potential benefit of using low-cost UAVs and sensors for tree species
+classification is evident, but there remain open question towards which
+is the most sensible approach to bring this data to efficient uses. To
+achieve this, a robust scheme of crown delineation seems to be of high
+importance in order to get a less erroneous training data set. Under
 these conditions, we suspect the gap between the accuracies of
-pixel-based and object-based classification methods to be smaller.
+pixel-based and object-based classification methods to be smaller,
+however, the dynamic of the classification accuracy across changing
+spatial resolutions seems to be worth to be further investigated.
 
 \hypertarget{references}{%
 \section*{References}\label{references}}
@@ -737,6 +780,11 @@ Food and Agriculture Organsiation of the United Nations, 2015. Global
 Forest Resources Assessment 2015.
 \url{https://doi.org/10.1002/2014GB005021}
 
+\leavevmode\hypertarget{ref-Fraser2018a}{}%
+Fraser, B.T., Congalton, R.G., 2018. Issues in Unmanned Aerial Systems
+(UAS) data collection of complex forest environments. Remote Sensing 10.
+\url{https://doi.org/10.3390/rs10060908}
+
 \leavevmode\hypertarget{ref-Fricker2019}{}%
 Fricker, G.A., Ventura, J.D., Wolf, J.A., North, M.P., Davis, F.W.,
 Franklin, J., 2019. A Convolutional Neural Network Classifier Identifies
@@ -759,9 +807,6 @@ and applications. IEEE Transactions on Geoscience and Remote Sensing 38,
 Grabska, E., Hostert, P., Pflugmacher, D., Ostapowicz, K., 2019. Forest
 stand species mapping using the sentinel-2 time series. Remote Sensing
 11, 1--24. \url{https://doi.org/10.3390/rs11101197}
-
-\leavevmode\hypertarget{ref-Greve1997}{}%
-Greve, W., Wentura, D., 1997. Wissenschaftliche Beobachtung.
 
 \leavevmode\hypertarget{ref-Hunt2012}{}%
 Hunt, E.R., Doraiswamy, P.C., McMurtrey, J.E., Daughtry, C.S., Perry,
@@ -828,6 +873,10 @@ Niculescu, S., Talab Ou Ali, H., Billey, A., 2018. Random forest
 classification using Sentinel-1 and Sentinel-2 series for vegetation
 monitoring in the Pays de Brest (France), in:. p. 6.
 \url{https://doi.org/10.1117/12.2325546}
+
+\leavevmode\hypertarget{ref-Onishi2018a}{}%
+Onishi, M., Ise, T., 2018. Automatic classification of trees using a UAV
+onboard camera and deep learning.
 
 \leavevmode\hypertarget{ref-Persson2018}{}%
 Persson, M., Lindberg, E., Reese, H., 2018. Tree species classification
