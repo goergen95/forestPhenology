@@ -163,7 +163,7 @@ of mono- vs. multi-temporal input data.
 
 ## Study Area
 
-The study area is located at 50.8°N 8.7°E in the German low mountain range in Hesse.
+The study area is located at 50.8°N 8.7°E in the German low mountain range in Hessen.
 It is part of the University Forest Caldern where the recently initiated joint research
 project Natur 4.0 aims at investigating the use of networked sensor technology for 
 biodiversity and ecosystem management and protection. It is in this context, that the aerial images 
