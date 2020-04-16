@@ -81,7 +81,7 @@
 
 \title{UAV imagery based tree species classification in the Marburg OpenForest}
 \author{Darius A. Görgen \and Tobias Koch \and Marvin Müsgen \and Eike Schott}
-\date{April 07, 2020}
+\date{April 16, 2020}
 
 \begin{document}
 \maketitle
@@ -114,6 +114,8 @@ preelminary importance and needs further improvment for our study area.
 \setcounter{tocdepth}{2}
 \tableofcontents
 }
+\newpage
+
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
@@ -183,15 +185,15 @@ suggesting that UAV imagery can contribute to investigate the
 phenological status of individual trees. Klosterman and Richardson
 (2017) were able to estimate phenological status on the leaf-level based
 on the calculation of the green and red chromatic coordinate (GCC and
-RCC) during spring and autumn to bud burst and leaf expansion as well as
-leaf senescence. Natesan et al. (2019) used Residual Neural Networks to
-classify three different tree species based on RGB imagery obtained over
-the course of three years and achieved a classification accuracy of
-about 80\%, and an accuracy of 51\% when only the data of single years
-was used. Fricker et al. (2019) used hyperspectral images obtained by a
-UAV and a Convolutional Neural Network to classify tree species. They
-also underwent an experiment which only included RGB data. The
-hyperspectral data achieved an F-score of 0.87, while the RGB data
+RCC) during spring and autumn to model bud burst and leaf expansion as
+well as leaf senescence. Natesan et al. (2019) used Residual Neural
+Networks to classify three different tree species based on RGB imagery
+obtained over the course of three years and achieved a classification
+accuracy of about 80\%, and an accuracy of 51\% when only the data of
+single years was used. Fricker et al. (2019) used hyperspectral images
+obtained by a UAV and a Convolutional Neural Network to classify tree
+species. They also underwent an experiment which only included RGB data.
+The hyperspectral data achieved an F-score of 0.87, while the RGB data
 achieved a score of 0.64 in a dominantly coniferous forest.
 
 Additionally, the development of structure-from-motion algorithms to get
@@ -233,13 +235,13 @@ University forest which is part of the research project
 forest is used as a joint research area for a project between several
 German universities and research institutes and sets out to investigate
 the potential of sensor technology for biodiversity and natural resource
-management in natural environments forests. We artificially decreased
-the spatial resolution of aerial imagery obtained in this area resulting
-in three different target resolutions of 10, 15, and 25 cm. For every
+management in natural forest environments. We artificially decreased the
+spatial resolution of aerial imagery obtained in this area resulting in
+three different target resolutions of 10, 15, and 25 cm. For every
 single overflight we calculated a series of RGB indices on a pixels
-basis. Additionally, we calculate descriptive statistics (mean, maximum,
-minimum, amplitude, etc.) for each index over the course of the year to
-include information about the seasonality of the phenological
+basis. Additionally, we calculated descriptive statistics (mean,
+maximum, minimum, amplitude, etc.) for each index over the course of the
+year to include information about the seasonality of the phenological
 development.
 
 The resulting input data is used to establish a total of nine distinct
@@ -272,7 +274,7 @@ robur}.
 
 \begin{figure}[H]
 
-{\centering \includegraphics[width=0.7\linewidth]{report_files/figure-latex/plot_aoi-1} 
+{\centering \includegraphics[width=0.6\linewidth]{report_files/figure-latex/plot_aoi-1} 
 
 }
 
@@ -287,25 +289,25 @@ In this project, AgisoftPhotoScan was used to process the UAV imagery.
 Agisoft Photoscan Professional is an affordable 3D reconstruction
 software from the Russian company Agisoft LLC Agisoft (2019) for the
 generation of dense point clouds and photogrammetric products such as
-orthorectified mosaics and DSM derived from images. Photoscan has the
-advantage to provide a simple workflow, from performing bundle block
-adjustment to calibrate the camera and orientate images after automatic
-tie point measurements, geo-referencing by measuring ground control
-points, concluding with the computation of a dense point cloud and
-requested final products (Mayer and Kersten, 2018). The Airborne system
-was used to acquire the UAV imagery using a commercial GoPro in several
-flight campaigns with a flight altitude of 40 meters The internal GPS of
-the GoPro was used for geotagging the images. A post referencing enabled
-a better processing of the images in SFM software and more accurate
-orthophotos without manual referencing in Photoscan. Photo Alignment is
-a process in PS for image matching and bundle block adjustment in an
-arbitrary system. It generates a sparse point cloud as well as the
-interior and exterior orientation parameters of all images in that
-system, including systematic error compensation such as non-linear lens
-distortions. Prior to the adjustment, the tie points are automatically
-measured by detecting and matching features in overlapping images
-resulting in a sparse point cloud (Mayer and Kersten, 2018). The
-settings in this project were chosen as follows:
+orthorectified mosaics and digital surface models (DSM) derived from
+point clouds. Photoscan has the advantage to provide a simple workflow,
+from performing bundle block adjustment to calibrate the camera and
+orientate images after automatic tie point measurements, geo-referencing
+by measuring ground control points, concluding with the computation of a
+dense point cloud and requested final products (Mayer and Kersten,
+2018). An airborne system was used to acquire the imagery using a
+commercial GoPro in several flight campaigns with a flight altitude of
+40 meters The internal GPS of the GoPro was used for geotagging the
+images. A post referencing enabled a better processing of the images in
+SFM software and more accurate orthophotos without manual referencing in
+Photoscan. Photo Alignment is a process in PS for image matching and
+bundle block adjustment in an arbitrary system. It generates a sparse
+point cloud as well as the interior and exterior orientation parameters
+of all images in that system, including systematic error compensation
+such as non-linear lens distortions. Prior to the adjustment, the tie
+points are automatically measured by detecting and matching features in
+overlapping images resulting in a sparse point cloud (Mayer and Kersten,
+2018). The settings in this project were chosen as follows:
 
 \begin{itemize}
 \item
@@ -321,9 +323,9 @@ Sparse cloud filtering was performed under the following settings:
 \begin{itemize}
 \tightlist
 \item
-  gradual Selection: reprojection error: 0.26; reconstruction
+  gradual selection: reprojection error: 0.26; reconstruction
   uncertainty: 189.461; projection accuracy: 12.4621; reconstruction
-  uncertainty:6.72951; reprojection error:0.122199
+  uncertainty: 6.72951; reprojection error: 0.122199
 \end{itemize}
 
 \begin{table}[!h]
@@ -353,8 +355,8 @@ build by the following settings:
   General: surface type: Height field (2.5D); source data: sparse cloud;
   face count: medium
 \item
-  Advanced: Interpolation: enabled; Point classes: all; calculate vertex
-  colors
+  Advanced: interpolation: enabled; point classes: all; calculate vertex
+  colors: no
 \end{itemize}
 
 The different pixel values from different photos are combined by the
@@ -379,7 +381,7 @@ completely.
 
 \begin{figure}[H]
 
-{\centering \includegraphics{report_files/figure-latex/Image distortion-1} 
+{\centering \includegraphics[width=0.6\linewidth]{report_files/figure-latex/Image distortion-1} 
 
 }
 
@@ -423,8 +425,9 @@ were calculated for each UAV overpass resulting in (7VIs+R+G+B) x 6
 observations = 60 mono-temporal predictor variables. Additionally, we
 calculated the maximum (MAX), minimum (MIN), sum (SUM), standard
 deviation (SD), amplitude (AMP) as well as the 25\%- (Q25) and
-75\%-percentile (Q75) values for each VI and the raw channels across the
-time series resulting in additional 70 seasonal predictors.
+75\%-percentile (Q75) values for each VI and the RGB channels and the
+raw channels across the time series resulting in additional 70 seasonal
+predictors.
 
 \begin{table}[H]
 
@@ -453,12 +456,13 @@ Red Chromatic Coordinate & RCC & R / (R+G+B) & Richardson et al. (2009)\\
 \end{table}
 
 Fig. 3 shows the trajectory of the calculated VIs according to the tree
-species indicating the mean value (solid line) as well as one standard
-deviation from the mean (dashed lines) based on all pixels within the
-respective tree polygons. The trajectories are very similar for both
-classes, however, for almost all VIs there are substantial differences
-between the classes during the first observations during the month of
-May.
+species indicating the mean value (points) as well as +/- one standard
+deviation from the mean (vertical bars) based on all pixels within the
+respective tree polygons per class. The trajectories are very similar
+for both classes, however, for almost all VIs there are substantial
+differences between the classes during the first few observations from
+April to May. We also see, that bettwen the 16th of May and the 5th of
+June, we have a relativly large period with no observations.
 
 \begin{figure}[H]
 
@@ -466,7 +470,7 @@ May.
 
 }
 
-\caption{Temporal dynamic of calculated VIs over the course of the year by tree species at 25 cm resolution (dashed lines represent plus and minus one standard deviation).}\label{fig:predictor_plots_indices}
+\caption{Temporal dynamic of calculated VIs over the course of the year by tree species at 25 cm resolution (points represent the average value, the bars represent +/- one standard deviation).}\label{fig:predictor_plots_indices}
 \end{figure}
 
 Concerning the frequency of the seasonal predictor variables both tree
@@ -491,21 +495,37 @@ For the classification of tree species we used a Random Forest model
 based on a forward-feature selection of predictor variables stratified
 by a leave-location-out five-fold cross-validation technique (LLOCV).
 Random Forest is a non-parametric model, both suitable for regression
-and classification problems. It was developed by Breiman (2001) and is
+and classification problems. It was developed by Breiman (2001) and it
 works by the establishment of a number of decision trees, the forest,
 each constructed on a random split of predictor variables. The final
 class decision is made by a majority vote of all trees in the forest. We
 used the implementation in the \texttt{caret} package (Kuhn, 2019) as
 well as the \texttt{CAST} package to implement the LLOCV (Meyer, 2018).
 
-\hypertarget{results}{%
-\section{Results}\label{results}}
-
 To validate the models, the overall accuracy (OA) is determined. OA
 describes the number of correctly classified observations divided by the
 total number of observations and is used in a number of studies to
 determine the validity of classification models (Natesan et al., 2019;
-Onishi and Ise, 2018; Sothe et al., 2019).
+Onishi and Ise, 2018; Sothe et al., 2019). As a another statistical
+measure of quality, the accuracy of species classification on an object
+basis is investigated. An object is considered correctly classified if a
+majority of the pixels belonging to the object corresponds to the class
+of this object. Here we consider the 2m x 2m squares around each GPS
+point as an representation of the corresponding tree object. Since we
+did not used a tree crown delineation, this is an over-simplistic object
+definition, thus we refer to it as a pseudo-object classification form
+here on.
+
+To generate further insights into the importance of single variables and
+indices, we evaluated the variable importance. The variable importance
+describes the explanatory portion a variable has in a given model in
+percent. The variable with the highest explanatory share is set to 100\%
+and the explanation share of the remaining variables is shown in
+relation to this variable with the highest explanation power, thus
+indicating percentages below 100\%.
+
+\hypertarget{results}{%
+\section{Results}\label{results}}
 
 Figure 5 shows that all models, excluding the model at a 25cm resolution
 including all variables, regardless of the use of seasonal and
@@ -515,7 +535,7 @@ resolution. The comparison shows that the models calculated exclusively
 with mono-temporal indices show a substantially higher OA than the
 models calculated exclusively with seasonal indices
 (\textasciitilde{}3\%). The inclusion of both, mono- temporal and
-seasonal paramters, increases the OA at a rate of about 1\%.
+seasonal parameters, increases the OA at a rate of about 1\%.
 
 \begin{figure}[H]
 
@@ -526,19 +546,15 @@ seasonal paramters, increases the OA at a rate of about 1\%.
 \caption{Overall accuracy of the random forest models based varying pixel sizes and predictor variables (green - mono-temporal indices, blue - seasonal indices, red - mono-temporal and seasonal indices)}\label{fig:result_plots}
 \end{figure}
 
-As a another statistical measure of quality, the accuracy of species
-classification on an object basis is investigated. An object is
-considered correctly classified if a majority of the pixels belonging to
-the object corresponds to the class of this object. Figure 6 shows the
-percentage of objects classified as the correct species based on the
-majority of pixels within its boundaries. It is clearly shown that,
-regardless of the variables used, the accuracy of object classification
-increases from a resolution of 10 cm to a resolution of 15 cm. The
-resolution of 20cm, on contrast, has either a negative effect or not
-effect at all on the accuracy for all models. It is striking that the
-models where mono-temporal and seasonal indices were used in combination
-had the lowest accuracy in object classification but achieved the
-highest OA on a pixels basis (Figure 5).
+Figure 6 shows the percentage of the pseudo-objects classified as the
+correct species based on the majority of pixels within its boundaries.
+It is clearly shown that, regardless of the variables used, the accuracy
+of pseudo-object classification increases from a resolution of 10 cm to
+a resolution of 15 cm. The resolution of 20cm, on contrast, has either a
+negative effect or not effect at all on the accuracy for all models. It
+is striking that the models where mono-temporal and seasonal indices
+were used in combination had the lowest accuracy in object
+classification but achieved the highest OA on a pixels basis (Figure 5).
 
 \begin{figure}[H]
 
@@ -546,19 +562,13 @@ highest OA on a pixels basis (Figure 5).
 
 }
 
-\caption{Overall Accuracy of species classification on an object basis.}\label{fig:validation_plots}
+\caption{Overall Accuracy of species classification on an pseudo-object basis.}\label{fig:validation_plots}
 \end{figure}
 
-To generate further insights into the importance of single variables and
-indices, we evaluated the variable importance. The variable importance
-describes the explanatory portion a variable has in a given model in
-percent. Figures 7, 8 and 9 show the predictors and their explanatory
-portions for the models with mono-temporal indices, seasonal indices and
-both variable types in combination. The explanation percentages of the
-individual predictors were calculated from the respective models. The
-variable with the highest explanatory share is shown as 100\%. The
-explanation share of the remaining variables is shown in relation to
-this variable with the highest explanation power.
+Figures 7, 8 and 9 show the predictors and their explanatory portions
+for the models with mono-temporal indices, seasonal indices and both
+variable types in combination. The explanation percentages of the
+individual predictors were calculated from the respective models.
 
 For models with mono-temporal predictors, the GCC, GLI and VVI indices
 are of particular high importance (Fig. 7). It is noticeable that the
@@ -584,38 +594,20 @@ importance explanatory variables than other indices.
 
 \begin{figure}[H]
 
-{\centering \includegraphics{report_files/figure-latex/var_imp_indices-1} 
+{\centering \includegraphics[height=0.4\textheight]{report_files/figure-latex/var_imp_indices-1} 
 
 }
 
-\caption{Variable importance for mono-temporal predictors averaged accross resolutions.}\label{fig:var_imp_indices}
+\caption{Variable importance for mono-temporal (left) and seasonal (right) predictors averaged accross resolutions.}\label{fig:var_imp_indices}
 \end{figure}
 
 \begin{figure}[H]
 
-{\centering \includegraphics{report_files/figure-latex/var_imp_season-1} 
+{\centering \includegraphics[height=0.4\textheight]{report_files/figure-latex/var_imp_all-1} 
 
 }
 
-\caption{Variable importance for seasonal predictors averaged accross resolutions.}\label{fig:var_imp_season}
-\end{figure}
-
-\begin{figure}[H]
-
-{\centering \includegraphics{report_files/figure-latex/var_imp_all-1} 
-
-}
-
-\caption{Variable importance for mono-temporal and seasonal predictors averaged accross resolutions.}\label{fig:var_imp_all}
-\end{figure}
-
-\begin{figure}[H]
-
-{\centering \includegraphics{report_files/figure-latex/var_imp_together-1} 
-
-}
-
-\caption{Variable importance across all model types and resoultions.}\label{fig:var_imp_together}
+\caption{Variable importance for mono-temporal and seasonal predictors averaged accross resolutions (left) and averaged variable importance across all model types and resoultions (right).}\label{fig:var_imp_all}
 \end{figure}
 
 \hypertarget{discussion-conclusion}{%
@@ -633,8 +625,8 @@ research in distinct forest environments of the world (Fricker et al.,
 Onishi and Ise (2018) achieved an OA of 83.1 \% by incorporating a tree
 crown segmentation and training the GoogLeNet neural-network with six
 different tree species in a forest stand in the warm and humid climate
-close to Kyoto. Sothe et al. (2019) achieved a maximum OA of 72.4 \%
-when next to predictor variables of the visible and near infrared
+close to Kyoto, Japan. Sothe et al. (2019) achieved a maximum OA of 72.4
+\% when next to predictor variables of the visible and near infrared
 spectrum other variables from a photogrammetric point cloud and the
 canopy height model were included in a support-vector-machine. They
 differentiated between 12 tree species in a subtropical forest in
@@ -661,28 +653,31 @@ delineation, very high accuracies can be achieved only based on RGB data
 even in more complex forest environments (Fricker et al., 2019; Natesan
 et al., 2019).
 
-Additionally, sources of error in the database should can significantly
-influence the outcome of any classification process. The images used in
+Additionally, sources of error in the imagery can have a significant
+influence on the outcome of a classification process. The images used in
 this study are prone to a number of sources of errors. Firstly, we
 observed inconsistencies in the process of georefferencing the images
 which led to rather large image distortions (Fig. 2). In dense canopy
 structures, such as our study area, the generation of tie points to
 correctly match objects from different images, is a function of flight
 path and height as well as the chosen sensor and can lead to very high
-margins of error (Fraser and Congalton, 2018). Another issue, are the
-differences in illumination and viewing geometry which seriously limits
-the comparability of images from different days or different paths
+margins of error in the localozation of pixels (Fraser and Congalton,
+2018). Another related issue are the differences in illumination and
+viewing geometry bettween several overflights, which seriously limit the
+comparability of images from different days or even different paths
 (Fraser and Congalton, 2018; Fricker et al., 2019; Sonnentag et al.,
-2012). These errors are amplified in the current study by our negligent
-approach to the localization of individual trees within and across the
-image time series (Fig. 1). The chosen approach was intended to focus
-solely on the analysis of the influence of spatial resolution and
-mono-temporal vs.~multi-temporal predictors. However, this makes our
-results less comparable to other studies and, in fact, useful for
-practitioners of forestry environmental protection. Without a clear
-approach to delineate tree crowns and track their development trough a
-time-series of images, the results presented here remain of academic
-interest only.
+2012). Also, the frequency of overflights is quite high for April and
+May, however, it is reduced between Mid-May to the end of June, leading
+to a lower sampling frequency well within the vegetation period. These
+errors are amplified in the current study by our negligent approach to
+the localization of individual trees within and across the image time
+series (Fig. 1). The chosen approach was intended to focus solely on the
+analysis of the influence of spatial resolution and mono-temporal
+vs.~multi-temporal predictors. However, this makes our results less
+comparable to other studies and, in fact, useful for practitioners of
+forestry environmental protection. Without a clear approach to delineate
+tree crowns and track their development trough a time-series of images,
+the results presented here remain of academic interest only.
 
 The results of the influences of different resolutions and the
 incorporation of mono- and seasonal-predictors, still have the potential
@@ -690,8 +685,8 @@ to highlight valid insights. Models trained with both mono-temporal and
 seasonal indices performed best overall closely followed by models
 trained with mono-temporal indices. Thus leading us to the conclusion,
 that mono-temporal predictors are more important than seasonal
-predictors but a combination of both improves model performance
-slightly. A reason for the rather poor performance of the seasonal
+predictors but a combination of both positivley increase the model
+performance. A reason for the rather poor performance of the seasonal
 parameters might be the temporal resolution of available UAV overpasses.
 It is possible that with low-frequency observation flights, the
 important development processes of vegetation growth and plant

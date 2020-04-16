@@ -42,8 +42,11 @@ library(tidyr)
 library(png)
 library(forcats)
 library(randomForest)
+library(gridExtra)
 trees = readOGR("../../data/trees_buffer.shp")
 ```
+
+\newpage
 
 # Introduction
 
@@ -99,7 +102,7 @@ four different tree species in deciduous woodland suggesting that UAV imagery
 can contribute to investigate the phenological status of individual trees.
 @Klosterman2017 were able to estimate phenological status on the leaf-level
 based on the calculation of the green and red chromatic coordinate (GCC and RCC) 
-during spring and autumn to bud burst and leaf expansion as well as leaf senescence.
+during spring and autumn to model bud burst and leaf expansion as well as leaf senescence.
 @Natesan2019 used Residual Neural Networks to classify three different tree species based on RGB
 imagery obtained over the course of three years and achieved a classification accuracy
 of about 80%, and an accuracy of 51% when only the data of single years was used. 
@@ -141,11 +144,11 @@ To this end we use the RGB imagery obtained by multiple overflights during the y
 of the research project [Natur 4.0](https://www.uni-marburg.de/en/fb19/natur40/). 
 This forest is used as a joint research area for a project between several German universities 
 and research institutes and sets out to investigate the potential of sensor technology for 
-biodiversity and natural resource management in natural environments forests. 
+biodiversity and natural resource management in natural forest environments. 
 We artificially decreased the spatial resolution of aerial imagery obtained in this
 area resulting in three different target resolutions of 10, 15, and 25 cm. 
 For every single overflight we calculated a series of RGB indices on a pixels basis. 
-Additionally, we calculate descriptive statistics (mean, maximum, minimum, amplitude, etc.) 
+Additionally, we calculated descriptive statistics (mean, maximum, minimum, amplitude, etc.) 
 for each index over the course of the year to include information about the 
 seasonality of the phenological development.
 
@@ -174,7 +177,7 @@ at breast height (DBH) greater than 40 cm, namely _fagus sylvatica_ and
 _quercus robur_.
 
 
-```{r plot_aoi, warning=F, message=F,fig.cap="RGB image of the study area from May 16th 2019 with central positions of tree stems superimposed (Coordinates are presented in UTM32N).", out.width="70%", fig.pos="H"}
+```{r plot_aoi, warning=F, message=F,fig.cap="RGB image of the study area from May 16th 2019 with central positions of tree stems superimposed (Coordinates are presented in UTM32N).", out.width="60%", fig.pos="H"}
 
 rgb = brick("../../data/resampled/res25.tif")[[10:12]]
 projection = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
@@ -195,12 +198,11 @@ tm_shape(rgb)+
 In this project, AgisoftPhotoScan was used to process the UAV imagery. Agisoft 
 Photoscan Professional is an affordable 3D reconstruction software from the 
 Russian company Agisoft LLC @Agisoft2019 for the generation of dense point clouds 
-and photogrammetric products such as orthorectified mosaics and DSM derived from 
-images. Photoscan has the advantage to provide a simple workflow, from performing 
+and photogrammetric products such as orthorectified mosaics and digital surface models (DSM) derived from point clouds. Photoscan has the advantage to provide a simple workflow, from performing 
 bundle block adjustment to calibrate the camera and orientate images after automatic 
 tie point measurements, geo-referencing by measuring ground control points, 
 concluding with the computation of a dense point cloud and requested final 
-products [@Mayer2018]. The Airborne system was used to acquire the UAV imagery 
+products [@Mayer2018]. An airborne system was used to acquire the imagery 
 using a commercial GoPro in several flight campaigns with a flight altitude of 
 40 meters The internal GPS of the GoPro was used for geotagging the images. A 
 post referencing enabled a better processing of the images in SFM software and 
@@ -220,8 +222,8 @@ The settings in this project were chosen as follows:
 
 Sparse cloud filtering was performed under the following settings:
 
-- gradual Selection: reprojection error: 0.26; reconstruction uncertainty: 189.461; 
-projection accuracy: 12.4621; reconstruction uncertainty:6.72951; reprojection error:0.122199
+- gradual selection: reprojection error: 0.26; reconstruction uncertainty: 189.461; 
+projection accuracy: 12.4621; reconstruction uncertainty: 6.72951; reprojection error: 0.122199
 
 ```{r dates-table, tab.cap="Days of UAV overpass.",}
 dates = unique(readRDS("../../data/resampled/dates.rds"))
@@ -238,7 +240,7 @@ Based on the information of the point cloud PhotoScan can construct a polygon mo
 
 - General: surface type: Height field (2.5D); source data: sparse cloud; face count: medium
 
-- Advanced: Interpolation: enabled; Point classes: all; calculate vertex colors
+- Advanced: interpolation: enabled; point classes: all; calculate vertex colors: no
 
 The different pixel values from different photos are combined by the mosaic type 
 in the final texture. Mosaic type implies a two-step approach. Low frequency 
@@ -257,7 +259,7 @@ for a sample location. This location is not included in our study area, where we
 the difference of loclizations to be much smaller than in the image below. However,
 we could not exclude the influence of these distortions completely. 
 
-```{r Image distortion, echo=F, message=F, warning=F, fig.cap="Display of the image distortion in the data basis (The car as well as the rectangle form on the right of the image are visible multiple times at slightly different locations due to the construction of the mesh)."}
+```{r Image distortion, echo=F, message=F, warning=F, fig.cap="Display of the image distortion in the data basis (The car as well as the rectangle form on the right of the image are visible multiple times at slightly different locations due to the construction of the mesh).", out.width="60%"}
 imgr <- stack("Bild_verzerrung.tif")
 plotRGB(imgr)
 
@@ -297,7 +299,7 @@ are reported in Table 2.
 They were calculated for each UAV overpass resulting in (7VIs+R+G+B) x 6 observations = 60 mono-temporal predictor
 variables. Additionally, we calculated the maximum (MAX), minimum (MIN), sum (SUM), standard
 deviation (SD), amplitude (AMP) as well as the 25%- (Q25) and 75%-percentile (Q75) values
-for each VI and the raw channels across the time series resulting in additional 70 seasonal predictors. 
+for each VI and the RGB channels and the raw channels across the time series resulting in additional 70 seasonal predictors. 
 
 ```{r indices, echo=F, message=F, warning=F}
 indicesdf = data.frame(name = c("Triangular greenness index",
@@ -339,16 +341,18 @@ kable(indicesdf, format = "latex", linesep="", align = "l", booktabs = T,
 ```
 
 Fig. 3 shows the trajectory of the calculated VIs according to the tree species
-indicating the mean value (solid line) as well as one standard deviation from the mean
-(dashed lines) based on all pixels within the respective tree polygons. The trajectories are very
+indicating the mean value (points) as well as +/- one standard deviation from the mean
+(vertical bars) based on all pixels within the respective tree polygons per class. The trajectories are very
 similar for both classes, however, for almost all VIs there are substantial differences
-between the classes during the first observations during the month of May.  
+between the classes during the first few observations from April to May. We also
+see, that bettwen the 16th of May and the 5th of June, we have a relativly large
+period with no observations.
 
-```{r predictor_plots_indices, echo=F, message=F, warning=F, fig.cap="Temporal dynamic of calculated VIs over the course of the year by tree species at 25 cm resolution (dashed lines represent plus and minus one standard deviation)."}
+```{r predictor_plots_indices, echo=F, message=F, warning=F, fig.cap="Temporal dynamic of calculated VIs over the course of the year by tree species at 25 cm resolution (points represent the average value, the bars represent +/- one standard deviation)."}
 
 if (!file.exists("ind_data.rds")){
   indices_names = readRDS("../../data/indices/names_indices_stack.rds")
-  indices = raster::stack(list.files("../../data/indices", pattern="25", full.names=TRUE))
+  indices = raster::stack(list.files("../../data/indices", pattern="res10", full.names=TRUE))
   names(indices) = indices_names
   fagus =  rasterize(trees[trees$specID == "BUR",], rgb, 1)
   quercus =  rasterize(trees[trees$specID == "EIT",], rgb, 1)
@@ -377,12 +381,20 @@ max_sd = function(x) { mean(x) + sd(x)}
 min_sd = function(x) { mean(x) - sd(x)}
 
 ggplot(ind, aes(x=date, y=value, col=species)) +
-  stat_summary(fun.y = "mean", geom = "line") +
-  stat_summary(fun.y = max_sd, geom = "line", lty = "dashed")+
-  stat_summary(fun.y = min_sd, geom = "line", lty = "dashed")+
+  stat_summary(fun.y = mean, 
+               fun.ymin = min_sd,
+               fun.ymax = max_sd,
+               geom = "pointrange",
+               alpha = .5) +
+   stat_summary(fun.y = mean,
+               geom = "line",
+               alpha = .7) +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  facet_wrap(. ~ index, scales = "free")
+  scale_x_date(date_labels = "%b %d", breaks  = unique(ind$date))+
+  facet_wrap(. ~ index, scales = "free")+
+  ylab("Value of corresponding index")+
+  xlab("Date")
 
 ```
 
@@ -422,9 +434,11 @@ if (!file.exists("ses_data.rds")){
 
 ggplot(filter(ses, index == "GCC"), aes(value, fill=species)) +
   facet_wrap(. ~ parameter, scales = "free")+
-  geom_histogram()+
+  geom_histogram(bins = 80, alpha = 0.6, position = "identity")+
   theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  ylab("Number of pixels")+
+  xlab("Value of GCC index")
 ```
 
 
@@ -434,17 +448,33 @@ For the classification of tree species we used a Random Forest model based
 on a forward-feature selection of predictor variables stratified by a leave-location-out 
 five-fold cross-validation technique (LLOCV). Random Forest is a non-parametric model, both suitable
 for regression and classification problems. It was developed by @Breiman2001 and 
-is works by the establishment of a number of decision trees, the forest, each 
+it works by the establishment of a number of decision trees, the forest, each 
 constructed on a random split of predictor variables. The final class decision is
 made by a majority vote of all trees in the forest. We used the implementation
 in the `caret` package [@R-caret] as well as the `CAST` package to implement the LLOCV [@R-CAST]. 
-
-# Results
 
 To validate the models, the overall accuracy (OA) is determined. OA describes
 the number of correctly classified observations divided by the total number
 of observations and is used in a number of studies to determine the validity
 of classification models [@Onishi2018a; @Sothe2019a; @Natesan2019].
+As a another statistical measure of quality, the accuracy of species 
+classification on an object basis is investigated. An object is considered 
+correctly classified if a majority of the pixels belonging to the object corresponds 
+to the class of this object. Here we consider the 2m x 2m squares around each
+GPS point as an representation of the corresponding tree object. Since we did not
+used a tree crown delineation, this is an over-simplistic object definition, thus
+we refer to it as a pseudo-object classification form here on.
+
+To generate further insights into the importance of single variables and indices,
+we evaluated the variable importance.
+The variable importance describes the explanatory portion a variable has in a 
+given model in percent. The variable 
+with the highest explanatory share is set to 100% and the explanation share of 
+the remaining variables is shown in relation to this variable with the highest
+explanation power, thus indicating percentages below 100%.
+
+# Results
+
 
 Figure 5 shows that all models, excluding the model at a 25cm resolution including
 all variables, regardless of the use of seasonal and vegetation indices and 
@@ -453,7 +483,7 @@ The OA increases for all predictor combinations with an increase in spatial reso
 The comparison shows that the models calculated exclusively with 
 mono-temporal indices show a substantially higher OA than the models 
 calculated exclusively with seasonal indices (~3%). The inclusion of both, mono-
-temporal and seasonal paramters, increases the OA at a rate of about 1%.
+temporal and seasonal parameters, increases the OA at a rate of about 1%.
 
 
 ```{r result_plots,  warning=F, message=F, fig.cap="Overall accuracy of the random forest models based varying pixel sizes and predictor variables (green - mono-temporal indices, blue - seasonal indices, red - mono-temporal and seasonal indices)", out.width="60%"}
@@ -493,25 +523,24 @@ getModelMetric <- function(model, metric){
 accuracies = do.call("rbind", lapply(models, getModelMetric, metric="Accuracy"))
 
  ggplot(data = accuracies, aes(x=resolution)) +
-   geom_point(aes(y=Accuracy, shape=type, col=type), size=2)+
+   geom_point(aes(y=Accuracy, shape=type, col=type), size=3)+
+  ylab("Overall accuracy") +
+  xlab("Spatial resolution")+
    theme_minimal()
 
 ```
 
-As a another statistical measure of quality, the accuracy of species 
-classification on an object basis is investigated. An object is considered 
-correctly classified if a majority of the pixels belonging to the object corresponds 
-to the class of this object. Figure 6 shows the percentage of objects classified as 
+Figure 6 shows the percentage of the pseudo-objects classified as 
 the correct species based on the majority of pixels within its boundaries. 
 It is clearly shown that, regardless of the variables used, 
-the accuracy of object classification increases from a resolution of 10 cm to a 
+the accuracy of pseudo-object classification increases from a resolution of 10 cm to a 
 resolution of 15 cm. The resolution of 20cm, on contrast, has either a negative effect 
 or not effect at all on the accuracy for all models. It is striking that the models 
 where mono-temporal and seasonal indices were used in combination had the 
 lowest accuracy in object classification but achieved the highest OA 
 on a pixels basis (Figure 5).
 
-```{r validation_plots, warning=F, message=F, fig.cap="Overall Accuracy of species classification on an object basis.", out.width="60%"}
+```{r validation_plots, warning=F, message=F, fig.cap="Overall Accuracy of species classification on an pseudo-object basis.", out.width="60%"}
 predictions = readRDS("../../results/validation_pred.rds")
 index = predictions$index
 
@@ -533,22 +562,18 @@ results$type = factor(types)
 
 
 ggplot(data = results, aes(x=resolution)) +
-  geom_point(aes(y=kappa, shape=type, col=type), size=2) +
-  ggplot2::labs(y = "accuracy") +
+  geom_point(aes(y=kappa, shape=type, col=type), size=3) +
+  ylab("Overall accuracy") +
+  xlab("Spatial resolution")+
   theme_minimal()
 
 ```
 
-To generate further insights into the importance of single variables and indices,
-we evaluated the variable importance.
-The variable importance describes the explanatory portion a variable has in a 
-given model in percent. Figures 7, 8 and 9 show the predictors and their 
+
+Figures 7, 8 and 9 show the predictors and their 
 explanatory portions for the models with mono-temporal indices, seasonal indices 
 and both variable types in combination. The explanation percentages of the 
-individual predictors were calculated from the respective models. The variable 
-with the highest explanatory share is shown as 100%. The explanation share of 
-the remaining variables is shown in relation to this variable with the highest
-explanation power.
+individual predictors were calculated from the respective models. 
 
 For models with mono-temporal predictors, the GCC, GLI and VVI indices are of 
 particular high importance (Fig. 7). It is noticeable that the aerial photographs 
@@ -570,7 +595,7 @@ however, remains also in the combination models.
 The situation is similar for the GCC, RCC and VVI indices, which are more frequently
 present as high importance explanatory variables than other indices.
 
-```{r var_imp_indices, echo=F, warning=F, message=F, fig.cap="Variable importance for mono-temporal predictors averaged accross resolutions."}
+```{r var_imp_indices, echo=F, warning=F, message=F, fig.cap="Variable importance for mono-temporal (left) and seasonal (right) predictors averaged accross resolutions.", out.height="40%"}
 getVarImp <- function(model){
   decomp = str_split(str_split(model, "/")[[1]][3], "_")[[1]]
   if (length(decomp) == 2){
@@ -619,9 +644,7 @@ varImpAll = filter(metrics, type == "all")
 varImpAll$variable = droplevels(varImpAll$variable)
 varImpAll$variable = reorder(varImpAll$variable, varImpAll$varImp)
 
-
-
-varImpInd %>%
+plt1 = varImpInd %>%
   group_by(variable) %>%
   summarise(value = sum(varImp, n = n())) %>%
   ungroup() %>%
@@ -630,12 +653,32 @@ varImpInd %>%
   ggplot(aes(x=variable, y=value))+
   geom_bar(stat="identity", fill = "dodgerblue1")+
   theme_minimal()+
-  coord_flip()
+  theme(text = element_text(size=6))+
+  coord_flip()+
+  xlab("Predictor variable")+
+  ylab("Relative importance")
+
+plt2 = varImpSes %>%
+  group_by(variable) %>%
+  summarise(value = sum(varImp, n = n())) %>%
+  ungroup() %>%
+  mutate(variable = fct_reorder(variable, value)) %>%
+  mutate(value = value / max(value) * 100) %>%
+  ggplot(aes(x=variable, y=value))+
+  geom_bar(stat="identity", fill = "dodgerblue1")+
+  theme_minimal()+
+  theme(text = element_text(size=6))+
+  coord_flip()+
+  xlab("")+
+  ylab("Relative importance")
+
+
+grid.arrange(plt1, plt2, ncol = 2)
 ```
 
-```{r var_imp_season, echo=F, warning=F, message=F, fig.cap="Variable importance for seasonal predictors averaged accross resolutions."}
+```{r var_imp_all, echo=F, warning=F, message=F, fig.cap="Variable importance for mono-temporal and seasonal predictors averaged accross resolutions (left) and averaged variable importance across all model types and resoultions (right).", out.height="40%"}
 
-varImpSes %>%
+plt1 = varImpAll %>%
   group_by(variable) %>%
   summarise(value = sum(varImp, n = n())) %>%
   ungroup() %>%
@@ -644,13 +687,12 @@ varImpSes %>%
   ggplot(aes(x=variable, y=value))+
   geom_bar(stat="identity", fill = "dodgerblue1")+
   theme_minimal()+
-  coord_flip()
-```
+  theme(text = element_text(size=6))+
+  coord_flip()+
+  xlab("Predictor variable")+
+  ylab("Relative importance")
 
-```{r var_imp_all, echo=F, warning=F, message=F, fig.cap="Variable importance for mono-temporal and seasonal predictors averaged accross resolutions."}
-
-
-varImpAll %>%
+plt2 = metrics %>%
   group_by(variable) %>%
   summarise(value = sum(varImp, n = n())) %>%
   ungroup() %>%
@@ -659,23 +701,12 @@ varImpAll %>%
   ggplot(aes(x=variable, y=value))+
   geom_bar(stat="identity", fill = "dodgerblue1")+
   theme_minimal()+
-  coord_flip()
-```
+  theme(text = element_text(size=6))+
+  coord_flip()+
+  xlab("")+
+  ylab("Relative importance")
 
-
-```{r var_imp_together, echo=F, warning=F, message=F, fig.cap="Variable importance across all model types and resoultions."}
-
-
-metrics %>%
-  group_by(variable) %>%
-  summarise(value = sum(varImp, n = n())) %>%
-  ungroup() %>%
-  mutate(variable = fct_reorder(variable, value)) %>%
-  mutate(value = value / max(value) * 100) %>%
-  ggplot(aes(x=variable, y=value))+
-  geom_bar(stat="identity", fill = "dodgerblue1")+
-  theme_minimal()+
-  coord_flip()
+grid.arrange(plt1, plt2, ncol = 2)
 ```
 
 # Discussion & Conclusion
@@ -689,7 +720,7 @@ On a pixel basis, we achieve slightly lower OA compared to other studies, conduc
 research in distinct forest environments of the world [@Onishi2018a; @Sothe2019a; @Fricker2019; @Natesan2019].
 @Onishi2018a achieved an OA of 83.1 % by incorporating a tree crown segmentation
 and training the GoogLeNet neural-network with six different tree species in 
-a forest stand in the warm and humid climate close to Kyoto.
+a forest stand in the warm and humid climate close to Kyoto, Japan.
 @Sothe2019a achieved a maximum OA of 72.4 % when next to predictor variables
 of the visible and near infrared spectrum other variables from a photogrammetric
 point cloud and the canopy height model were included in a support-vector-machine.
@@ -714,16 +745,19 @@ As reported by other studies, with the use of neural-networks and a thorough
 tree crown delineation, very high accuracies can be achieved 
 only based on RGB data even in more complex forest environments [@Fricker2019; @Natesan2019]. 
 
-Additionally, sources of error in the database should can significantly influence
-the outcome of any classification process. The images used in this study
+Additionally, sources of error in the imagery can have a significant influence on
+the outcome of a classification process. The images used in this study
 are prone to a number of sources of errors. Firstly, we observed inconsistencies 
 in the process of georefferencing the images which led to rather large image distortions (Fig. 2). 
 In dense canopy structures, such as our study area, the generation of tie points
 to correctly match objects from different images, is a function
 of flight path and height as well as the chosen sensor and can lead to very
-high margins of error [@Fraser2018a]. Another issue, are the differences 
-in illumination and viewing geometry which seriously limits the comparability
-of images from different days or different paths [@Fraser2018a; @Fricker2019; @Sonnentag2012].
+high margins of error in the localozation of pixels [@Fraser2018a]. Another related issue are the differences 
+in illumination and viewing geometry bettween several overflights, which seriously limit the comparability
+of images from different days or even different paths [@Fraser2018a; @Fricker2019; @Sonnentag2012].
+Also, the frequency of overflights is quite high for April and May, however, it
+is reduced between Mid-May to the end of June, leading to a lower sampling
+frequency well within the vegetation period. 
 These errors are amplified in the current study by our negligent approach to
 the localization of individual trees within and across the image time series (Fig. 1).
 The chosen approach was intended to focus solely on the analysis of the influence
@@ -738,8 +772,8 @@ the incorporation of mono- and seasonal-predictors, still have the potential
 to highlight valid insights. Models trained with both mono-temporal and seasonal
 indices performed best overall closely followed by models trained with mono-temporal 
 indices. Thus leading us to the conclusion, that mono-temporal predictors 
-are more important than seasonal predictors but a combination of both improves 
-model performance slightly. A reason for the rather poor performance of the 
+are more important than seasonal predictors but a combination of both positivley increase the 
+model performance. A reason for the rather poor performance of the 
 seasonal parameters might be the temporal resolution of available UAV overpasses. 
 It is possible that with low-frequency observation flights, the important development processes 
 of vegetation growth and plant senescence might not be captured. Concerning the
