@@ -22,7 +22,7 @@ author:
 - Eike Schott
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 
-abstract: "The monitoring of forests environments is of crucial importance since they serve as natural habitats and constitute a main source of biological diversity on the planet. Yet, it is very costly and labor intensive to monitor forests by traditional means and classical remote sensing technologies restrict the analysis to the regional level. To overcome these challenges there have been several attempts to use UAV-borne imagery in forest monitoring. By the use of drones images can be obtained at low cost and can be associated with both, high spatial and temporal resolution. This enables scientists and practitioners to comprehensively monitor forest environments. In this paper we present our results of an experiment exploring the influence of spatial resolution of RGB imagery, artificially derived vegetation indices as well as seasonal parameters on the accuracy of tree species classification within the Marburg OpenForest. We used a resolution of 10, 15, and 25 cm in a forward-feature-selection based on the Random Forest classification algorithm. Additionally we tested the obtained accuracy when only mono-temporal or multi-temporal variables are included as well as both types of variables. Our results show that accuracy is prone to errors in pixel georeferrencing and tree location. Object-based classification methods might lead to higher classification accuracies, but the construction of balanced traning dataset is of preelminary importance and needs further improvment for our study area."
+abstract: "The monitoring of forests environments is of crucial importance since they serve as natural habitats and constitute a main source of biological diversity on the planet. Yet, it is very costly and labor intensive to monitor forests by traditional means and classical remote sensing technologies restrict the analysis to the regional level. To overcome these challenges there have been several attempts to use UAV-borne imagery in forest monitoring. By the use of drones images can be obtained at low cost and can be associated with both, high spatial and temporal resolution. This enables scientists and practitioners to comprehensively monitor forest environments. In this paper we present our results of an experiment exploring the influence of spatial resolution of RGB imagery, artificially derived vegetation indices as well as seasonal parameters on the accuracy of tree species classification within the Marburg OpenForest. We used a resolution of 10, 15, and 25 cm in a forward-feature-selection based on the Random Forest classification algorithm. Additionally we tested the obtained accuracy when only mono-temporal or multi-temporal variables are included as well as both types of variables. Our results show that accuracy is prone to errors in pixel georeferencing and tree location. Object-based classification methods might lead to higher classification accuracies, but the construction of balanced training dataset is of preliminary importance and needs further improvement for our study area."
 
 ---
 
@@ -127,8 +127,8 @@ hyperspectral images for tree delineation and classification in subtropical rain
 and achieved and Kappa score of 0.7 (overall accuracy of 72.4%) by combining spectral
 raw data, indices as well as structural parameters in the classification process using 
 a support-vector machine. @Richardson2009 proved, that simple RGB images can 
-contribute to seasonally differntiate tree green-up and senescence
-in different forest envrionments.
+contribute to seasonally differentiate tree green-up and senescence
+in different forest environments.
 
 However, little efforts have been done to structurally investigate the impact of decreasing
 spatial resolution on the classification accuracy as well as the impact of
@@ -166,7 +166,7 @@ of mono- vs. multi-temporal input data.
 
 ## Study Area
 
-The study area is located at 50.8°N 8.7°E in the German low mountain range in Hesse.
+The study area is located at 50.8°N 8.7°E in the German low mountain range in Hessen.
 It is part of the University Forest Caldern where the recently initiated joint research
 project Natur 4.0 aims at investigating the use of networked sensor technology for 
 biodiversity and ecosystem management and protection. It is in this context, that the aerial images 
@@ -225,7 +225,7 @@ Sparse cloud filtering was performed under the following settings:
 - gradual selection: reprojection error: 0.26; reconstruction uncertainty: 189.461; 
 projection accuracy: 12.4621; reconstruction uncertainty: 6.72951; reprojection error: 0.122199
 
-```{r dates-table, tab.cap="Days of UAV overpass.",}
+```{r dates-table, tab.cap="Days of UAV overpass."}
 dates = unique(readRDS("../../data/resampled/dates.rds"))
 dates = as.Date(dates, format = "%Y_%m_%d" )
 dates = data.frame(Dates=dates)
@@ -252,11 +252,11 @@ In total we worked on 6 images which were obtained between the end of April to
 the end of June (see Table 1). In the mid latitudes of central Europe these are the 
 months of vegetational peak of mixed forests.
 However, it must be noted, that the images provided by the Nature 4.0 project 
-showed a rather large margin of error when it comes to the accuracy of georefferencing. 
+showed a rather large margin of error when it comes to the accuracy of georeferencing 
 Therefore, a number of locations in the images are not optimally overlaid, 
 which leads to image distortions. The following figure shows the image distortion 
 for a sample location. This location is not included in our study area, where we suggest
-the difference of loclizations to be much smaller than in the image below. However,
+the difference of localization to be much smaller than in the image below. However,
 we could not exclude the influence of these distortions completely. 
 
 ```{r Image distortion, echo=F, message=F, warning=F, fig.cap="Display of the image distortion in the data basis (The car as well as the rectangle form on the right of the image are visible multiple times at slightly different locations due to the construction of the mesh).", out.width="60%"}
@@ -279,7 +279,7 @@ of greater trees would cover the smaller ones and thus they could not be observe
 on aerial images from above the crown surface. Secondly, we buffered the central 
 positions of the residual trees by a square of 2 x 2 m, assuming that with this
 size we would essentially cover substantial proportions of the associated tree 
-crown (**Fig. 1**). However, some of these buffered polygons intersected. 
+crown (Fig. 1). However, some of these buffered polygons intersected. 
 In these cases, we decided to exclude both intersecting polygons since any 
 decision to keep one over the other would be arbitrary. In the end, we obtained 
 `r nrow(trees@data)` tree individuals of which `r length(which(trees$specID == "BUR"))` 
@@ -402,8 +402,6 @@ Concerning the frequency of the seasonal predictor variables both tree species
 are characterized by a very similar distribution (Fig. 4), however, we see that
 we have a substantially higher number of pixels classified as _fagus sylvatica_ in 
 total.  
-
-
 
 ```{r example_seasonal_plots, echo=F, warning=F, message=F, fig.cap="Exampalary histogramm plot of seasonal parameters for RCC by tree species at 25 cm resolution."}
 
@@ -584,7 +582,7 @@ is of great importance. Also, seasonal parameters of the TGI appear three times.
 Looking at the explanatory share for models calculated using a combination of 
 mono-temporal and seasonal indices, it is noticeable that significantly more 
 mono-temporal predictors are important than seasonal predictors. Furthermore, 
-it can be seen that the importanve of mono-temporal predictors for model 
+it can be seen that the importance of mono-temporal predictors for model 
 explanation changes in comparison to Figure 7. However, it is observed that the 
 GCC index of April 29th is of higher importance compared to the mono-temporal 
 predictors models only. In addition, completely different predictors, 
@@ -748,7 +746,7 @@ only based on RGB data even in more complex forest environments [@Fricker2019; @
 Additionally, sources of error in the imagery can have a significant influence on
 the outcome of a classification process. The images used in this study
 are prone to a number of sources of errors. Firstly, we observed inconsistencies 
-in the process of georefferencing the images which led to rather large image distortions (Fig. 2). 
+in the process of georeferencing the images which led to rather large image distortions (Fig. 2). 
 In dense canopy structures, such as our study area, the generation of tie points
 to correctly match objects from different images, is a function
 of flight path and height as well as the chosen sensor and can lead to very
