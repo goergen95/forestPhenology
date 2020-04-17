@@ -345,7 +345,7 @@ indicating the mean value (points) as well as +/- one standard deviation from th
 (vertical bars) based on all pixels within the respective tree polygons per class. The trajectories are very
 similar for both classes, however, for almost all VIs there are substantial differences
 between the classes during the first few observations from April to May. We also
-see, that bettwen the 16th of May and the 5th of June, we have a relativly large
+see, that bettwen the 16th of May and the 5th of June, we have a relatively large
 period with no observations.
 
 ```{r predictor_plots_indices, echo=F, message=F, warning=F, fig.cap="Temporal dynamic of calculated VIs over the course of the year by tree species at 25 cm resolution (points represent the average value, the bars represent +/- one standard deviation)."}
@@ -754,8 +754,8 @@ in the process of georeferencing the images which led to rather large image dist
 In dense canopy structures, such as our study area, the generation of tie points
 to correctly match objects from different images, is a function
 of flight path and height as well as the chosen sensor and can lead to very
-high margins of error in the localozation of pixels [@Fraser2018a]. Another related issue are the differences 
-in illumination and viewing geometry bettween several overflights, which seriously limit the comparability
+high margins of error in the localization of pixels [@Fraser2018a]. Another related issue are the differences 
+in illumination and viewing geometry between several overflights, which seriously limit the comparability
 of images from different days or even different paths [@Fraser2018a; @Fricker2019; @Sonnentag2012].
 Also, the frequency of overflights is quite high for April and May, however, it
 is reduced between Mid-May to the end of June, leading to a lower sampling
@@ -774,7 +774,7 @@ the incorporation of mono- and seasonal-predictors, still have the potential
 to highlight valid insights. Models trained with both mono-temporal and seasonal
 indices performed best overall closely followed by models trained with mono-temporal 
 indices. Thus leading us to the conclusion, that mono-temporal predictors 
-are more important than seasonal predictors but a combination of both positivley increase the 
+are more important than seasonal predictors but a combination of both positively increase the 
 model performance. A reason for the rather poor performance of the 
 seasonal parameters might be the temporal resolution of available UAV overpasses. 
 It is possible that with low-frequency observation flights, the important development processes 
