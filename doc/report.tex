@@ -30,7 +30,7 @@
 \usepackage{hyperref}
 \hypersetup{
             pdftitle={UAV imagery based tree species classification in the Marburg OpenForest},
-            pdfauthor={Darius A. Görgen; Tobias Koch; Marvin Müsgen; Eike Schott},
+            pdfauthor={Darius Görgen (*******); Tobias Koch (*******); Marvin Müsgen (*******); Eike Schott (*******)},
             pdfborder={0 0 0},
             breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
@@ -80,8 +80,8 @@
 \usepackage{xcolor}
 
 \title{UAV imagery based tree species classification in the Marburg OpenForest}
-\author{Darius A. Görgen \and Tobias Koch \and Marvin Müsgen \and Eike Schott}
-\date{April 16, 2020}
+\author{Darius Görgen (*******) \and Tobias Koch (*******) \and Marvin Müsgen (*******) \and Eike Schott (*******)}
+\date{April 17, 2020}
 
 \begin{document}
 \maketitle
@@ -104,10 +104,13 @@ classification within the Marburg OpenForest. We used a resolution of
 Forest classification algorithm. Additionally we tested the obtained
 accuracy when only mono-temporal or multi-temporal variables are
 included as well as both types of variables. Our results show that
-accuracy is prone to errors in pixel georeferrencing and tree location.
+accuracy is prone to errors in pixel georeferencing and tree location.
 Object-based classification methods might lead to higher classification
-accuracies, but the construction of balanced traning dataset is of
-preelminary importance and needs further improvment for our study area.
+accuracies, but the construction of balanced training dataset is of
+preliminary importance and needs further improvement for our study area,
+where we yield to an overall accuracy of 64.8\% for a pixel-wise
+classification based on a combination of mono-temporal and seasonal
+predictors.
 \end{abstract}
 
 {
@@ -215,8 +218,8 @@ achieved and Kappa score of 0.7 (overall accuracy of 72.4\%) by
 combining spectral raw data, indices as well as structural parameters in
 the classification process using a support-vector machine. Richardson et
 al. (2009) proved, that simple RGB images can contribute to seasonally
-differntiate tree green-up and senescence in different forest
-envrionments.
+differentiate tree green-up and senescence in different forest
+environments.
 
 However, little efforts have been done to structurally investigate the
 impact of decreasing spatial resolution on the classification accuracy
@@ -261,7 +264,7 @@ as well as the importance of mono- vs.~multi-temporal input data.
 \subsection{Study Area}\label{study-area}}
 
 The study area is located at 50.8°N 8.7°E in the German low mountain
-range in Hesse. It is part of the University Forest Caldern where the
+range in Hessen. It is part of the University Forest Caldern where the
 recently initiated joint research project Natur 4.0 aims at
 investigating the use of networked sensor technology for biodiversity
 and ecosystem management and protection. It is in this context, that the
@@ -371,11 +374,11 @@ April to the end of June (see Table 1). In the mid latitudes of central
 Europe these are the months of vegetational peak of mixed forests.
 However, it must be noted, that the images provided by the Nature 4.0
 project showed a rather large margin of error when it comes to the
-accuracy of georefferencing. Therefore, a number of locations in the
+accuracy of georeferencing Therefore, a number of locations in the
 images are not optimally overlaid, which leads to image distortions. The
 following figure shows the image distortion for a sample location. This
 location is not included in our study area, where we suggest the
-difference of loclizations to be much smaller than in the image below.
+difference of localization to be much smaller than in the image below.
 However, we could not exclude the influence of these distortions
 completely.
 
@@ -403,10 +406,10 @@ crowns of greater trees would cover the smaller ones and thus they could
 not be observed on aerial images from above the crown surface. Secondly,
 we buffered the central positions of the residual trees by a square of 2
 x 2 m, assuming that with this size we would essentially cover
-substantial proportions of the associated tree crown (\textbf{Fig. 1}).
-However, some of these buffered polygons intersected. In these cases, we
-decided to exclude both intersecting polygons since any decision to keep
-one over the other would be arbitrary. In the end, we obtained 161 tree
+substantial proportions of the associated tree crown (Fig. 1). However,
+some of these buffered polygons intersected. In these cases, we decided
+to exclude both intersecting polygons since any decision to keep one
+over the other would be arbitrary. In the end, we obtained 161 tree
 individuals of which 92 (57\%) were \emph{fagus sylvatica} and 69 (43\%)
 were \emph{quercus robur}.
 
@@ -461,8 +464,8 @@ deviation from the mean (vertical bars) based on all pixels within the
 respective tree polygons per class. The trajectories are very similar
 for both classes, however, for almost all VIs there are substantial
 differences between the classes during the first few observations from
-April to May. We also see, that bettwen the 16th of May and the 5th of
-June, we have a relativly large period with no observations.
+April to May. We also see, that between the 16th of May and the 5th of
+June, we have a relatively large period with no observations.
 
 \begin{figure}[H]
 
@@ -527,45 +530,52 @@ indicating percentages below 100\%.
 \hypertarget{results}{%
 \section{Results}\label{results}}
 
-Figure 5 shows that all models, excluding the model at a 25cm resolution
-including all variables, regardless of the use of seasonal and
-vegetation indices and resolution, show an OA below 0.65. The OA
-increases for all predictor combinations with an increase in spatial
-resolution. The comparison shows that the models calculated exclusively
-with mono-temporal indices show a substantially higher OA than the
-models calculated exclusively with seasonal indices
-(\textasciitilde{}3\%). The inclusion of both, mono- temporal and
-seasonal parameters, increases the OA at a rate of about 1\%.
+Figure 5 shows that all models regardless of the predictor combination
+and resolution, show an averaged OA across all folds below 65\%. The
+averaged OA slightly increases for all predictor combinations with a
+decrease in the spatial resolution, yielding to the highest accuracies
+at a resoultion of 25 cm. The comparison reveals that the models
+calculated exclusively with mono-temporal indices show a substantially
+higher OA than the models calculated exclusively with seasonal indices
+(\textasciitilde{}3\%). The inclusion of both, mono-temporal and
+seasonal parameters, increases the OA at a rate of about
+\textasciitilde{}1\%. For the 15 cm resoultion, we observe that for all
+predictor combinations the margin between the folds of the
+cross-validation is the largest, ranging between 55\% to 74.8\%. The
+margin of accuracies across the folds is the smallest at a resolution of
+25 cm for all predictor combinations.
 
 \begin{figure}[H]
 
-{\centering \includegraphics[width=0.6\linewidth]{report_files/figure-latex/result_plots-1} 
+{\centering \includegraphics[width=0.8\linewidth]{report_files/figure-latex/result_plots-1} 
 
 }
 
-\caption{Overall accuracy of the random forest models based varying pixel sizes and predictor variables (green - mono-temporal indices, blue - seasonal indices, red - mono-temporal and seasonal indices)}\label{fig:result_plots}
+\caption{Overall accuracy of the 5-fold cross-validation based on varying pixel sizes and predictor variables (green - mono-temporal indices, blue - seasonal indices, red - mono-temporal and seasonal indices)}\label{fig:result_plots}
 \end{figure}
 
-Figure 6 shows the percentage of the pseudo-objects classified as the
-correct species based on the majority of pixels within its boundaries.
-It is clearly shown that, regardless of the variables used, the accuracy
-of pseudo-object classification increases from a resolution of 10 cm to
-a resolution of 15 cm. The resolution of 20cm, on contrast, has either a
-negative effect or not effect at all on the accuracy for all models. It
-is striking that the models where mono-temporal and seasonal indices
-were used in combination had the lowest accuracy in object
-classification but achieved the highest OA on a pixels basis (Figure 5).
+Figure 6 shows the OA of the pseudo-objects classified as the correct
+species based on the majority of pixels within its boundaries. It is
+clearly shown that, regardless of the variables used, the accuracy of
+pseudo-object classification increases from a resolution of 10 cm to a
+resolution of 15 cm. At a resolution of 20 cm, on contrast, we either
+observe a negative effect or no effect at all on the OA of the models.
+Especially for mono-temporal predictors, we observe an decrease of OA
+from 94.8\% to 89.1\% (-5.7\%). It is alos evident from the figure that
+the models where a combination of mono-temporal and seasonal indices
+were used had the lowest accuracy in an object-based classification but
+achieved the highest OA on a pixels basis (Figure 5).
 
 \begin{figure}[H]
 
-{\centering \includegraphics[width=0.6\linewidth]{report_files/figure-latex/validation_plots-1} 
+{\centering \includegraphics[width=0.8\linewidth]{report_files/figure-latex/validation_plots-1} 
 
 }
 
 \caption{Overall Accuracy of species classification on an pseudo-object basis.}\label{fig:validation_plots}
 \end{figure}
 
-Figures 7, 8 and 9 show the predictors and their explanatory portions
+Figures 7 and 8 show the predictors and their relative explanatory power
 for the models with mono-temporal indices, seasonal indices and both
 variable types in combination. The explanation percentages of the
 individual predictors were calculated from the respective models.
@@ -578,19 +588,19 @@ Figure 8 shows that the RCC index is of great importance. Also, seasonal
 parameters of the TGI appear three times.
 
 Looking at the explanatory share for models calculated using a
-combination of mono-temporal and seasonal indices, it is noticeable that
-significantly more mono-temporal predictors are important than seasonal
-predictors. Furthermore, it can be seen that the importanve of
-mono-temporal predictors for model explanation changes in comparison to
-Figure 7. However, it is observed that the GCC index of April 29th is of
-higher importance compared to the mono-temporal predictors models only.
-In addition, completely different predictors, irrespective of whether
-they are mono-temporal or seasonal, have an influence on the model
-explanation than in the models with exclusively mono-temporal or
-seasonal predictors. The importance of predictors for June 5th, however,
-remains also in the combination models. The situation is similar for the
-GCC, RCC and VVI indices, which are more frequently present as high
-importance explanatory variables than other indices.
+combination of mono-temporal and seasonal indices (Fig. 8), it is
+noticeable that significantly more mono-temporal predictors are
+important than seasonal predictors. Furthermore, it can be seen that the
+importance of mono-temporal predictors for model explanation changes in
+comparison to Figure 7. However, it is observed that the GCC index of
+April 29th is of higher importance compared to the mono-temporal
+predictors models only. In addition, completely different predictors,
+irrespective of whether they are mono-temporal or seasonal, have an
+influence on the model explanation than in the models with exclusively
+mono-temporal or seasonal predictors. The importance of predictors for
+June 5th, however, remains also in the combination models. The situation
+is similar for the GCC, RCC and VVI indices, which are more frequently
+present as high importance explanatory variables than other indices.
 
 \begin{figure}[H]
 
@@ -614,14 +624,15 @@ importance explanatory variables than other indices.
 \section{Discussion \& Conclusion}\label{discussion-conclusion}}
 
 By combining mono-temporal and seasonal parameters we were able to
-achieve an OA accuracy of 64.8\% at a spatial resolution of 25 cm. It
-seems that the spatial aggregation of RGB information into coarser
-resolutions can help to correctly identify tree species. On a
-pseudo-object based level, without incorporating a true crown
-delineation, we achieved an maximum OA of 97.1 \%. On a pixel basis, we
-achieve slightly lower OA compared to other studies, conducting similar
-research in distinct forest environments of the world (Fricker et al.,
-2019; Natesan et al., 2019; Onishi and Ise, 2018; Sothe et al., 2019).
+achieve an OA of 64.8\% at a spatial resolution of 25 cm. It seems that
+the spatial aggregation of RGB information into coarser resolutions can
+help to correctly identify tree species. On a pseudo-object based level,
+without incorporating a true crown delineation, we achieved an maximum
+OA of 97.1 \%. On a pixel basis, we achieve slightly lower OA compared
+to other studies, conducting similar research in distinct forest
+environments of the world (Fricker et al., 2019; Natesan et al., 2019;
+Onishi and Ise, 2018; Sothe et al., 2019).
+
 Onishi and Ise (2018) achieved an OA of 83.1 \% by incorporating a tree
 crown segmentation and training the GoogLeNet neural-network with six
 different tree species in a forest stand in the warm and humid climate
@@ -636,8 +647,10 @@ America and report an F-Score of 64 \% for RGB predictors only to
 differentiate 10 tree species. Natesan et al. (2019) trained a residual
 network on RGB based predictors to classify between pine trees and
 non-pine trees in a tree crown segmented image and achieved an OA of 80
-\%. When comparing our results to other studies, we have to note that
-our study area is of less complexity, than for example tropical or
+\%.
+
+When comparing our results to other studies, we have to note that our
+study area is of less complexity, than for example tropical or
 sub-tropical forests. We only have two different species in our area and
 the training data set is slightly unbalanced towards the class of
 \emph{fagus sylvatica}. This can contribute to an over-classification of
@@ -656,14 +669,14 @@ et al., 2019).
 Additionally, sources of error in the imagery can have a significant
 influence on the outcome of a classification process. The images used in
 this study are prone to a number of sources of errors. Firstly, we
-observed inconsistencies in the process of georefferencing the images
+observed inconsistencies in the process of georeferencing the images
 which led to rather large image distortions (Fig. 2). In dense canopy
 structures, such as our study area, the generation of tie points to
 correctly match objects from different images, is a function of flight
 path and height as well as the chosen sensor and can lead to very high
-margins of error in the localozation of pixels (Fraser and Congalton,
+margins of error in the localization of pixels (Fraser and Congalton,
 2018). Another related issue are the differences in illumination and
-viewing geometry bettween several overflights, which seriously limit the
+viewing geometry between several overflights, which seriously limit the
 comparability of images from different days or even different paths
 (Fraser and Congalton, 2018; Fricker et al., 2019; Sonnentag et al.,
 2012). Also, the frequency of overflights is quite high for April and
@@ -685,7 +698,7 @@ to highlight valid insights. Models trained with both mono-temporal and
 seasonal indices performed best overall closely followed by models
 trained with mono-temporal indices. Thus leading us to the conclusion,
 that mono-temporal predictors are more important than seasonal
-predictors but a combination of both positivley increase the model
+predictors but a combination of both positively increase the model
 performance. A reason for the rather poor performance of the seasonal
 parameters might be the temporal resolution of available UAV overpasses.
 It is possible that with low-frequency observation flights, the

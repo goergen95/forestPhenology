@@ -13,16 +13,16 @@ header-includes:
 bibliography: ["ForestPhenology.bib", "r-bib.bib"] 
 csl: elsevier-harvard.csl
 nocite: |
-@Broge2001, @Gobron2000, @Wan2018, @Rowan2003, @Laboratory2015, @Sonnentag2012, @Richardson2009, @Hunt2012
+  @Broge2001, @Gobron2000, @Wan2018, @Rowan2003, @Laboratory2015, @Sonnentag2012, @Richardson2009, @Hunt2012
 title: "UAV imagery based tree species classification in the Marburg OpenForest"
 author: 
-- Darius A. Görgen
-- Tobias Koch
-- Marvin Müsgen
-- Eike Schott
+- Darius Görgen (*******)
+- Tobias Koch (*******)
+- Marvin Müsgen (*******)
+- Eike Schott (*******)
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 
-abstract: "The monitoring of forests environments is of crucial importance since they serve as natural habitats and constitute a main source of biological diversity on the planet. Yet, it is very costly and labor intensive to monitor forests by traditional means and classical remote sensing technologies restrict the analysis to the regional level. To overcome these challenges there have been several attempts to use UAV-borne imagery in forest monitoring. By the use of drones images can be obtained at low cost and can be associated with both, high spatial and temporal resolution. This enables scientists and practitioners to comprehensively monitor forest environments. In this paper we present our results of an experiment exploring the influence of spatial resolution of RGB imagery, artificially derived vegetation indices as well as seasonal parameters on the accuracy of tree species classification within the Marburg OpenForest. We used a resolution of 10, 15, and 25 cm in a forward-feature-selection based on the Random Forest classification algorithm. Additionally we tested the obtained accuracy when only mono-temporal or multi-temporal variables are included as well as both types of variables. Our results show that accuracy is prone to errors in pixel georeferencing and tree location. Object-based classification methods might lead to higher classification accuracies, but the construction of balanced training dataset is of preliminary importance and needs further improvement for our study area."
+abstract: "The monitoring of forests environments is of crucial importance since they serve as natural habitats and constitute a main source of biological diversity on the planet. Yet, it is very costly and labor intensive to monitor forests by traditional means and classical remote sensing technologies restrict the analysis to the regional level. To overcome these challenges there have been several attempts to use UAV-borne imagery in forest monitoring. By the use of drones images can be obtained at low cost and can be associated with both, high spatial and temporal resolution. This enables scientists and practitioners to comprehensively monitor forest environments. In this paper we present our results of an experiment exploring the influence of spatial resolution of RGB imagery, artificially derived vegetation indices as well as seasonal parameters on the accuracy of tree species classification within the Marburg OpenForest. We used a resolution of 10, 15, and 25 cm in a forward-feature-selection based on the Random Forest classification algorithm. Additionally we tested the obtained accuracy when only mono-temporal or multi-temporal variables are included as well as both types of variables. Our results show that accuracy is prone to errors in pixel georeferencing and tree location. Object-based classification methods might lead to higher classification accuracies, but the construction of balanced training dataset is of preliminary importance and needs further improvement for our study area, where we yield to an overall accuracy of 64.8% for a pixel-wise classification based on a combination of mono-temporal and seasonal predictors."
 
 ---
 
@@ -345,7 +345,7 @@ indicating the mean value (points) as well as +/- one standard deviation from th
 (vertical bars) based on all pixels within the respective tree polygons per class. The trajectories are very
 similar for both classes, however, for almost all VIs there are substantial differences
 between the classes during the first few observations from April to May. We also
-see, that bettwen the 16th of May and the 5th of June, we have a relatively large
+see, that between the 16th of May and the 5th of June, we have a relatively large
 period with no observations.
 
 ```{r predictor_plots_indices, echo=F, message=F, warning=F, fig.cap="Temporal dynamic of calculated VIs over the course of the year by tree species at 25 cm resolution (points represent the average value, the bars represent +/- one standard deviation)."}
@@ -474,17 +474,21 @@ explanation power, thus indicating percentages below 100%.
 # Results
 
 
-Figure 5 shows that all models, excluding the model at a 25cm resolution including
-all variables, regardless of the use of seasonal and vegetation indices and 
-resolution, show an OA below 0.65. 
-The OA increases for all predictor combinations with an increase in spatial resolution. 
-The comparison shows that the models calculated exclusively with 
-mono-temporal indices show a substantially higher OA than the models 
-calculated exclusively with seasonal indices (~3%). The inclusion of both, mono-
-temporal and seasonal parameters, increases the OA at a rate of about 1%.
+Figure 5 shows that all models regardless of the predictor combination and 
+resolution, show an averaged OA across all folds below 65%. 
+The averaged OA slightly increases for all predictor combinations with a decrease 
+in the spatial resolution, yielding to the highest accuracies at a resoultion of 25 cm. 
+The comparison reveals that the models calculated exclusively with mono-temporal 
+indices show a substantially higher OA than the models calculated exclusively with 
+seasonal indices (~3%). The inclusion of both, mono-temporal and seasonal parameters, 
+increases the OA at a rate of about ~1%. 
+For the 15 cm resoultion, we observe that for all predictor combinations the margin
+between the folds of the cross-validation is the largest, ranging between 55% to 74.8%.
+The margin of accuracies across the folds is the smallest at a resolution of 25 cm 
+for all predictor combinations. 
 
 
-```{r result_plots,  warning=F, message=F, fig.cap="Overall accuracy of the random forest models based varying pixel sizes and predictor variables (green - mono-temporal indices, blue - seasonal indices, red - mono-temporal and seasonal indices)", out.width="60%"}
+```{r result_plots,  warning=F, message=F, fig.cap="Overall accuracy of the 5-fold cross-validation based on varying pixel sizes and predictor variables (green - mono-temporal indices, blue - seasonal indices, red - mono-temporal and seasonal indices)", out.width="80%"}
 
 models = list.files("../results", pattern = "\\.rds$", full.names = T)
 
@@ -502,10 +506,12 @@ getModelMetric <- function(model, metric){
   besthyper = as.numeric(model$bestTune)
   if (!metric %in% c("Kappa", "Accuracy")) stop("chosen metric not valid.")
   if (metric == "Kappa"){
-    metricVal = model$results$Kappa[which(model$results$mtry == besthyper)]}
+    metricVals = model$resample$Kappa
+  }
   if (metric == "Accuracy"){
-    metricVal = model$results$Accuracy[which(model$results$mtry == besthyper)]}
-  df_return = data.frame(resolution=res, type=type, metric=metricVal)
+    metricVals = model$resample$Accuracy
+  }
+  df_return = data.frame(resolution=res, type=type, metric=metricVals)
   names(df_return)[3] = metric
   return(df_return)
 }
@@ -519,26 +525,31 @@ getModelMetric <- function(model, metric){
 
 
 accuracies = do.call("rbind", lapply(models, getModelMetric, metric="Accuracy"))
+accuracies %<>%
+  group_by(resolution, type) %>%
+  summarise(ymin = min(Accuracy), ymax = max(Accuracy), y = mean(Accuracy))
+accuracies$type = factor(accuracies$type, c("all", "indices", "season") )
 
 ggplot(data = accuracies, aes(x=resolution)) +
-  geom_point(aes(y=Accuracy, shape=type, col=type), size=3)+
+  geom_pointrange(aes(col=type, ymin=ymin, ymax=ymax, y = y, shape = type),position=position_dodge(width=0.20)) +
   ylab("Overall accuracy") +
   xlab("Spatial resolution")+
   theme_minimal()
 
 ```
 
-Figure 6 shows the percentage of the pseudo-objects classified as 
+Figure 6 shows the OA of the pseudo-objects classified as 
 the correct species based on the majority of pixels within its boundaries. 
 It is clearly shown that, regardless of the variables used, 
 the accuracy of pseudo-object classification increases from a resolution of 10 cm to a 
-resolution of 15 cm. The resolution of 20cm, on contrast, has either a negative effect 
-or not effect at all on the accuracy for all models. It is striking that the models 
-where mono-temporal and seasonal indices were used in combination had the 
-lowest accuracy in object classification but achieved the highest OA 
-on a pixels basis (Figure 5).
+resolution of 15 cm. At a resolution of 20 cm, on contrast, we either observe a negative effect 
+or no effect at all on the OA of the models. Especially for mono-temporal predictors, 
+we observe an decrease of OA from 94.8% to 89.1% (-5.7%). 
+It is alos evident from the figure that the models where a combination of mono-temporal and 
+seasonal indices were used had the lowest accuracy in an object-based classification 
+but achieved the highest OA on a pixels basis (Figure 5).
 
-```{r validation_plots, warning=F, message=F, fig.cap="Overall Accuracy of species classification on an pseudo-object basis.", out.width="60%"}
+```{r validation_plots, warning=F, message=F, fig.cap="Overall Accuracy of species classification on an pseudo-object basis.", out.width="80%"}
 predictions = readRDS("../../results/validation_pred.rds")
 index = predictions$index
 
@@ -568,8 +579,8 @@ ggplot(data = results, aes(x=resolution)) +
 ```
 
 
-Figures 7, 8 and 9 show the predictors and their 
-explanatory portions for the models with mono-temporal indices, seasonal indices 
+Figures 7 and 8 show the predictors and their relative
+explanatory power for the models with mono-temporal indices, seasonal indices 
 and both variable types in combination. The explanation percentages of the 
 individual predictors were calculated from the respective models. 
 
@@ -580,7 +591,7 @@ predictors are used for model calculation, Figure 8 shows that the RCC index
 is of great importance. Also, seasonal parameters of the TGI appear three times.
 
 Looking at the explanatory share for models calculated using a combination of 
-mono-temporal and seasonal indices, it is noticeable that significantly more 
+mono-temporal and seasonal indices (Fig. 8), it is noticeable that significantly more 
 mono-temporal predictors are important than seasonal predictors. Furthermore, 
 it can be seen that the importance of mono-temporal predictors for model 
 explanation changes in comparison to Figure 7. However, it is observed that the 
@@ -714,12 +725,13 @@ grid.arrange(plt1, plt2, ncol = 2)
 # Discussion & Conclusion
 
 By combining mono-temporal and seasonal parameters we were able to achieve an
-OA accuracy of 64.8% at a spatial resolution of 25 cm. It seems that the 
+OA of 64.8% at a spatial resolution of 25 cm. It seems that the 
 spatial aggregation of RGB information into coarser resolutions can help 
 to correctly identify tree species. On a pseudo-object based level,
 without incorporating a true crown delineation, we achieved an maximum OA of 97.1 %.
 On a pixel basis, we achieve slightly lower OA compared to other studies, conducting similar
 research in distinct forest environments of the world [@Onishi2018a; @Sothe2019a; @Fricker2019; @Natesan2019].
+
 @Onishi2018a achieved an OA of 83.1 % by incorporating a tree crown segmentation
 and training the GoogLeNet neural-network with six different tree species in 
 a forest stand in the warm and humid climate close to Kyoto, Japan.
@@ -733,6 +745,7 @@ Northern America and report an F-Score of 64 % for RGB predictors only to differ
 @Natesan2019 trained a residual network on RGB based predictors to classify between
 pine trees and non-pine trees in a tree crown segmented image and achieved an OA
 of 80 %.
+
 When comparing our results to other studies, we have to note that our study area
 is of less complexity, than for example tropical or sub-tropical forests. We only
 have two different species in our area and the training data set is slightly 
