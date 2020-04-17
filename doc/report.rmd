@@ -13,7 +13,7 @@ header-includes:
 bibliography: ["ForestPhenology.bib", "r-bib.bib"] 
 csl: elsevier-harvard.csl
 nocite: |
-  @Broge2001, @Gobron2000, @Wan2018, @Rowan2003, @Laboratory2015, @Sonnentag2012, @Richardson2009, @Hunt2012
+@Broge2001, @Gobron2000, @Wan2018, @Rowan2003, @Laboratory2015, @Sonnentag2012, @Richardson2009, @Hunt2012
 title: "UAV imagery based tree species classification in the Marburg OpenForest"
 author: 
 - Darius A. Görgen
@@ -386,7 +386,7 @@ ggplot(ind, aes(x=date, y=value, col=species)) +
                fun.ymax = max_sd,
                geom = "pointrange",
                alpha = .5) +
-   stat_summary(fun.y = mean,
+  stat_summary(fun.y = mean,
                geom = "line",
                alpha = .7) +
   theme_minimal()+
@@ -520,11 +520,11 @@ getModelMetric <- function(model, metric){
 
 accuracies = do.call("rbind", lapply(models, getModelMetric, metric="Accuracy"))
 
- ggplot(data = accuracies, aes(x=resolution)) +
-   geom_point(aes(y=Accuracy, shape=type, col=type), size=3)+
+ggplot(data = accuracies, aes(x=resolution)) +
+  geom_point(aes(y=Accuracy, shape=type, col=type), size=3)+
   ylab("Overall accuracy") +
   xlab("Spatial resolution")+
-   theme_minimal()
+  theme_minimal()
 
 ```
 
@@ -649,7 +649,8 @@ plt1 = varImpInd %>%
   mutate(variable = fct_reorder(variable, value)) %>%
   mutate(value = value / max(value) * 100) %>%
   ggplot(aes(x=variable, y=value))+
-  geom_bar(stat="identity", fill = "dodgerblue1")+
+  geom_point(color = "dodgerblue1", size = 2)+
+  geom_linerange(aes(ymin = 0, ymax = value), color = "dodgerblue1", linetype = 2) +
   theme_minimal()+
   theme(text = element_text(size=6))+
   coord_flip()+
@@ -663,7 +664,8 @@ plt2 = varImpSes %>%
   mutate(variable = fct_reorder(variable, value)) %>%
   mutate(value = value / max(value) * 100) %>%
   ggplot(aes(x=variable, y=value))+
-  geom_bar(stat="identity", fill = "dodgerblue1")+
+  geom_point(color = "dodgerblue1", size = 2)+
+  geom_linerange(aes(ymin = 0, ymax = value), color = "dodgerblue1", linetype = 2) +
   theme_minimal()+
   theme(text = element_text(size=6))+
   coord_flip()+
@@ -683,7 +685,8 @@ plt1 = varImpAll %>%
   mutate(variable = fct_reorder(variable, value)) %>%
   mutate(value = value / max(value) * 100) %>%
   ggplot(aes(x=variable, y=value))+
-  geom_bar(stat="identity", fill = "dodgerblue1")+
+  geom_point(aes(y = value), color = "dodgerblue1", size = 2)+
+  geom_linerange(aes(ymin = 0, ymax = value), color = "dodgerblue1", linetype = 2) +
   theme_minimal()+
   theme(text = element_text(size=6))+
   coord_flip()+
@@ -697,7 +700,8 @@ plt2 = metrics %>%
   mutate(variable = fct_reorder(variable, value)) %>%
   mutate(value = value / max(value) * 100) %>%
   ggplot(aes(x=variable, y=value))+
-  geom_bar(stat="identity", fill = "dodgerblue1")+
+  geom_point(aes(y = value), color = "dodgerblue1", size = 2)+
+  geom_linerange(aes(ymin = 0, ymax = value), color = "dodgerblue1", linetype = 2) +
   theme_minimal()+
   theme(text = element_text(size=6))+
   coord_flip()+
