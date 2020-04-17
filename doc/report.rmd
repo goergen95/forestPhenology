@@ -16,10 +16,10 @@ nocite: |
   @Broge2001, @Gobron2000, @Wan2018, @Rowan2003, @Laboratory2015, @Sonnentag2012, @Richardson2009, @Hunt2012
 title: "UAV imagery based tree species classification in the Marburg OpenForest"
 author: 
-- Darius Görgen (`r config::get(file = "config.yml")$darius`)
-- Tobias Koch (`r config::get(file = "config.yml")$tobi`)
-- Marvin Müsgen (`r config::get(file = "config.yml")$marvin`)
-- Eike Schott (`r config::get(file = "config.yml")$eike`)
+- Darius Görgen (`r try(config::get(file = "config.yml")$darius)`)
+- Tobias Koch (`r try(config::get(file = "config.yml")$tobi)`)
+- Marvin Müsgen (`r try(config::get(file = "config.yml")$marvin)`)
+- Eike Schott (`r try(config::get(file = "config.yml")$eike)`)
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 
 abstract: "The monitoring of forests environments is of crucial importance since they serve as natural habitats and constitute a main source of biological diversity on the planet. Yet, it is very costly and labor intensive to monitor forests by traditional means and classical remote sensing technologies restrict the analysis to the regional level. To overcome these challenges there have been several attempts to use UAV-borne imagery in forest monitoring. By the use of drones images can be obtained at low cost and can be associated with both, high spatial and temporal resolution. This enables scientists and practitioners to comprehensively monitor forest environments. In this paper we present our results of an experiment exploring the influence of spatial resolution of RGB imagery, artificially derived vegetation indices as well as seasonal parameters on the accuracy of tree species classification within the Marburg OpenForest. We used a resolution of 10, 15, and 25 cm in a forward-feature-selection based on the Random Forest classification algorithm. Additionally we tested the obtained accuracy when only mono-temporal or multi-temporal variables are included as well as both types of variables. Our results show that accuracy is prone to errors in pixel georeferencing and tree location. Object-based classification methods might lead to higher classification accuracies, but the construction of balanced training dataset is of preliminary importance and needs further improvement for our study area, where we yield to an overall accuracy of 64.8% for a pixel-wise classification based on a combination of mono-temporal and seasonal predictors."
